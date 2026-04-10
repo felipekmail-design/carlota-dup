@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Carlota DUP">
+<title>Carlota.DUP — Felipe Kuhlmann</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:#f4f4f0;font-family:'DM Sans',sans-serif;color:#111;}
+.app{max-width:480px;margin:0 auto;min-height:100vh;background:#f4f4f0;}
+.header{background:#111;padding:18px 20px 0;position:sticky;top:0;z-index:100;}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#fff;}
+.logo span{color:var(--zc,#dc2626);}
+.week-badge{font-family:'DM Mono',monospace;font-size:9px;color:#666;letter-spacing:2px;text-transform:uppercase;}
+.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{flex-shrink:0;padding:10px 14px;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:1px;cursor:pointer;border:none;background:transparent;color:#555;border-bottom:3px solid transparent;transition:all .2s;text-transform:uppercase;-webkit-appearance:none;}
+.tab.active{color:#fff;border-bottom:3px solid var(--zc,#dc2626);}
+.tab.prog-tab.active{border-bottom-color:#10b981;}
+.page{padding:20px;display:none;}
+.page.active{display:block;}
+.wk-title{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:4px;line-height:1;color:#111;margin-bottom:4px;}
+.wk-sub{font-size:13px;color:#888;margin-bottom:14px;}
+.zone-badge{display:inline-flex;align-items:center;padding:7px 14px;border-radius:6px;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;background:var(--zc);color:#fff;margin-bottom:16px;}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:22px;}
+.stat{background:#fff;border:1px solid #e0e0d8;border-radius:10px;padding:12px 8px;text-align:center;}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--zc);display:block;line-height:1.1;}
+.stat-lbl{font-family:'DM Mono',monospace;font-size:9px;color:#aaa;letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+.sec-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:#bbb;text-transform:uppercase;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #e4e4dc;}
+
+/* HISTORY PANEL */
+.hist-panel{background:#fff;border:1px solid #e0e0d8;border-radius:12px;margin-bottom:16px;overflow:hidden;}
+.hist-panel-hdr{width:100%;text-align:left;background:transparent;border:none;padding:14px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-appearance:none;touch-action:manipulation;}
+.hist-panel-hdr:active{background:rgba(0,0,0,.02);}
+.hist-label{font-family:‘DM Mono’,monospace;font-size:9px;letter-spacing:3px;color:#10b981;text-transform:uppercase;font-weight:500;}
+.hist-date{font-family:‘DM Mono’,monospace;font-size:10px;color:#bbb;}
+.hist-arrow{font-size:11px;color:#bbb;}
+.hist-body{display:none;border-top:1px solid #f0f0e8;padding:12px 16px 14px;}
+.hist-body.open{display:block;}
+.hist-ex{margin-bottom:12px;}
+.hist-ex:last-child{margin-bottom:0;}
+.hist-ex-name{font-size:12px;font-weight:600;color:#555;margin-bottom:6px;}
+.hist-sets{display:grid;grid-template-columns:26px 1fr 1fr;gap:5px;margin-bottom:2px;}
+.hist-col{font-family:‘DM Mono’,monospace;font-size:8px;letter-spacing:2px;color:#ccc;text-transform:uppercase;text-align:center;}
+.hist-row-data{display:grid;grid-template-columns:26px 1fr 1fr;gap:5px;margin-bottom:3px;align-items:center;}
+.hist-sn{font-family:‘Bebas Neue’,sans-serif;font-size:14px;color:#bbb;text-align:center;}
+.hist-val{font-family:‘DM Mono’,monospace;font-size:12px;color:#444;text-align:center;background:#f9f9f6;border-radius:5px;padding:5px 2px;font-weight:500;}
+.hist-val.empty{color:#ddd;}
+.hist-obs{font-size:11px;color:#aaa;margin-top:4px;font-style:italic;}
+.no-hist{text-align:center;padding:16px;color:#ccc;font-family:‘DM Mono’,monospace;font-size:11px;letter-spacing:1px;}
+
+/* EXERCISE */
+.ex-list{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.ex-card{background:#fff;border:1px solid #e0e0d8;border-radius:12px;overflow:hidden;}
+.ex-card.has-alert{border-left:4px solid #f59e0b;}
+.ex-card.is-primary{border-left:4px solid var(–zc);}
+.ex-toggle-btn{width:100%;text-align:left;background:transparent;border:none;padding:14px 16px 12px;cursor:pointer;display:block;-webkit-appearance:none;touch-action:manipulation;}
+.ex-toggle-btn:active{background:rgba(0,0,0,.02);}
+.ex-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.ex-num{font-family:‘DM Mono’,monospace;font-size:9px;letter-spacing:2px;color:#bbb;margin-bottom:4px;display:block;}
+.ex-name{font-size:14px;font-weight:700;color:#111;margin-bottom:8px;line-height:1.3;display:block;}
+.chips{display:flex;gap:6px;flex-wrap:wrap;}
+.chip{font-family:‘DM Mono’,monospace;font-size:10px;padding:3px 8px;border-radius:5px;background:#f4f4f0;color:#666;border:1px solid #e0e0d8;}
+.chip.z{background:var(–zc);color:#fff;border-color:var(–zc);}
+.arrow{flex-shrink:0;width:28px;height:28px;background:#f4f4f0;border:1px solid #e0e0d8;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;margin-top:2px;pointer-events:none;}
+.ex-note{font-size:11px;color:#777;line-height:1.5;margin-top:8px;display:block;text-align:left;}
+.alert-row{display:flex;gap:6px;margin-top:8px;padding:7px 10px;background:#fffbeb;border-radius:6px;border:1px solid #fcd34d;font-size:11px;color:#92400e;font-weight:500;line-height:1.4;text-align:left;}
+.log-body{border-top:1px solid #eeeee8;padding:14px 16px 16px;background:#fafaf7;display:none;}
+.log-body.open{display:block;}
+.log-cols{display:grid;grid-template-columns:26px 1fr 1fr 38px;gap:6px;margin-bottom:8px;}
+.col-h{font-family:‘DM Mono’,monospace;font-size:9px;letter-spacing:2px;color:#bbb;text-transform:uppercase;text-align:center;}
+.set-row{display:grid;grid-template-columns:26px 1fr 1fr 38px;gap:6px;margin-bottom:6px;align-items:center;}
+.set-n{font-family:‘Bebas Neue’,sans-serif;font-size:16px;color:var(–zc);text-align:center;opacity:.65;}
+.inp{background:#fff;border:1.5px solid #e0e0d8;border-radius:7px;padding:10px 4px;font-family:‘DM Mono’,monospace;font-size:14px;color:#111;width:100%;text-align:center;outline:none;-webkit-appearance:none;font-weight:500;transition:border-color .2s;}
+.inp:focus{border-color:var(–zc);}
+.inp::placeholder{color:#ccc;font-size:11px;font-weight:400;}
+.inp.faded{opacity:.4;}
+.ok-btn{width:38px;height:42px;border-radius:7px;border:1.5px solid #e0e0d8;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#ccc;transition:all .2s;-webkit-appearance:none;touch-action:manipulation;}
+.ok-btn.done{background:var(–zc);border-color:var(–zc);color:#fff;}
+.obs{width:100%;margin-top:10px;background:#fff;border:1.5px solid #e0e0d8;border-radius:7px;padding:10px 12px;font-family:‘DM Sans’,sans-serif;font-size:12px;color:#444;resize:none;outline:none;height:52px;-webkit-appearance:none;}
+.obs::placeholder{color:#ccc;}
+.clear-btn{margin-top:8px;width:100%;padding:9px;background:transparent;border:1px solid #e0e0d8;border-radius:7px;font-family:‘DM Mono’,monospace;font-size:9px;color:#bbb;letter-spacing:1px;cursor:pointer;-webkit-appearance:none;touch-action:manipulation;}
+
+/* SEND */
+.send-wrap{margin-bottom:22px;}
+.send-btn{width:100%;padding:16px;background:#111;border:none;border-radius:12px;font-family:‘DM Mono’,monospace;font-size:11px;font-weight:500;letter-spacing:2px;color:#fff;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-appearance:none;touch-action:manipulation;}
+.send-btn:active{background:#333;transform:scale(.98);}
+.send-note{text-align:center;margin-top:8px;font-size:11px;color:#aaa;line-height:1.5;}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;display:none;align-items:flex-end;justify-content:center;}
+.overlay.open{display:flex;}
+.modal{background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 44px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;}
+.modal-title{font-family:‘Bebas Neue’,sans-serif;font-size:24px;letter-spacing:3px;color:#111;margin-bottom:6px;}
+.modal-sub{font-size:13px;color:#888;margin-bottom:16px;line-height:1.5;}
+.modal-preview{background:#f9f9f6;border:1px solid #e0e0d8;border-radius:10px;padding:14px;margin-bottom:16px;font-family:‘DM Mono’,monospace;font-size:11px;color:#555;line-height:1.7;white-space:pre-wrap;max-height:180px;overflow-y:auto;}
+.modal-btn{width:100%;padding:15px;border:none;border-radius:10px;font-family:‘DM Mono’,monospace;font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-bottom:8px;touch-action:manipulation;-webkit-appearance:none;text-align:center;display:block;text-decoration:none;line-height:1.4;}
+.modal-btn.gmail{background:#dc2626;color:#fff;}
+.modal-btn.copy{background:#10b981;color:#fff;}
+.modal-btn.cancel{background:#f4f4f0;color:#666;border:1px solid #e0e0d8;}
+.copied-msg{display:none;text-align:center;font-family:‘DM Mono’,monospace;font-size:11px;color:#10b981;margin-bottom:8px;letter-spacing:1px;}
+
+/* SCIENCE/TIP */
+.sci-box{background:#eef4ff;border:1px solid #c7dafb;border-radius:12px;padding:14px 16px;margin-bottom:14px;}
+.sci-lbl{font-family:‘DM Mono’,monospace;font-size:9px;letter-spacing:3px;color:#3b82f6;text-transform:uppercase;margin-bottom:6px;}
+.sci-txt{font-size:12px;color:#2c5282;line-height:1.6;}
+.tip-box{background:#fff;border:1px solid #e0e0d8;border-radius:12px;padding:14px 16px;margin-bottom:28px;}
+.tip-lbl{font-family:‘DM Mono’,monospace;font-size:9px;letter-spacing:3px;color:var(–zc);text-transform:uppercase;margin-bottom:6px;}
+.tip-txt{font-size:12px;color:#666;line-height:1.6;}
+
+/* PROGRESS */
+.prog-title{font-family:‘Bebas Neue’,sans-serif;font-size:42px;letter-spacing:4px;color:#111;line-height:1;margin-bottom:4px;}
+.prog-sub{font-size:13px;color:#888;margin-bottom:20px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:22px;}
+.kpi-card{background:#fff;border:1px solid #e0e0d8;border-radius:12px;padding:14px;}
+.kpi-lbl{font-family:‘DM Mono’,monospace;font-size:9px;letter-spacing:2px;color:#bbb;text-transform:uppercase;margin-bottom:4px;}
+.kpi-val{font-family:‘Bebas Neue’,sans-serif;font-size:26px;color:#111;line-height:1;}
+.kpi-d{font-family:‘DM Mono’,monospace;font-size:11px;margin-top:3px;font-weight:500;}
+.kpi-d.g{color:#10b981;}.kpi-d.r{color:#ef4444;}.kpi-d.n{color:#aaa;}
+.ci-card{background:#fff;border:1px solid #e0e0d8;border-radius:12px;padding:18px;margin-bottom:22px;}
+.ci-title{font-family:‘DM Mono’,monospace;font-size:10px;letter-spacing:3px;color:#10b981;text-transform:uppercase;margin-bottom:16px;font-weight:500;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.form-row.one{grid-template-columns:1fr;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-label{font-family:‘DM Mono’,monospace;font-size:9px;letter-spacing:2px;color:#aaa;text-transform:uppercase;}
+.form-inp{background:#f9f9f6;border:1.5px solid #e0e0d8;border-radius:8px;padding:11px 12px;font-family:‘DM Mono’,monospace;font-size:14px;color:#111;outline:none;-webkit-appearance:none;width:100%;font-weight:500;}
+.form-inp:focus{border-color:#10b981;background:#fff;}
+.form-inp::placeholder{color:#ccc;font-weight:400;}
+.save-btn{width:100%;margin-top:12px;padding:14px;background:#10b981;border:none;border-radius:8px;font-family:‘DM Mono’,monospace;font-size:11px;font-weight:500;letter-spacing:2px;color:#fff;text-transform:uppercase;cursor:pointer;-webkit-appearance:none;touch-action:manipulation;}
+.save-btn.purple{background:#7c3aed;}
+.save-msg{display:none;text-align:center;margin-top:8px;font-family:‘DM Mono’,monospace;font-size:11px;color:#10b981;letter-spacing:1px;}
+.chart-card{background:#fff;border:1px solid #e0e0d8;border-radius:12px;padding:16px;margin-bottom:14px;}
+.chart-title{font-family:‘DM Mono’,monospace;font-size:9px;letter-spacing:3px;color:#bbb;text-transform:uppercase;margin-bottom:14px;}
+.chart-wrap{position:relative;height:180px;}
+.hrow{display:grid;grid-template-columns:60px 1fr 1fr 1fr 32px;gap:6px;padding:10px 14px;align-items:center;border-bottom:1px solid #f0f0e8;}
+.hrow.hdr{background:#f9f9f6;}
+.hrow:last-child{border-bottom:none;}
+.hc{font-family:‘DM Mono’,monospace;font-size:10px;text-align:center;}
+.hc.lbl{color:#bbb;font-size:9px;text-transform:uppercase;}
+.hc.wk{color:#10b981;font-weight:500;}
+.hc.v{color:#333;font-weight:500;}
+.del-btn{width:28px;height:28px;background:transparent;border:1px solid #e0e0d8;border-radius:6px;color:#ccc;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-appearance:none;touch-action:manipulation;}
+.empty{text-align:center;padding:32px 20px;color:#bbb;font-size:13px;line-height:1.6;}
+.hrv-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px 16px;margin-bottom:22px;}
+.hrv-title{font-family:‘DM Mono’,monospace;font-size:9px;letter-spacing:3px;color:#10b981;text-transform:uppercase;margin-bottom:12px;}
+.hrv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.hrv-item{background:#fff;border-radius:8px;padding:10px 8px;text-align:center;border:1px solid #d1fae5;}
+.hrv-val{font-family:‘Bebas Neue’,sans-serif;font-size:22px;color:#10b981;line-height:1;display:block;}
+.hrv-lbl{font-family:‘DM Mono’,monospace;font-size:8px;color:#6ee7b7;letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+.hrv-badge{display:inline-flex;padding:5px 12px;border-radius:20px;font-family:‘DM Mono’,monospace;font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;margin-top:10px;}
+.hrv-badge.max{background:#dcfce7;color:#16a34a;}
+.hrv-badge.normal{background:#fef9c3;color:#a16207;}
+.hrv-badge.low{background:#fee2e2;color:#dc2626;}
+</style>
+
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-top">
+      <div class="logo">CARLOTA<span>.</span>DUP</div>
+      <div class="week-badge">FELIPE KUHLMANN · 4W</div>
+    </div>
+    <div class="tabs" id="tabs"></div>
+  </div>
+  <div id="pages"></div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-title">ENVIAR TREINO</div>
+    <div class="modal-sub">Prévia do registro — será salvo no histórico e enviado para a Carlota:</div>
+    <div class="modal-preview" id="modal-preview"></div>
+    <div class="copied-msg" id="copied-msg">✓ Copiado! Abra o Gmail e cole.</div>
+    <a class="modal-btn gmail" id="gmail-link" href="#" target="_blank" rel="noopener">📧 ABRIR GMAIL E ENVIAR</a>
+    <button class="modal-btn copy" onclick="copyContent()">📋 COPIAR CONTEÚDO</button>
+    <button class="modal-btn cancel" onclick="closeModal()">CANCELAR</button>
+  </div>
+</div>
+
+<script>
+const WK=[
+  {id:"PUSH-A",label:"PUSH A",title:"PUSH A",sub:"Peito · Ombro · Tríceps",zoneLabel:"💪 FORÇA",zc:"#dc2626",series:"5",reps:"4–6",rest:"2–3 min",
+   ex:[
+    {n:"01",name:"Supino Inclinado com Halteres",sets:5,rT:"4–6",rest:"3 min",p:true,note:"Pegada neutra ou semi-pronada. Cotovelo a 45–60° do tronco.",alert:"Halteres obrigatórios — cotovelo esquerdo"},
+    {n:"02",name:"Desenvolvimento com Halteres em Pé",sets:5,rT:"4–6",rest:"2–3 min",p:true,note:"Não bloqueie os cotovelos no topo. Amplitude total.",alert:"Halteres obrigatórios — epicondilite"},
+    {n:"03",name:"Mergulho em Paralelas com Carga",sets:4,rT:"4–6",rest:"2–3 min",note:"Tronco inclinado para frente. Cinto com anilha ou colete."},
+    {n:"04",name:"Elevação Lateral com Halteres (Força)",sets:4,rT:"6–8",rest:"90 seg",note:"Amplitude até linha dos ombros. Pausa 1s no topo."},
+    {n:"05",name:"Extensão de Tríceps na Corda (Força)",sets:4,rT:"6–8",rest:"90 seg",p:true,note:"Carga alta. Pronação total no final.",alert:"Corda obrigatória — sem barra reta"},
+   ],
+   ref:"Schoenfeld et al. (2017, JSCR): Protocolo de força (4–6 reps) gera maior ativação das unidades motoras de alto limiar, sendo superior para ganho de força máxima em atletas avançados.",
+   tip:"Sessão mais intensa da semana. Aqueça com 2 séries leves em cada movimento antes de ir para carga máxima."},
+  {id:"PUSH-B",label:"PUSH B",title:"PUSH B",sub:"Peito · Ombro · Tríceps",zoneLabel:"📈 HIPERTROFIA",zc:"#2563eb",series:"4",reps:"10–12",rest:"60–90 s",
+   ex:[
+    {n:"01",name:"Supino Reto com Halteres",sets:4,rT:"10–12",rest:"75 seg",p:true,note:"ROM completo. Pausa leve no fundo.",alert:"Halteres obrigatórios — cotovelo esquerdo"},
+    {n:"02",name:"Crucifixo Inclinado no Cabo",sets:3,rT:"12–15",rest:"60 seg",note:"Tensão constante. Cotovelo levemente flexionado."},
+    {n:"03",name:"Desenvolvimento Arnold com Halteres",sets:4,rT:"10–12",rest:"75 seg",note:"Rotação supina na descida.",alert:"Halteres obrigatórios"},
+    {n:"04",name:"Elevação Lateral no Cabo (unilateral)",sets:3,rT:"13–15",rest:"60 seg",note:"Cabo garante tensão constante em toda amplitude."},
+    {n:"05",name:"Extensão de Tríceps na Corda (Volume)",sets:4,rT:"12–15",rest:"60 seg",p:true,note:"Carga moderada. Foco em contração máxima.",alert:"Corda obrigatória"},
+    {n:"06",name:"Tríceps Coice com Haltere (kickback)",sets:3,rT:"15",rest:"45 seg",note:"Supinação completa no final.",alert:"Halter — sem pressão no cotovelo"},
+   ],
+   ref:"Burd et al. (2012, J Physiology): Cargas moderadas com alto volume provocam maior síntese proteica muscular, especialmente em atletas avançados.",
+   tip:"Priorize tempo sob tensão — cada rep ~2s na descida e 1s na subida. Não corra para aumentar carga."},
+  {id:"PULL-A",label:"PULL A",title:"PULL A",sub:"Costas · Bíceps · Trapézio",zoneLabel:"📈 HIPERTROFIA",zc:"#2563eb",series:"4",reps:"8–12",rest:"60–90 s",
+   ex:[
+    {n:"01",name:"Puxada Frontal Pronada (Lat Pulldown)",sets:4,rT:"8–12",rest:"90 seg",p:true,note:"Depressão da escápula antes de puxar."},
+    {n:"02",name:"Remada Unilateral com Haltere",sets:4,rT:"10–12",rest:"75 seg",note:"Apoio no banco. Puxe cotovelo em direção ao quadril.",alert:"Use STRAPS — protege pegada sem sobrecarregar cotovelo"},
+    {n:"03",name:"Pullover no Cabo (braço reto)",sets:3,rT:"12–15",rest:"60 seg",note:"Grande dorsal em amplitude total."},
+    {n:"04",name:"Rosca Scott com Barra EZ",sets:4,rT:"10–12",rest:"60 seg",p:true,note:"Apoio total no banco. Não solte no fundo.",alert:"EZ bar OBRIGATÓRIA — sem barra reta"},
+    {n:"05",name:"Rosca Martelo com Halteres",sets:3,rT:"12–15",rest:"60 seg",note:"Pegada neutra. Recruta braquial e braquiorradial."},
+    {n:"06",name:"Encolhimento com Halteres (Shrug)",sets:3,rT:"15",rest:"60 seg",note:"Pausa 1s no topo. Sem impulso de joelhos."},
+   ],
+   ref:"Kroc et al. (2009, JSCR): Combinação de exercícios compostos com isoladores maximiza recrutamento diferencial dos feixes do dorsal.",
+   tip:"STRAPS em todos os puxamentos. Priorize conexão mente-músculo no dorsal, não a pegada."},
+  {id:"PULL-B",label:"PULL B",title:"PULL B",sub:"Costas · Bíceps · Trapézio",zoneLabel:"💪 FORÇA",zc:"#dc2626",series:"5",reps:"4–6",rest:"2–3 min",
+   ex:[
+    {n:"01",name:"Barra Fixa com Carga (Weighted Pull-up)",sets:5,rT:"4–6",rest:"3 min",p:true,note:"Amplitude total — braços completamente estendidos no fundo."},
+    {n:"02",name:"Remada Curvada com Halteres (bilateral)",sets:5,rT:"4–6",rest:"2–3 min",p:true,note:"Tronco a ~45°. STRAPS obrigatório.",alert:"Halteres preferidos — preserva cotovelo esquerdo"},
+    {n:"03",name:"Puxada Supinada Pegada Fechada",sets:4,rT:"6–8",rest:"2 min",note:"Bíceps e dorsal em co-ativação máxima."},
+    {n:"04",name:"Rosca Direta com Barra EZ (Força)",sets:4,rT:"4–6",rest:"2 min",p:true,note:"Sem momentum. Carga máxima com técnica perfeita.",alert:"EZ bar OBRIGATÓRIA — nunca barra reta"},
+    {n:"05",name:"Rosca Inversa com EZ Bar",sets:3,rT:"10",rest:"75 seg",note:"Reabilitação preventiva. Pegada pronada.",alert:"Exercício terapêutico — carga leve a moderada"},
+    {n:"06",name:"Encolhimento com Barra/Halteres (Força)",sets:4,rT:"6–8",rest:"90 seg",note:"Carga máxima. Pausa 2s no topo."},
+   ],
+   ref:"Peterson et al. (2011, Clin Orthop Relat Res): Rosca inversa é o exercício mais indicado para epicondilite lateral.",
+   tip:"Aqueça o manguito rotador com 2x15 de rotação externa antes de começar."},
+  {id:"LEGS-A",label:"LEGS A",title:"LEGS A",sub:"Quadríceps · Panturrilha",zoneLabel:"🔁 METABÓLICO",zc:"#d97706",series:"4",reps:"15–20",rest:"45–60 s",
+   ex:[
+    {n:"01",name:"Leg Press 45°",sets:4,rT:"15–20",rest:"60 seg",p:true,note:"Posição de pés média-alta. NÃO bloqueie joelhos.",alert:"Lombar: não retire o glúteo do encosto no fundo"},
+    {n:"02",name:"Agachamento Goblet com Kettlebell",sets:4,rT:"15–20",rest:"60 seg",note:"KB no peito. Postura vertical do tronco.",alert:"Lombar: variação segura — sem compressão axial"},
+    {n:"03",name:"Extensão de Quadríceps (Leg Extension)",sets:4,rT:"15–20",rest:"45 seg",note:"Pausa 1s no topo. Descida em 3 segundos."},
+    {n:"04",name:"Hack Squat ou Smith Machine Squat",sets:3,rT:"15",rest:"60 seg",note:"Pés alinhados com ombros, levemente à frente.",alert:"Se dor lombar >3, substitua por Leg Press adicional"},
+    {n:"05",name:"Panturrilha em Pé (Standing Calf Raise)",sets:4,rT:"20–25",rest:"45 seg",note:"Calcanhar abaixo do degrau. Pausa 1s no topo."},
+    {n:"06",name:"Panturrilha Sentado (Seated Calf Raise)",sets:3,rT:"20–25",rest:"45 seg",note:"Foco no sóleo. Pausa 2s no pico."},
+   ],
+   ref:"Schoenfeld & Contreras (2014, NSCA): Protocolos metabólicos aumentam GH e IGF-1, otimizando recomposição corporal.",
+   tip:"Objetivo é acúmulo metabólico. Não aumente carga se isso significa perder as 15 reps mínimas."},
+  {id:"LEGS-B",label:"LEGS B",title:"LEGS B",sub:"Posterior · Glúteo · Adutores",zoneLabel:"📈 HIPERTROFIA",zc:"#2563eb",series:"4",reps:"8–12",rest:"75–90 s",
+   ex:[
+    {n:"01",name:"RDL com Halteres (Romanian Deadlift)",sets:4,rT:"10–12",rest:"90 seg",p:true,note:"Quadril para trás, não para baixo.",alert:"Halteres OBRIGATÓRIOS — lombar em recuperação"},
+    {n:"02",name:"Leg Curl Deitado (Femoral)",sets:4,rT:"10–12",rest:"75 seg",p:true,note:"Pés em dorsiflexão. Pausa 1s na contração."},
+    {n:"03",name:"Hip Thrust com Haltere ou Barra",sets:4,rT:"10–12",rest:"90 seg",note:"Escápulas no banco. Pausa 2s no topo.",alert:"Prefira haltere se houver desconforto lombar"},
+    {n:"04",name:"Cadeira Abdutora (Hip Abductor)",sets:3,rT:"12–15",rest:"60 seg",note:"Glúteo médio — essencial para estabilidade do quadril."},
+    {n:"05",name:"Stiff-leg Deadlift com Halteres",sets:3,rT:"10–12",rest:"75 seg",note:"Pernas quase retas. ROM mais amplo que o RDL.",alert:"Halteres obrigatórios — coluna neutra"},
+    {n:"06",name:"Panturrilha Unilateral em Pé",sets:4,rT:"12–15",rest:"45 seg",note:"Maior ROM e correção de desequilíbrios. Pausa 1s no topo."},
+   ],
+   ref:"Contreras et al. (2015, JSCR): Hip Thrust apresenta maior ativação EMG do glúteo máximo no pico.",
+   tip:"Ative o glúteo antes: 2x20 ponte unilateral no chão. Sábado de manhã é a melhor janela."},
+];
+
+// ── STORAGE ───────────────────────────────────────────────────────────────────
+const gp=()=>{try{return JSON.parse(localStorage.getItem('dup_p')||'[]');}catch{return[];}};
+const sp=d=>localStorage.setItem('dup_p',JSON.stringify(d));
+const gh=()=>{try{return JSON.parse(localStorage.getItem('dup_h')||'{}');}catch{return{};}};
+const sh=d=>localStorage.setItem('dup_h',JSON.stringify(d));
+
+// Session history per workout: key = 'sess_PUSH-A', value = array of sessions (max 4)
+function getSessions(wkId){try{return JSON.parse(localStorage.getItem('sess_'+wkId)||'[]');}catch{return[];}}
+function saveSessions(wkId,sessions){localStorage.setItem('sess_'+wkId,JSON.stringify(sessions));}
+
+function saveSession(wkId, sessionData){
+  const sessions=getSessions(wkId);
+  sessions.unshift(sessionData); // newest first
+  if(sessions.length>4) sessions.pop(); // keep last 4
+  saveSessions(wkId,sessions);
+}
+
+// ── HISTORY PANEL HTML ────────────────────────────────────────────────────────
+function buildHistPanel(wkId, exList){
+  const sessions=getSessions(wkId);
+  if(!sessions.length){
+    return `<div class="hist-panel">
+      <button class="hist-panel-hdr" type="button" onclick="toggleHistPanel(this)">
+        <span class="hist-label">📋 Últimas Sessões</span>
+        <span class="hist-arrow">▼</span>
+      </button>
+      <div class="hist-body">
+        <div class="no-hist">NENHUMA SESSÃO REGISTRADA AINDA</div>
+      </div>
+    </div>`;
+  }
+
+  const sessHtml = sessions.map((sess,si)=>{
+    const exRows = sess.exercises.map((ex,ei)=>{
+      if(!ex.sets.some(s=>s.kg||s.reps)) return '';
+      const setRows = ex.sets.map((s,i)=>`
+        <div class="hist-row-data">
+          <div class="hist-sn">${i+1}</div>
+          <div class="hist-val${s.kg?'':' empty'}">${s.kg||'—'}</div>
+          <div class="hist-val${s.reps?'':' empty'}">${s.reps||'—'}</div>
+        </div>`).join('');
+      return `<div class="hist-ex">
+        <div class="hist-ex-name">${exList[ei]?.name||''}</div>
+        <div class="hist-sets">
+          <div class="hist-col">Sér</div>
+          <div class="hist-col">KG</div>
+          <div class="hist-col">Reps</div>
+        </div>
+        ${setRows}
+        ${ex.obs?`<div class="hist-obs">${ex.obs}</div>`:''}
+      </div>`;
+    }).filter(Boolean).join('');
+
+    return `<div style="margin-bottom:${si<sessions.length-1?'18px':'0'}">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:#10b981;text-transform:uppercase;margin-bottom:10px;font-weight:500;">
+        ${si===0?'🟢 ÚLTIMA SESSÃO':'SESSÃO -'+(si+1)} · ${sess.date}
+      </div>
+      ${exRows||'<div class="no-hist">Sem cargas registradas</div>'}
+    </div>`;
+  }).join('<hr style="border:none;border-top:1px solid #f0f0e8;margin:12px 0;">');
+
+  return `<div class="hist-panel">
+    <button class="hist-panel-hdr" type="button" onclick="toggleHistPanel(this)">
+      <div>
+        <span class="hist-label">📋 Últimas Sessões</span>
+        <div class="hist-date" style="margin-top:2px">${sessions[0].date}</div>
+      </div>
+      <span class="hist-arrow">▼</span>
+    </button>
+    <div class="hist-body">
+      ${sessHtml}
+    </div>
+  </div>`;
+}
+
+function toggleHistPanel(btn){
+  const body=btn.nextElementSibling;
+  const arr=btn.querySelector('.hist-arrow');
+  const open=body.classList.toggle('open');
+  arr.textContent=open?'▲':'▼';
+}
+
+// ── MODAL / SEND ──────────────────────────────────────────────────────────────
+let emailContent='';
+let pendingSave=null;
+
+function openSendModal(wi){
+  const w=WK[wi];
+  const pg=document.querySelectorAll('.page')[wi];
+  const date=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'});
+  const subject=`[CARLOTA DUP] ${w.title} — ${date}`;
+  let lines=[subject,`Zona: ${w.zoneLabel} | ${w.series}x${w.reps} | Descanso: ${w.rest}`,``];
+  let hasData=false;
+
+  // Collect session data for local save
+  const sessionData={date:new Date().toLocaleDateString('pt-BR'),exercises:[]};
+
+  pg.querySelectorAll('.ex-card').forEach((card,ci)=>{
+    const ex=w.ex[ci];
+    const exSession={name:ex.name,sets:[],obs:''};
+    let sl=[];
+
+    card.querySelectorAll('.set-row').forEach((row,si)=>{
+      const kg=row.querySelectorAll('.inp')[0]?.value||'';
+      const rp=row.querySelectorAll('.inp')[1]?.value||'';
+      const ok=row.querySelector('.ok-btn')?.classList.contains('done')?'✓':'·';
+      exSession.sets.push({kg,reps:rp,done:ok==='✓'});
+      if(kg||rp){sl.push(`  S${si+1}: ${kg||'?'}kg × ${rp||'?'} reps ${ok}`);hasData=true;}
+    });
+
+    const obs=card.querySelector('.obs')?.value||'';
+    exSession.obs=obs;
+    sessionData.exercises.push(exSession);
+
+    if(sl.length||obs){
+      lines.push(`${ex.n}. ${ex.name}`);
+      lines.push(...sl);
+      if(obs)lines.push(`  Obs: ${obs}`);
+      lines.push('');
+    }
+  });
+
+  if(!hasData){alert('Registre pelo menos uma carga antes de enviar.');return;}
+
+  emailContent=lines.join('\n');
+  pendingSave={wkId:w.id,sessionData,wi};
+
+  document.getElementById('modal-preview').textContent=emailContent;
+  document.getElementById('copied-msg').style.display='none';
+
+  const to='felipekmail%40gmail.com';
+  const su=encodeURIComponent(subject);
+  const body=encodeURIComponent(emailContent);
+  document.getElementById('gmail-link').href=
+    `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${su}&body=${body}`;
+
+  // Save session immediately when modal opens
+  saveSession(pendingSave.wkId, pendingSave.sessionData);
+  refreshHistPanel(pendingSave.wi);
+
+  document.getElementById('overlay').classList.add('open');
+}
+
+function refreshHistPanel(wi){
+  const w=WK[wi];
+  const pg=document.querySelectorAll('.page')[wi];
+  const container=pg.querySelector('.hist-container');
+  if(container) container.innerHTML=buildHistPanel(w.id,w.ex);
+}
+
+function closeModal(e){
+  if(!e||e.target===document.getElementById('overlay')){
+    document.getElementById('overlay').classList.remove('open');
+  }
+}
+
+async function copyContent(){
+  const msg=document.getElementById('copied-msg');
+  try{await navigator.clipboard.writeText(emailContent);}
+  catch{
+    const ta=document.createElement('textarea');
+    ta.value=emailContent;ta.style.cssText='position:fixed;opacity:0;top:0;left:0;';
+    document.body.appendChild(ta);ta.focus();ta.select();
+    try{document.execCommand('copy');}catch{}
+    document.body.removeChild(ta);
+  }
+  msg.style.display='block';setTimeout(()=>{msg.style.display='none';},3000);
+}
+
+// ── PROGRESS ──────────────────────────────────────────────────────────────────
+let charts={};
+function mkChart(id,labels,datasets){
+  if(charts[id]){charts[id].destroy();delete charts[id];}
+  const ctx=document.getElementById(id);if(!ctx)return;
+  charts[id]=new Chart(ctx,{type:'line',data:{labels,datasets},options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:datasets.length>1,labels:{font:{family:'DM Sans',size:11},color:'#888',boxWidth:12,padding:12}}},
+    scales:{x:{grid:{color:'#f0f0e8'},ticks:{font:{family:'DM Mono',size:10},color:'#bbb'}},
+            y:{grid:{color:'#f0f0e8'},ticks:{font:{family:'DM Mono',size:10},color:'#bbb'}}},
+    elements:{point:{radius:5,hoverRadius:7},line:{tension:0.3}}
+  }});
+}
+
+function renderProg(){
+  const data=gp(),hrv=gh(),div=document.getElementById('page-prog');
+  if(!div)return;
+  const first=data[0]||null,last=data[data.length-1]||null,EMPTY=!data.length;
+  function delta(key,goodDown){
+    if(!first||!last||first===last)return`<span class="kpi-d n">—</span>`;
+    const d=(parseFloat(last[key])-parseFloat(first[key])).toFixed(1);
+    const sign=d>0?'+':'';const isGood=goodDown?d<0:d>0;
+    return`<span class="kpi-d ${isGood?'g':'r'}">${sign}${d} vs início</span>`;
+  }
+  const hv=parseFloat(hrv.hrv)||0;
+  const badge=hv>=60?['max','🟢 INTENSIDADE MÁXIMA']:hv>=40?['normal','🟡 INTENSIDADE NORMAL']:['low','🔴 REDUZIR INTENSIDADE'];
+  const labels=data.map(d=>d.week);
+
+  div.innerHTML=`
+  <div class="prog-title">EVOLUÇÃO</div>
+  <div class="prog-sub">Ciclo DUP 4 Semanas</div>
+
+  ${(hrv.hrv||hrv.hr||hrv.sleep)?`<div class="hrv-box">
+    <div class="hrv-title">⚡ Check-in de Hoje</div>
+    <div class="hrv-grid">
+      <div class="hrv-item"><span class="hrv-val">${hrv.hrv||'—'}</span><div class="hrv-lbl">HRV ms</div></div>
+      <div class="hrv-item"><span class="hrv-val">${hrv.hr||'—'}</span><div class="hrv-lbl">FC Rep.</div></div>
+      <div class="hrv-item"><span class="hrv-val">${hrv.sleep||'—'}</span><div class="hrv-lbl">Sono h</div></div>
+    </div>
+    ${hv?`<div style="margin-top:10px"><span class="hrv-badge ${badge[0]}">${badge[1]}</span></div>`:''}
+  </div>`:''}
+
+  <div class="sec-title">Check-in Semanal</div>
+  <div class="ci-card">
+    <div class="ci-title">📋 Bioimpedância</div>
+    <div class="form-row">
+      <div class="form-group"><div class="form-label">Semana</div>
+        <select class="form-inp" id="ci-w" style="-webkit-appearance:none">
+          <option value="S1 · Adaptação">S1 — Adaptação</option>
+          <option value="S2 · Sobrecarga">S2 — Sobrecarga</option>
+          <option value="S3 · Pico">S3 — Pico</option>
+          <option value="S4 · Deload">S4 — Deload</option>
+        </select>
+      </div>
+      <div class="form-group"><div class="form-label">Peso (kg)</div>
+        <input class="form-inp" id="ci-p" type="number" inputmode="decimal" placeholder="70.6" step="0.1">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><div class="form-label">% Gordura</div>
+        <input class="form-inp" id="ci-g" type="number" inputmode="decimal" placeholder="17.3" step="0.1">
+      </div>
+      <div class="form-group"><div class="form-label">Massa Magra (kg)</div>
+        <input class="form-inp" id="ci-m" type="number" inputmode="decimal" placeholder="54.7" step="0.1">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><div class="form-label">Massa Musc. Esq.</div>
+        <input class="form-inp" id="ci-mu" type="number" inputmode="decimal" placeholder="42.9" step="0.1">
+      </div>
+      <div class="form-group"><div class="form-label">Gordura Visceral</div>
+        <input class="form-inp" id="ci-v" type="number" inputmode="decimal" placeholder="8.0" step="0.5">
+      </div>
+    </div>
+    <div class="form-row one">
+      <div class="form-group"><div class="form-label">Observação</div>
+        <input class="form-inp" id="ci-o" type="text" placeholder="Sensação geral, sono, aderência...">
+      </div>
+    </div>
+    <button class="save-btn" onclick="saveCI()">✓ SALVAR CHECK-IN</button>
+    <div class="save-msg" id="save-msg">✓ Salvo!</div>
+  </div>
+
+  <div class="sec-title">Check-in Diário HRV</div>
+  <div class="ci-card">
+    <div class="ci-title">⚡ Apple Watch · Hoje</div>
+    <div class="form-row">
+      <div class="form-group"><div class="form-label">HRV (ms)</div>
+        <input class="form-inp" id="h-v" type="number" inputmode="decimal" placeholder="67" value="${hrv.hrv||''}">
+      </div>
+      <div class="form-group"><div class="form-label">FC Rep. (bpm)</div>
+        <input class="form-inp" id="h-hr" type="number" inputmode="numeric" placeholder="57" value="${hrv.hr||''}">
+      </div>
+    </div>
+    <div class="form-row one">
+      <div class="form-group"><div class="form-label">Sono (horas)</div>
+        <input class="form-inp" id="h-s" type="number" inputmode="decimal" placeholder="7.5" step="0.5" value="${hrv.sleep||''}">
+      </div>
+    </div>
+    <button class="save-btn purple" onclick="saveHRV()">✓ ATUALIZAR HRV</button>
+  </div>
+
+  ${EMPTY?`<div class="sec-title">Gráficos</div><div class="chart-card"><div class="empty">📊<br><br>Registre o primeiro check-in para ver os gráficos.</div></div>`:`
+  <div class="sec-title">Métricas Atuais</div>
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-lbl">Peso</div><div class="kpi-val">${last.p}<span style="font-size:14px;font-family:'DM Mono'"> kg</span></div>${delta('p',true)}</div>
+    <div class="kpi-card"><div class="kpi-lbl">% Gordura</div><div class="kpi-val">${last.g}<span style="font-size:14px;font-family:'DM Mono'">%</span></div>${delta('g',true)}</div>
+    <div class="kpi-card"><div class="kpi-lbl">Massa Magra</div><div class="kpi-val">${last.m}<span style="font-size:14px;font-family:'DM Mono'"> kg</span></div>${delta('m',false)}</div>
+    <div class="kpi-card"><div class="kpi-lbl">Massa Musc.</div><div class="kpi-val">${last.mu}<span style="font-size:14px;font-family:'DM Mono'"> kg</span></div>${delta('mu',false)}</div>
+  </div>
+  <div class="sec-title">Gráficos</div>
+  <div class="chart-card"><div class="chart-title">Peso Corporal (kg)</div><div class="chart-wrap"><canvas id="ch-p"></canvas></div></div>
+  <div class="chart-card"><div class="chart-title">Gordura (%) vs Massa Magra (kg)</div><div class="chart-wrap"><canvas id="ch-c"></canvas></div></div>
+  <div class="chart-card"><div class="chart-title">Massa Muscular Esquelética (kg)</div><div class="chart-wrap"><canvas id="ch-m"></canvas></div></div>`}
+
+  <div class="sec-title">Histórico Semanal</div>
+  ${EMPTY?`<div class="chart-card"><div class="empty">📋<br><br>Nenhum registro ainda.</div></div>`:`
+  <div class="chart-card" style="padding:0;overflow:hidden;border-radius:12px;">
+    <div class="hrow hdr"><div class="hc lbl">SEM</div><div class="hc lbl">PESO</div><div class="hc lbl">GORD</div><div class="hc lbl">MAGRA</div><div class="hc lbl"></div></div>
+    ${data.map((d,i)=>`<div class="hrow">
+      <div class="hc wk">${d.week.split('·')[0].trim()}</div>
+      <div class="hc v">${d.p}kg</div><div class="hc v">${d.g}%</div><div class="hc v">${d.m}kg</div>
+      <button class="del-btn" onclick="delCI(${i})">✕</button>
+    </div>`).join('')}
+  </div>`}`;
+
+  if(!EMPTY){setTimeout(()=>{
+    mkChart('ch-p',labels,[{label:'Peso (kg)',data:data.map(d=>parseFloat(d.p)),borderColor:'#dc2626',backgroundColor:'rgba(220,38,38,0.1)',fill:true,borderWidth:2}]);
+    mkChart('ch-c',labels,[
+      {label:'Gordura (%)',data:data.map(d=>parseFloat(d.g)),borderColor:'#f59e0b',fill:false,borderWidth:2},
+      {label:'Massa Magra (kg)',data:data.map(d=>parseFloat(d.m)),borderColor:'#10b981',fill:false,borderWidth:2}
+    ]);
+    mkChart('ch-m',labels,[{label:'Massa Muscular (kg)',data:data.map(d=>parseFloat(d.mu)),borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.1)',fill:true,borderWidth:2}]);
+  },60);}
+}
+
+function saveCI(){
+  const week=document.getElementById('ci-w').value,p=document.getElementById('ci-p').value,g=document.getElementById('ci-g').value;
+  if(!p||!g){alert('Preencha pelo menos Peso e % Gordura.');return;}
+  const data=gp();
+  const entry={week,p,g,m:document.getElementById('ci-m').value||0,mu:document.getElementById('ci-mu').value||0,v:document.getElementById('ci-v').value||0,o:document.getElementById('ci-o').value,date:new Date().toLocaleDateString('pt-BR')};
+  const idx=data.findIndex(d=>d.week===week);
+  if(idx>=0)data[idx]=entry;else data.push(entry);
+  sp(data);
+  const msg=document.getElementById('save-msg');msg.style.display='block';
+  setTimeout(()=>{msg.style.display='none';renderProg();},1200);
+}
+function saveHRV(){sh({hrv:document.getElementById('h-v').value,hr:document.getElementById('h-hr').value,sleep:document.getElementById('h-s').value});renderProg();}
+function delCI(i){if(!confirm('Remover?'))return;const d=gp();d.splice(i,1);sp(d);renderProg();}
+
+// ── BUILD ─────────────────────────────────────────────────────────────────────
+function setZC(zc){document.documentElement.style.setProperty('--zc',zc);}
+function switchTab(idx){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  document.querySelectorAll('.page').forEach((p,i)=>p.classList.toggle('active',i===idx));
+  if(idx<WK.length)setZC(WK[idx].zc);
+  else{setZC('#10b981');renderProg();}
+}
+
+(function build(){
+  const tabsEl=document.getElementById('tabs'),pagesEl=document.getElementById('pages');
+  WK.forEach((w,wi)=>{
+    const tb=document.createElement('button');
+    tb.className='tab'+(wi===0?' active':'');tb.textContent=w.label;tb.onclick=()=>switchTab(wi);
+    tabsEl.appendChild(tb);
+
+    const pg=document.createElement('div');
+    pg.className='page'+(wi===0?' active':'');
+
+    const exHtml=w.ex.map(ex=>{
+      const cls=ex.alert?'has-alert':ex.p?'is-primary':'';
+      let rows='';
+      for(let i=0;i<ex.sets;i++){
+        rows+=`<div class="set-row">
+          <div class="set-n">${i+1}</div>
+          <input class="inp" type="number" inputmode="decimal" placeholder="—">
+          <input class="inp" type="number" inputmode="numeric" placeholder="${ex.rT}">
+          <button class="ok-btn" type="button">○</button>
+        </div>`;
+      }
+      return`<div class="ex-card ${cls}">
+        <button class="ex-toggle-btn" type="button">
+          <div class="ex-top">
+            <div style="flex:1">
+              <span class="ex-num" data-base="EX ${ex.n}">EX ${ex.n}</span>
+              <span class="ex-name">${ex.name}</span>
+              <div class="chips"><span class="chip z">${ex.sets}×${ex.rT}</span><span class="chip">⏱ ${ex.rest}</span></div>
+            </div>
+            <div class="arrow">▼</div>
+          </div>
+          ${ex.note?`<span class="ex-note">${ex.note}</span>`:''}
+          ${ex.alert?`<div class="alert-row">⚠️ ${ex.alert}</div>`:''}
+        </button>
+        <div class="log-body">
+          <div class="log-cols"><div class="col-h">Sér</div><div class="col-h">KG</div><div class="col-h">Reps</div><div class="col-h">OK</div></div>
+          ${rows}
+          <textarea class="obs" placeholder="Observações..."></textarea>
+
+```
+      <button class="clear-btn" type="button">↺ LIMPAR</button>
+    </div>
+  </div>`;
+}).join('');
+
+pg.innerHTML=`
+  <div class="wk-title">${w.title}</div>
+  <div class="wk-sub">${w.sub}</div>
+  <div class="zone-badge">${w.zoneLabel}</div>
+  <div class="stats">
+    <div class="stat"><span class="stat-val">${w.series}</span><div class="stat-lbl">Séries</div></div>
+    <div class="stat"><span class="stat-val">${w.reps}</span><div class="stat-lbl">Reps</div></div>
+    <div class="stat"><span class="stat-val">${w.rest}</span><div class="stat-lbl">Descanso</div></div>
+  </div>
+  <div class="sec-title">Referência · Sessões Anteriores</div>
+  <div class="hist-container">${buildHistPanel(w.id,w.ex)}</div>
+  <div class="sec-title">Exercícios · Toque para registrar</div>
+  <div class="ex-list">${exHtml}</div>
+  <div class="send-wrap">
+    <button class="send-btn" type="button" onclick="openSendModal(${wi})">📤 Salvar + Enviar para a Carlota</button>
+    <div class="send-note">Salva no histórico local e abre o Gmail.</div>
+  </div>
+  <div class="sec-title">Embasamento Científico</div>
+  <div class="sci-box"><div class="sci-lbl">📚 Referência</div><div class="sci-txt">${w.ref}</div></div>
+  <div class="sec-title">Dica da Sessão</div>
+  <div class="tip-box"><div class="tip-lbl">💡 Carlota DUP</div><div class="tip-txt">${w.tip}</div></div>`;
+
+pagesEl.appendChild(pg);
+
+pg.querySelectorAll('.ex-toggle-btn').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    const log=this.nextElementSibling,arr=this.querySelector('.arrow');
+    const open=log.classList.toggle('open');
+    arr.textContent=open?'▲':'▼';
+  });
+});
+pg.querySelectorAll('.ok-btn').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    this.classList.toggle('done');
+    this.textContent=this.classList.contains('done')?'✓':'○';
+    this.closest('.set-row').querySelectorAll('.inp').forEach(i=>i.classList.toggle('faded',this.classList.contains('done')));
+    const card=this.closest('.ex-card');
+    const total=card.querySelectorAll('.ok-btn').length,done=card.querySelectorAll('.ok-btn.done').length;
+    const el=card.querySelector('.ex-num');
+    el.textContent=done===0?el.dataset.base:done===total?el.dataset.base+' ✓':el.dataset.base+` · ${done}/${total}`;
+  });
+});
+pg.querySelectorAll('.clear-btn').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    const card=this.closest('.ex-card');
+    card.querySelectorAll('.inp').forEach(i=>{i.value='';i.classList.remove('faded');});
+    card.querySelectorAll('.ok-btn').forEach(b=>{b.classList.remove('done');b.textContent='○';});
+    card.querySelector('.obs').value='';
+    const el=card.querySelector('.ex-num');el.textContent=el.dataset.base;
+  });
+});
+```
+
+});
+
+const pt=document.createElement(‘button’);
+pt.className=‘tab prog-tab’;pt.textContent=‘📊 Progresso’;pt.onclick=()=>switchTab(WK.length);
+tabsEl.appendChild(pt);
+
+const pp=document.createElement(‘div’);
+pp.className=‘page’;pp.id=‘page-prog’;
+pagesEl.appendChild(pp);
+
+setZC(WK[0].zc);
+})();
+</script>
+
+</body>
+</html>
