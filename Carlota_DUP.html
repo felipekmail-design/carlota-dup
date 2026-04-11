@@ -375,6 +375,66 @@ function switchTab(idx){
   if(idx<WK.length)setZC(WK[idx].zc);else{setZC('#10b981');renderProg();}
 }
 
+
+// ── SEED DATA from Google Calendar ──────────────────────────────────────────
+(function seedCalendarData(){
+  if(localStorage.getItem('seed_v1')) return; // only seed once
+  
+  const pullBSeed = {
+    date: '10/04/2026',
+    exercises: [
+      {nm:'Barra Fixa com Carga (Weighted Pull-up)', sets:[
+        {kg:'PC',reps:'9',done:true},{kg:'PC',reps:'7',done:true},{kg:'PC',reps:'7',done:true},
+        {kg:'PC',reps:'8',done:true},{kg:'PC',reps:'7',done:true}], obs:'META: +5kg no cinto'},
+      {nm:'Remada Curvada com Halteres (bilateral)', sets:[
+        {kg:'65',reps:'5',done:true},{kg:'65',reps:'5',done:true},{kg:'65',reps:'5',done:true},
+        {kg:'65',reps:'5',done:true},{kg:'65',reps:'4',done:true}], obs:'Feito na máquina deadlift. META: 67,5kg'},
+      {nm:'Puxada Supinada Pegada Fechada', sets:[
+        {kg:'60',reps:'6',done:true},{kg:'80',reps:'5',done:true},{kg:'80',reps:'4',done:true},
+        {kg:'80',reps:'5',done:true}], obs:''},
+      {nm:'Rosca Direta com Barra EZ (Força)', sets:[
+        {kg:'27',reps:'6',done:true},{kg:'29.5',reps:'4',done:true},{kg:'32.5',reps:'4',done:true},
+        {kg:'32.5',reps:'5',done:true}], obs:'META: 34–35kg total'},
+      {nm:'Rosca Inversa com EZ Bar', sets:[
+        {kg:'12',reps:'8',done:true},{kg:'14.5',reps:'10',done:true},{kg:'14.5',reps:'7',done:true}
+        ], obs:''},
+      {nm:'Encolhimento com Barra/Halteres (Força)', sets:[
+        {kg:'56',reps:'10',done:true},{kg:'60',reps:'9',done:true},{kg:'60',reps:'9',done:true},
+        {kg:'60',reps:'9',done:true}], obs:'30kg/mão está leve. META: 40–50kg na máquina'},
+    ]
+  };
+
+  const legsBSeed = {
+    date: '11/04/2026',
+    exercises: [
+      {nm:'RDL com Halteres (Romanian Deadlift)', sets:[
+        {kg:'24',reps:'10',done:true},{kg:'24',reps:'12',done:true},{kg:'24',reps:'12',done:true},
+        {kg:'24',reps:'12',done:true}], obs:'META: 28kg total'},
+      {nm:'Leg Curl Deitado (Femoral)', sets:[
+        {kg:'32.5',reps:'12',done:true},{kg:'35',reps:'10',done:true},{kg:'35',reps:'8',done:true},
+        {kg:'32.5',reps:'9',done:true}], obs:'META: 35kg em todas as séries'},
+      {nm:'Hip Thrust com Haltere ou Barra', sets:[
+        {kg:'45',reps:'10',done:true},{kg:'45',reps:'9',done:true},{kg:'40',reps:'10',done:true},
+        {kg:'40',reps:'10',done:true}], obs:'META: 45kg em todas as séries'},
+      {nm:'Cadeira Abdutora (Hip Abductor)', sets:[
+        {kg:'80',reps:'14',done:true},{kg:'90',reps:'12',done:true},{kg:'95',reps:'12',done:true}
+        ], obs:'META: 95kg todas → 100kg'},
+      {nm:'Stiff-leg Deadlift com Halteres', sets:[
+        {kg:'24',reps:'12',done:true},{kg:'24',reps:'12',done:true},{kg:'24',reps:'12',done:true}
+        ], obs:'META: 28kg total'},
+      {nm:'Panturrilha Unilateral em Pé', sets:[
+        {kg:'PC',reps:'15',done:true},{kg:'PC',reps:'15',done:true},{kg:'PC',reps:'15',done:true},
+        {kg:'PC',reps:'15',done:true}], obs:'PRÓXIMA: adicionar halter'},
+    ]
+  };
+
+  // Save to localStorage as session history
+  localStorage.setItem('ss_PULL-B', JSON.stringify([pullBSeed]));
+  localStorage.setItem('ss_LEGS-B', JSON.stringify([legsBSeed]));
+  localStorage.setItem('seed_v1', '1');
+})();
+// ── END SEED ─────────────────────────────────────────────────────────────────
+
 (function build(){
   const te=document.getElementById('tabs'),pe=document.getElementById('pages');
   WK.forEach((w,wi)=>{
