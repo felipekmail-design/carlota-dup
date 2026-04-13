@@ -6,8 +6,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="Carlota DUP">
-<title>Carlota.DUP</title>
+<meta name="apple-mobile-web-app-title" content="Carlota · J.R.V">
+<title>Carlota.DUP — J.R.V</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -21,7 +21,7 @@ body{background:#f4f4f0;font-family:'DM Sans',sans-serif;color:#111;}
 .tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;}
 .tabs::-webkit-scrollbar{display:none;}
 .tab{flex-shrink:0;padding:10px 14px;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:1px;cursor:pointer;border:none;background:transparent;color:rgba(255,255,255,0.7);border-bottom:3px solid transparent;transition:all .2s;text-transform:uppercase;-webkit-appearance:none;}
-.tab.active{color:#ffffff;border-bottom:3px solid var(--zc,#dc2626);}
+.tab.active{color:#ffffff;border-bottom:3px solid var(--zc,#f9a8d4);}
 .tab.ptab.active{border-bottom-color:#10b981;}
 .page{padding:20px;display:none;}
 .page.active{display:block;}
@@ -54,6 +54,7 @@ body{background:#f4f4f0;font-family:'DM Sans',sans-serif;color:#111;}
 .exl{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
 .ec{background:#fff;border:1px solid #e0e0d8;border-radius:12px;overflow:hidden;}
 .ec.al{border-left:4px solid #f59e0b;}
+.ec.sh{border-left:4px solid #fda4af;}.sar{display:flex;gap:6px;margin-top:8px;padding:7px 10px;background:#fff1f6;border-radius:6px;border:1px solid #fda4af;font-size:11px;color:#9f1239;font-weight:500;line-height:1.4;text-align:left;}
 .ec.pr{border-left:4px solid var(--zc);}
 .etb{width:100%;text-align:left;background:transparent;border:none;padding:14px 16px 12px;cursor:pointer;display:block;-webkit-appearance:none;touch-action:manipulation;}
 .etb:active{background:rgba(0,0,0,.02);}
@@ -66,8 +67,6 @@ body{background:#f4f4f0;font-family:'DM Sans',sans-serif;color:#111;}
 .aw{flex-shrink:0;width:28px;height:28px;background:#f4f4f0;border:1px solid #e0e0d8;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;margin-top:2px;pointer-events:none;}
 .eno{font-size:11px;color:#777;line-height:1.5;margin-top:8px;display:block;text-align:left;}
 .ar{display:flex;gap:6px;margin-top:8px;padding:7px 10px;background:#fffbeb;border-radius:6px;border:1px solid #fcd34d;font-size:11px;color:#92400e;font-weight:500;line-height:1.4;text-align:left;}
-.sar{display:flex;gap:6px;margin-top:8px;padding:7px 10px;background:#fff1f6;border-radius:6px;border:1px solid #fda4af;font-size:11px;color:#9f1239;font-weight:500;line-height:1.4;text-align:left;}
-.ec.sh{border-left:4px solid #f9a8d4;}
 .lb{border-top:1px solid #eeeee8;padding:14px 16px 16px;background:#fafaf7;display:none;}
 .lb.open{display:block;}
 .lc{display:grid;grid-template-columns:26px 1fr 1fr 38px;gap:6px;margin-bottom:8px;}
@@ -93,7 +92,7 @@ body{background:#f4f4f0;font-family:'DM Sans',sans-serif;color:#111;}
 .tpb{background:#fff;border:1px solid #e0e0d8;border-radius:12px;padding:14px 16px;margin-bottom:28px;}
 .tpl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--zc);text-transform:uppercase;margin-bottom:6px;}
 .tpt{font-size:12px;color:#666;line-height:1.6;}
-.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(12px);background:#065f46;color:#fff;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;padding:12px 22px;border-radius:30px;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(12px);background:#111;color:#fff;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;padding:12px 22px;border-radius:30px;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .pt{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:4px;color:#111;line-height:1;margin-bottom:4px;}
 .ps{font-size:13px;color:#888;margin-bottom:20px;}
@@ -112,7 +111,7 @@ body{background:#f4f4f0;font-family:'DM Sans',sans-serif;color:#111;}
 .fi{background:#f9f9f6;border:1.5px solid #e0e0d8;border-radius:8px;padding:11px 12px;font-family:'DM Mono',monospace;font-size:14px;color:#111;outline:none;-webkit-appearance:none;width:100%;font-weight:500;}
 .fi:focus{border-color:#10b981;background:#fff;}
 .fi::placeholder{color:#ccc;font-weight:400;}
-.sb{width:100%;margin-top:12px;padding:14px;background:#065f46;border:none;border-radius:8px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:2px;color:#fff;text-transform:uppercase;cursor:pointer;-webkit-appearance:none;touch-action:manipulation;}
+.sb{width:100%;margin-top:12px;padding:14px;background:#10b981;border:none;border-radius:8px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:2px;color:#fff;text-transform:uppercase;cursor:pointer;-webkit-appearance:none;touch-action:manipulation;}
 .sb.pu{background:#7c3aed;}
 .sm{display:none;text-align:center;margin-top:8px;font-family:'DM Mono',monospace;font-size:11px;color:#10b981;}
 .chc{background:#fff;border:1px solid #e0e0d8;border-radius:12px;padding:16px;margin-bottom:14px;}
@@ -156,31 +155,31 @@ body{background:#f4f4f0;font-family:'DM Sans',sans-serif;color:#111;}
 const WK=[
   {id:"PUSH-A",label:"PUSH A",title:"PUSH A",sub:"Peito · Ombro · Tríceps",zl:"💪 FORÇA",zc:"#dc2626",s:"5",r:"4–6",d:"2–3 min",
    ex:[
-    {n:"01",nm:"Supino Inclinado com Halteres",s:5,r:"4–6",d:"3 min",p:1,no:"Pegada neutra ou semi-pronada. Cotovelo a 45–60° do tronco."},
-    {n:"02",nm:"Desenvolvimento com Halteres em Pé",sh:"Ombro: overhead — monitore o ombro esquerdo. Reduza amplitude se sentir desconforto.",s:5,r:"4–6",d:"2–3 min",p:1,no:"Não bloqueie os cotovelos no topo. Amplitude total."},
-    {n:"03",nm:"Mergulho em Paralelas com Carga",sh:"Ombro: na descida não force além do conforto — extensão excessiva pode irritar o ombro.",s:4,r:"4–6",d:"2–3 min",no:"Tronco inclinado para frente. Cinto com anilha ou colete."},
-    {n:"04",nm:"Elevação Lateral com Halteres (Força)",sh:"Ombro: arco 60–120° é ponto crítico. Pare se sentir dor aguda.",s:4,r:"6–8",d:"90 seg",no:"Amplitude até linha dos ombros. Pausa 1s no topo."},
-    {n:"05",nm:"Extensão de Tríceps na Corda (Força)",s:4,r:"6–8",d:"90 seg",p:1,no:"Carga alta. Pronação total no final."},
+    {n:"01",nm:"Supino Inclinado com Halteres",s:5,r:"4–6",d:"3 min",p:1,no:"Pegada neutra ou semi-pronada. Cotovelo a 45–60° do tronco.",a:"Halteres obrigatórios — cotovelo esquerdo"},
+    {n:"02",nm:"Desenvolvimento com Halteres em Pé",s:5,r:"4–6",d:"2–3 min",p:1,no:"Não bloqueie os cotovelos no topo. Amplitude total.",a:"Halteres obrigatórios — epicondilite"},
+    {n:"03",nm:"Mergulho em Paralelas com Carga",s:4,r:"4–6",d:"2–3 min",no:"Tronco inclinado para frente. Cinto com anilha ou colete.",sh:"Ombro: na descida, não force além do ponto de conforto — extensão excessiva pode irritar o ombro."},
+    {n:"04",nm:"Elevação Lateral com Halteres (Força)",s:4,r:"6–8",d:"90 seg",no:"Amplitude até linha dos ombros. Pausa 1s no topo."},
+    {n:"05",nm:"Extensão de Tríceps na Corda (Força)",s:4,r:"6–8",d:"90 seg",p:1,no:"Carga alta. Pronação total no final.",a:"Corda obrigatória — sem barra reta"},
    ],
    ref:"Schoenfeld et al. (2017, JSCR): Protocolo de força (4–6 reps) gera maior ativação das unidades motoras de alto limiar, sendo superior para ganho de força máxima em atletas avançados.",
    tip:"Sessão mais intensa da semana. Aqueça com 2 séries leves em cada movimento antes de ir para carga máxima."},
   {id:"PUSH-B",label:"PUSH B",title:"PUSH B",sub:"Peito · Ombro · Tríceps",zl:"📈 HIPERTROFIA",zc:"#2563eb",s:"4",r:"10–12",d:"60–90 s",
    ex:[
-    {n:"01",nm:"Supino Reto com Halteres",s:4,r:"10–12",d:"75 seg",p:1,no:"ROM completo. Pausa leve no fundo."},
+    {n:"01",nm:"Supino Reto com Halteres",s:4,r:"10–12",d:"75 seg",p:1,no:"ROM completo. Pausa leve no fundo.",a:"Halteres obrigatórios — cotovelo esquerdo"},
     {n:"02",nm:"Crucifixo Inclinado no Cabo",s:3,r:"12–15",d:"60 seg",no:"Tensão constante. Cotovelo levemente flexionado."},
-    {n:"03",nm:"Desenvolvimento Arnold com Halteres",sh:"Ombro: rotação sob carga — o mais exigente para o ombro. Reduza rotação se houver desconforto.",s:4,r:"10–12",d:"75 seg",no:"Rotação supina na descida."},
-    {n:"04",nm:"Elevação Lateral no Cabo (unilateral)",sh:"Ombro: mantenha amplitude controlada no lado esquerdo.",s:3,r:"13–15",d:"60 seg",no:"Cabo garante tensão constante em toda amplitude."},
-    {n:"05",nm:"Extensão de Tríceps na Corda (Volume)",s:4,r:"12–15",d:"60 seg",p:1,no:"Carga moderada. Foco em contração máxima."},
-    {n:"06",nm:"Tríceps Coice com Haltere (kickback)",s:3,r:"15",d:"45 seg",no:"Supinação completa no final."},
+    {n:"03",nm:"Desenvolvimento Arnold com Halteres",s:4,r:"10–12",d:"75 seg",no:"Rotação supina na descida.",a:"Halteres obrigatórios"},
+    {n:"04",nm:"Elevação Lateral no Cabo (unilateral)",s:3,r:"13–15",d:"60 seg",no:"Cabo garante tensão constante em toda amplitude."},
+    {n:"05",nm:"Extensão de Tríceps na Corda (Volume)",s:4,r:"12–15",d:"60 seg",p:1,no:"Carga moderada. Foco em contração máxima.",a:"Corda obrigatória"},
+    {n:"06",nm:"Tríceps Coice com Haltere (kickback)",s:3,r:"15",d:"45 seg",no:"Supinação completa no final.",a:"Halter — sem pressão no cotovelo"},
    ],
    ref:"Burd et al. (2012, J Physiology): Cargas moderadas com alto volume provocam maior síntese proteica muscular, especialmente em atletas avançados.",
    tip:"Priorize tempo sob tensão — cada rep ~2s na descida e 1s na subida."},
   {id:"PULL-A",label:"PULL A",title:"PULL A",sub:"Costas · Bíceps · Trapézio",zl:"📈 HIPERTROFIA",zc:"#2563eb",s:"4",r:"8–12",d:"60–90 s",
    ex:[
-    {n:"01",nm:"Puxada Frontal Pronada (Lat Pulldown)",sh:"Ombro: prefira pegada na largura dos ombros — pegada aberta aumenta torque na articulação.",s:4,r:"8–12",d:"90 seg",p:1,no:"Depressão da escápula antes de puxar."},
-    {n:"02",nm:"Remada Unilateral com Haltere",s:4,r:"10–12",d:"75 seg",no:"Apoio no banco. Puxe cotovelo em direção ao quadril."},
-    {n:"03",nm:"Pullover no Cabo (braço reto)",sh:"Ombro: monitore na fase de extensão máxima.",s:3,r:"12–15",d:"60 seg",no:"Grande dorsal em amplitude total."},
-    {n:"04",nm:"Rosca Scott com Barra EZ",s:4,r:"10–12",d:"60 seg",p:1,no:"Apoio total no banco. Não solte no fundo."},
+    {n:"01",nm:"Puxada Frontal Pronada (Lat Pulldown)",s:4,r:"8–12",d:"90 seg",p:1,no:"Depressão da escápula antes de puxar.",sh:"Ombro: prefira pegada na largura dos ombros — pegada muito aberta aumenta o torque na articulação."},
+    {n:"02",nm:"Remada Unilateral com Haltere",s:4,r:"10–12",d:"75 seg",no:"Apoio no banco. Puxe cotovelo em direção ao quadril.",a:"STRAPS — protege pegada sem sobrecarregar cotovelo"},
+    {n:"03",nm:"Pullover no Cabo (braço reto)",s:3,r:"12–15",d:"60 seg",no:"Grande dorsal em amplitude total."},
+    {n:"04",nm:"Rosca Scott com Barra EZ",s:4,r:"10–12",d:"60 seg",p:1,no:"Apoio total no banco. Não solte no fundo.",a:"EZ bar OBRIGATÓRIA — sem barra reta"},
     {n:"05",nm:"Rosca Martelo com Halteres",s:3,r:"12–15",d:"60 seg",no:"Pegada neutra. Recruta braquial e braquiorradial."},
     {n:"06",nm:"Encolhimento com Halteres (Shrug)",s:3,r:"15",d:"60 seg",no:"Pausa 1s no topo. Sem impulso de joelhos."},
    ],
@@ -188,21 +187,21 @@ const WK=[
    tip:"STRAPS em todos os puxamentos. Priorize conexão mente-músculo no dorsal."},
   {id:"PULL-B",label:"PULL B",title:"PULL B",sub:"Costas · Bíceps · Trapézio",zl:"💪 FORÇA",zc:"#dc2626",s:"5",r:"4–6",d:"2–3 min",
    ex:[
-    {n:"01",nm:"Barra Fixa com Carga (Weighted Pull-up)",sh:"Ombro: se sentir dor no ponto de extensão total, reduza levemente a amplitude final.",s:5,r:"4–6",d:"3 min",p:1,no:"Amplitude total — braços completamente estendidos no fundo."},
-    {n:"02",nm:"Remada Curvada com Halteres (bilateral)",s:5,r:"4–6",d:"2–3 min",p:1,no:"Tronco a ~45°. STRAPS obrigatório."},
+    {n:"01",nm:"Barra Fixa com Carga (Weighted Pull-up)",s:5,r:"4–6",d:"3 min",p:1,no:"Amplitude total — braços completamente estendidos no fundo.",sh:"Ombro: se sentir dor no ponto de extensão total, reduza levemente a amplitude final — ainda é seguro."},
+    {n:"02",nm:"Remada Curvada com Halteres (bilateral)",s:5,r:"4–6",d:"2–3 min",p:1,no:"Tronco a ~45°. STRAPS obrigatório.",a:"Halteres preferidos — preserva cotovelo esquerdo"},
     {n:"03",nm:"Puxada Supinada Pegada Fechada",s:4,r:"6–8",d:"2 min",no:"Bíceps e dorsal em co-ativação máxima."},
-    {n:"04",nm:"Rosca Direta com Barra EZ (Força)",s:4,r:"4–6",d:"2 min",p:1,no:"Sem momentum. Carga máxima com técnica perfeita."},
-    {n:"05",nm:"Rosca Inversa com EZ Bar",s:3,r:"10",d:"75 seg",no:"Reabilitação preventiva. Pegada pronada."},
+    {n:"04",nm:"Rosca Direta com Barra EZ (Força)",s:4,r:"4–6",d:"2 min",p:1,no:"Sem momentum. Carga máxima com técnica perfeita.",a:"EZ bar OBRIGATÓRIA — nunca barra reta"},
+    {n:"05",nm:"Rosca Inversa com EZ Bar",s:3,r:"10",d:"75 seg",no:"Reabilitação preventiva. Pegada pronada.",a:"Exercício terapêutico — carga leve a moderada"},
     {n:"06",nm:"Encolhimento com Barra/Halteres (Força)",s:4,r:"6–8",d:"90 seg",no:"Carga máxima. Pausa 2s no topo."},
    ],
    ref:"Peterson et al. (2011, Clin Orthop Relat Res): Rosca inversa é o exercício mais indicado para epicondilite lateral.",
    tip:"Aqueça o manguito rotador com 2×15 de rotação externa antes de começar."},
   {id:"LEGS-A",label:"LEGS A",title:"LEGS A",sub:"Quadríceps · Panturrilha",zl:"🔁 METABÓLICO",zc:"#d97706",s:"4",r:"15–20",d:"45–60 s",
    ex:[
-    {n:"01",nm:"Leg Press 45°",s:4,r:"15–20",d:"60 seg",p:1,no:"Posição de pés média-alta. NÃO bloqueie joelhos."},
-    {n:"02",nm:"Agachamento Goblet com Kettlebell",s:4,r:"15–20",d:"60 seg",no:"KB no peito. Postura vertical do tronco."},
+    {n:"01",nm:"Leg Press 45°",s:4,r:"15–20",d:"60 seg",p:1,no:"Posição de pés média-alta. NÃO bloqueie joelhos.",a:"Lombar: não retire o glúteo do encosto no fundo"},
+    {n:"02",nm:"Agachamento Goblet com Kettlebell",s:4,r:"15–20",d:"60 seg",no:"KB no peito. Postura vertical do tronco.",a:"Lombar: variação segura — sem compressão axial"},
     {n:"03",nm:"Extensão de Quadríceps (Leg Extension)",s:4,r:"15–20",d:"45 seg",no:"Pausa 1s no topo. Descida em 3 segundos."},
-    {n:"04",nm:"Hack Squat ou Smith Machine Squat",s:3,r:"15",d:"60 seg",no:"Pés alinhados com ombros, levemente à frente."},
+    {n:"04",nm:"Hack Squat ou Smith Machine Squat",s:3,r:"15",d:"60 seg",no:"Pés alinhados com ombros, levemente à frente.",a:"Se dor lombar >3, substitua por Leg Press"},
     {n:"05",nm:"Panturrilha em Pé (Standing Calf Raise)",s:4,r:"20–25",d:"45 seg",no:"Calcanhar abaixo do degrau. Pausa 1s no topo."},
     {n:"06",nm:"Panturrilha Sentado (Seated Calf Raise)",s:3,r:"20–25",d:"45 seg",no:"Foco no sóleo. Pausa 2s no pico."},
    ],
@@ -210,11 +209,11 @@ const WK=[
    tip:"Objetivo é acúmulo metabólico. Não aumente carga se isso significa perder as 15 reps mínimas."},
   {id:"LEGS-B",label:"LEGS B",title:"LEGS B",sub:"Posterior · Glúteo · Adutores",zl:"📈 HIPERTROFIA",zc:"#2563eb",s:"4",r:"8–12",d:"75–90 s",
    ex:[
-    {n:"01",nm:"RDL com Halteres (Romanian Deadlift)",s:4,r:"10–12",d:"90 seg",p:1,no:"Quadril para trás, não para baixo."},
+    {n:"01",nm:"RDL com Halteres (Romanian Deadlift)",s:4,r:"10–12",d:"90 seg",p:1,no:"Quadril para trás, não para baixo.",a:"Halteres OBRIGATÓRIOS — lombar em recuperação"},
     {n:"02",nm:"Leg Curl Deitado (Femoral)",s:4,r:"10–12",d:"75 seg",p:1,no:"Pés em dorsiflexão. Pausa 1s na contração."},
-    {n:"03",nm:"Hip Thrust com Haltere ou Barra",sh:"Ombro: posicione o acolchoamento corretamente se usar barra — evite pressão no ombro esquerdo.",s:4,r:"10–12",d:"90 seg",no:"Escápulas no banco. Pausa 2s no topo."},
+    {n:"03",nm:"Hip Thrust com Haltere ou Barra",s:4,r:"10–12",d:"90 seg",no:"Escápulas no banco. Pausa 2s no topo.",a:"Prefira haltere se houver desconforto lombar"},
     {n:"04",nm:"Cadeira Abdutora (Hip Abductor)",s:3,r:"12–15",d:"60 seg",no:"Glúteo médio — essencial para estabilidade do quadril."},
-    {n:"05",nm:"Stiff-leg Deadlift com Halteres",s:3,r:"10–12",d:"75 seg",no:"Pernas quase retas. ROM mais amplo que o RDL."},
+    {n:"05",nm:"Stiff-leg Deadlift com Halteres",s:3,r:"10–12",d:"75 seg",no:"Pernas quase retas. ROM mais amplo que o RDL.",a:"Halteres obrigatórios — coluna neutra"},
     {n:"06",nm:"Panturrilha Unilateral em Pé",s:4,r:"12–15",d:"45 seg",no:"Maior ROM e correção de desequilíbrios. Pausa 1s no topo."},
    ],
    ref:"Contreras et al. (2015, JSCR): Hip Thrust apresenta maior ativação EMG do glúteo máximo no pico.",
@@ -229,7 +228,33 @@ function gss(id){try{return JSON.parse(localStorage.getItem(‘jss_’+id)||’[
 function sss(id,a){localStorage.setItem(‘jss_’+id,JSON.stringify(a));}
 function addSess(id,data){const ss=gss(id);ss.unshift(data);if(ss.length>4)ss.pop();sss(id,ss);}
 
-(function seed(){if(localStorage.getItem(‘jv1’))return;localStorage.setItem(‘jv1’,‘1’);})();
+(function seed(){
+if(localStorage.getItem(‘sv3’))return;
+if(!gss(‘PUSH-A’).length)sss(‘PUSH-A’,[{date:‘12/04/2026’,exercises:[
+{nm:‘Supino Inclinado com Halteres’,sets:[{kg:‘52’,reps:‘6’},{kg:‘56’,reps:‘6’},{kg:‘56’,reps:‘6’},{kg:‘56’,reps:‘6’},{kg:‘56’,reps:‘5’}],obs:’’},
+{nm:‘Desenvolvimento com Halteres em Pé’,sets:[{kg:‘32’,reps:‘5’},{kg:‘32’,reps:‘5’},{kg:‘32’,reps:‘5’},{kg:‘32’,reps:‘4’},{kg:‘32’,reps:‘4’}],obs:’’},
+{nm:‘Mergulho em Paralelas com Carga’,sets:[{kg:‘8’,reps:‘6’},{kg:‘8’,reps:‘6’},{kg:‘8’,reps:‘5’},{kg:‘8’,reps:‘6’}],obs:’’},
+{nm:‘Elevação Lateral com Halteres (Força)’,sets:[{kg:‘18’,reps:‘8’},{kg:‘20’,reps:‘8’},{kg:‘20’,reps:‘8’},{kg:‘20’,reps:‘7’}],obs:’’},
+{nm:‘Extensão de Tríceps na Corda (Força)’,sets:[{kg:‘22.5’,reps:‘8’},{kg:‘25’,reps:‘6’},{kg:‘25’,reps:‘6’},{kg:‘25’,reps:‘5’}],obs:’’},
+]}]);
+if(!gss(‘PULL-B’).length)sss(‘PULL-B’,[{date:‘10/04/2026’,exercises:[
+{nm:‘Barra Fixa com Carga (Weighted Pull-up)’,sets:[{kg:‘PC’,reps:‘9’},{kg:‘PC’,reps:‘7’},{kg:‘PC’,reps:‘7’},{kg:‘PC’,reps:‘8’},{kg:‘PC’,reps:‘7’}],obs:‘META: +5kg no cinto’},
+{nm:‘Remada Curvada com Halteres (bilateral)’,sets:[{kg:‘65’,reps:‘5’},{kg:‘65’,reps:‘5’},{kg:‘65’,reps:‘5’},{kg:‘65’,reps:‘5’},{kg:‘65’,reps:‘4’}],obs:‘Máquina deadlift. META: 67,5kg’},
+{nm:‘Puxada Supinada Pegada Fechada’,sets:[{kg:‘60’,reps:‘6’},{kg:‘80’,reps:‘5’},{kg:‘80’,reps:‘4’},{kg:‘80’,reps:‘5’}],obs:’’},
+{nm:‘Rosca Direta com Barra EZ (Força)’,sets:[{kg:‘27’,reps:‘6’},{kg:‘29.5’,reps:‘4’},{kg:‘32.5’,reps:‘4’},{kg:‘32.5’,reps:‘5’}],obs:‘META: 34–35kg’},
+{nm:‘Rosca Inversa com EZ Bar’,sets:[{kg:‘12’,reps:‘8’},{kg:‘14.5’,reps:‘10’},{kg:‘14.5’,reps:‘7’}],obs:’’},
+{nm:‘Encolhimento com Barra/Halteres (Força)’,sets:[{kg:‘56’,reps:‘10’},{kg:‘60’,reps:‘9’},{kg:‘60’,reps:‘9’},{kg:‘60’,reps:‘9’}],obs:‘META: máquina 40–50kg’},
+]}]);
+if(!gss(‘LEGS-B’).length)sss(‘LEGS-B’,[{date:‘11/04/2026’,exercises:[
+{nm:‘RDL com Halteres (Romanian Deadlift)’,sets:[{kg:‘24’,reps:‘10’},{kg:‘24’,reps:‘12’},{kg:‘24’,reps:‘12’},{kg:‘24’,reps:‘12’}],obs:‘META: 28kg’},
+{nm:‘Leg Curl Deitado (Femoral)’,sets:[{kg:‘32.5’,reps:‘12’},{kg:‘35’,reps:‘10’},{kg:‘35’,reps:‘8’},{kg:‘32.5’,reps:‘9’}],obs:‘META: 35kg todas’},
+{nm:‘Hip Thrust com Haltere ou Barra’,sets:[{kg:‘45’,reps:‘10’},{kg:‘45’,reps:‘9’},{kg:‘40’,reps:‘10’},{kg:‘40’,reps:‘10’}],obs:‘META: 45kg todas’},
+{nm:‘Cadeira Abdutora (Hip Abductor)’,sets:[{kg:‘80’,reps:‘14’},{kg:‘90’,reps:‘12’},{kg:‘95’,reps:‘12’}],obs:‘META: 95kg → 100kg’},
+{nm:‘Stiff-leg Deadlift com Halteres’,sets:[{kg:‘24’,reps:‘12’},{kg:‘24’,reps:‘12’},{kg:‘24’,reps:‘12’}],obs:‘META: 28kg’},
+{nm:‘Panturrilha Unilateral em Pé’,sets:[{kg:‘PC’,reps:‘15’},{kg:‘PC’,reps:‘15’},{kg:‘PC’,reps:‘15’},{kg:‘PC’,reps:‘15’}],obs:‘Adicionar carga’},
+]}]);
+localStorage.setItem(‘sv3’,‘1’);
+})();
 
 function buildHP(wid,exl){
 const ss=gss(wid);
@@ -293,7 +318,7 @@ div.innerHTML=’<div class="pt">EVOLUÇÃO</div><div class="ps">Ciclo DUP 4 Sem
 +(EMPTY?’<div class="chc"><div class="emp">📋<br><br>Nenhum registro ainda.</div></div>’
 :’<div class="hisc"><div class="hr hd"><div class="hcc lb">SEM</div><div class="hcc lb">PESO</div><div class="hcc lb">GORD</div><div class="hcc lb">MAGRA</div><div class="hcc lb"></div></div>’+data.map(function(d,i){return’<div class="hr"><div class="hcc wk">’+d.week+’</div><div class="hcc vl">’+d.p+‘kg</div><div class="hcc vl">’+d.g+’%</div><div class="hcc vl">’+d.m+‘kg</div><button class="db" onclick="delCI('+i+')">✕</button></div>’;}).join(’’)+’</div>’);
 if(!EMPTY){loadChartJS(function(){setTimeout(function(){
-mkChart(‘chp’,labels,[{label:‘Peso (kg)’,data:data.map(function(d){return parseFloat(d.p);}),borderColor:’#065f46’,backgroundColor:‘rgba(6,95,70,0.1)’,fill:true,borderWidth:2}]);
+mkChart(‘chp’,labels,[{label:‘Peso (kg)’,data:data.map(function(d){return parseFloat(d.p);}),borderColor:’#dc2626’,backgroundColor:‘rgba(220,38,38,0.1)’,fill:true,borderWidth:2}]);
 mkChart(‘chc’,labels,[{label:‘Gordura (%)’,data:data.map(function(d){return parseFloat(d.g);}),borderColor:’#f59e0b’,fill:false,borderWidth:2},{label:‘Massa Magra (kg)’,data:data.map(function(d){return parseFloat(d.m);}),borderColor:’#10b981’,fill:false,borderWidth:2}]);
 mkChart(‘chm’,labels,[{label:‘Massa Muscular (kg)’,data:data.map(function(d){return parseFloat(d.mu);}),borderColor:’#2563eb’,backgroundColor:‘rgba(37,99,235,0.1)’,fill:true,borderWidth:2}]);
 },100);});}
@@ -324,7 +349,7 @@ var pg=document.createElement(‘div’);pg.className=‘page’+(wi===0?’ act
 var exH=w.ex.map(function(ex){
 var cls=ex.a?‘al’:ex.sh?‘sh’:ex.p?‘pr’:’’;
 var rows=’’;for(var i=0;i<ex.s;i++)rows+=’<div class="sr"><div class="sn">’+(i+1)+’</div><input class="inp" type="number" inputmode="decimal" placeholder="—"><input class="inp" type="number" inputmode="numeric" placeholder="'+ex.r+'"><button class="ob" type="button">○</button></div>’;
-return’<div class="ec '+cls+'"><button class="etb" type="button"><div class="etp"><div style="flex:1"><span class="en" data-base="EX '+ex.n+'">EX ‘+ex.n+’</span><span class="enm">’+ex.nm+’</span><div class="chs"><span class="ch z">’+ex.s+‘×’+ex.r+’</span><span class="ch">⏱ ‘+ex.d+’</span></div></div><div class="aw">▼</div></div>’+(ex.no?’<span class="eno">’+ex.no+’</span>’:’’)+(ex.a?’<div class="ar">⚠️ ‘+ex.a+’</div>’:’’)+(ex.sh?’<div class="sar">🫀 ‘+ex.sh+’</div>’:’’)+’</button><div class="lb"><div class="lc"><div class="clh">Sér</div><div class="clh">KG</div><div class="clh">Reps</div><div class="clh">OK</div></div>’+rows+’<textarea class="obs" placeholder="Observações..."></textarea><button class="cb" type="button">↺ LIMPAR</button></div></div>’;
+return’<div class="ec '+cls+'"><button class="etb" type="button"><div class="etp"><div style="flex:1"><span class="en" data-base="EX '+ex.n+'">EX ‘+ex.n+’</span><span class="enm">’+ex.nm+’</span><div class="chs"><span class="ch z">’+ex.s+‘×’+ex.r+’</span><span class="ch">⏱ ‘+ex.d+’</span></div></div><div class="aw">▼</div></div>’+(ex.no?’<span class="eno">’+ex.no+’</span>’:’’)+(ex.a?’<div class="ar">⚠️ ‘+ex.a+’</div>’:’’)+(ex.sh?’<div class="sar">🫀 ‘+ex.sh+’</div>’:’’)+(ex.sh?’<div class="sar">🫀 ‘+ex.sh+’</div>’:’’)+’</button><div class="lb"><div class="lc"><div class="clh">Sér</div><div class="clh">KG</div><div class="clh">Reps</div><div class="clh">OK</div></div>’+rows+’<textarea class="obs" placeholder="Observações..."></textarea><button class="cb" type="button">↺ LIMPAR</button></div></div>’;
 }).join(’’);
 pg.innerHTML=’<div class="wt">’+w.title+’</div><div class="ws">’+w.sub+’</div><div class="zb">’+w.zl+’</div>’
 +’<div class="stats"><div class="stat"><span class="sv">’+w.s+’</span><div class="sl">Séries</div></div><div class="stat"><span class="sv">’+w.r+’</span><div class="sl">Reps</div></div><div class="stat"><span class="sv">’+w.d+’</span><div class="sl">Descanso</div></div></div>’
