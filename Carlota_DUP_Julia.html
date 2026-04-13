@@ -6,22 +6,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="Carlota · J.R.V">
-<title>Carlota.DUP — J.R.V</title>
+<meta name="apple-mobile-web-app-title" content="Carlota JRV">
+<title>Carlota.DUP · J.R.V</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{background:#f4f4f0;font-family:'DM Sans',sans-serif;color:#111;}
 .app{max-width:480px;margin:0 auto;min-height:100vh;background:#f4f4f0;}
-.header{background:linear-gradient(135deg,#064e3b 0%,#065f46 60%,#047857 100%);box-shadow:0 2px 16px rgba(6,78,59,.35);padding:18px 20px 0;position:sticky;top:0;z-index:100;}
+.header{background:linear-gradient(135deg,#064e3b,#065f46,#047857);padding:18px 20px 0;position:sticky;top:0;z-index:100;}
 .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#fff;}
 .logo span{color:#f9a8d4;}
-.wb{font-family:'DM Mono',monospace;font-size:9px;color:#ffffff;letter-spacing:2px;text-transform:uppercase;}
+.wb{font-family:'DM Mono',monospace;font-size:9px;color:#fff;letter-spacing:2px;text-transform:uppercase;}
 .tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;}
 .tabs::-webkit-scrollbar{display:none;}
-.tab{flex-shrink:0;padding:10px 14px;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:1px;cursor:pointer;border:none;background:transparent;color:rgba(255,255,255,0.7);border-bottom:3px solid transparent;transition:all .2s;text-transform:uppercase;-webkit-appearance:none;}
-.tab.active{color:#ffffff;border-bottom:3px solid var(--zc,#f9a8d4);}
+.tab{flex-shrink:0;padding:10px 14px;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:1px;cursor:pointer;border:none;background:transparent;color:rgba(255,255,255,0.65);border-bottom:3px solid transparent;transition:all .2s;text-transform:uppercase;-webkit-appearance:none;}
+.tab.active{color:#fff;border-bottom:3px solid var(--zc,#f9a8d4);}
 .tab.ptab.active{border-bottom-color:#10b981;}
 .page{padding:20px;display:none;}
 .page.active{display:block;}
@@ -49,95 +49,98 @@ body{background:#f4f4f0;font-family:'DM Sans',sans-serif;color:#111;}
 .hsn{font-family:'Bebas Neue',sans-serif;font-size:14px;color:#bbb;text-align:center;}
 .hv{font-family:'DM Mono',monospace;font-size:12px;color:#444;text-align:center;background:#f9f9f6;border-radius:5px;padding:5px 2px;font-weight:500;}
 .hv.e{color:#ddd;}
+.sar{display:flex;gap:6px;margin-top:8px;padding:7px 10px;background:#fff1f6;border-radius:6px;border:1px solid #fda4af;font-size:11px;color:#9f1239;font-weight:500;line-height:1.4;text-align:left;}
+
 .hobs{font-size:11px;color:#aaa;margin-top:4px;font-style:italic;}
-.noh{text-align:center;padding:16px;color:#ccc;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
+.noh{text-align:center;padding:16px;color:#ccc;font-family:‘DM Mono’,monospace;font-size:11px;letter-spacing:1px;}
 .exl{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
 .ec{background:#fff;border:1px solid #e0e0d8;border-radius:12px;overflow:hidden;}
 .ec.al{border-left:4px solid #f59e0b;}
-.ec.sh{border-left:4px solid #fda4af;}.sar{display:flex;gap:6px;margin-top:8px;padding:7px 10px;background:#fff1f6;border-radius:6px;border:1px solid #fda4af;font-size:11px;color:#9f1239;font-weight:500;line-height:1.4;text-align:left;}
-.ec.pr{border-left:4px solid var(--zc);}
+.ec.sh{border-left:4px solid #fda4af;}
+.ec.pr{border-left:4px solid var(–zc);}
 .etb{width:100%;text-align:left;background:transparent;border:none;padding:14px 16px 12px;cursor:pointer;display:block;-webkit-appearance:none;touch-action:manipulation;}
 .etb:active{background:rgba(0,0,0,.02);}
 .etp{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
-.en{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:#bbb;margin-bottom:4px;display:block;}
+.en{font-family:‘DM Mono’,monospace;font-size:9px;letter-spacing:2px;color:#bbb;margin-bottom:4px;display:block;}
 .enm{font-size:14px;font-weight:700;color:#111;margin-bottom:8px;line-height:1.3;display:block;}
 .chs{display:flex;gap:6px;flex-wrap:wrap;}
-.ch{font-family:'DM Mono',monospace;font-size:10px;padding:3px 8px;border-radius:5px;background:#f4f4f0;color:#666;border:1px solid #e0e0d8;}
-.ch.z{background:var(--zc);color:#fff;border-color:var(--zc);}
+.ch{font-family:‘DM Mono’,monospace;font-size:10px;padding:3px 8px;border-radius:5px;background:#f4f4f0;color:#666;border:1px solid #e0e0d8;}
+.ch.z{background:var(–zc);color:#fff;border-color:var(–zc);}
 .aw{flex-shrink:0;width:28px;height:28px;background:#f4f4f0;border:1px solid #e0e0d8;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;margin-top:2px;pointer-events:none;}
 .eno{font-size:11px;color:#777;line-height:1.5;margin-top:8px;display:block;text-align:left;}
 .ar{display:flex;gap:6px;margin-top:8px;padding:7px 10px;background:#fffbeb;border-radius:6px;border:1px solid #fcd34d;font-size:11px;color:#92400e;font-weight:500;line-height:1.4;text-align:left;}
 .lb{border-top:1px solid #eeeee8;padding:14px 16px 16px;background:#fafaf7;display:none;}
 .lb.open{display:block;}
 .lc{display:grid;grid-template-columns:26px 1fr 1fr 38px;gap:6px;margin-bottom:8px;}
-.clh{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:#bbb;text-transform:uppercase;text-align:center;}
+.clh{font-family:‘DM Mono’,monospace;font-size:9px;letter-spacing:2px;color:#bbb;text-transform:uppercase;text-align:center;}
 .sr{display:grid;grid-template-columns:26px 1fr 1fr 38px;gap:6px;margin-bottom:6px;align-items:center;}
-.sn{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--zc);text-align:center;opacity:.65;}
-.inp{background:#fff;border:1.5px solid #e0e0d8;border-radius:7px;padding:10px 4px;font-family:'DM Mono',monospace;font-size:14px;color:#111;width:100%;text-align:center;outline:none;-webkit-appearance:none;font-weight:500;transition:border-color .2s;}
-.inp:focus{border-color:var(--zc);}
+.sn{font-family:‘Bebas Neue’,sans-serif;font-size:16px;color:var(–zc);text-align:center;opacity:.65;}
+.inp{background:#fff;border:1.5px solid #e0e0d8;border-radius:7px;padding:10px 4px;font-family:‘DM Mono’,monospace;font-size:14px;color:#111;width:100%;text-align:center;outline:none;-webkit-appearance:none;font-weight:500;transition:border-color .2s;}
+.inp:focus{border-color:var(–zc);}
 .inp::placeholder{color:#ccc;font-size:11px;font-weight:400;}
 .inp.fd{opacity:.4;}
 .ob{width:38px;height:42px;border-radius:7px;border:1.5px solid #e0e0d8;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#ccc;transition:all .2s;-webkit-appearance:none;touch-action:manipulation;}
-.ob.dn{background:var(--zc);border-color:var(--zc);color:#fff;}
-.obs{width:100%;margin-top:10px;background:#fff;border:1.5px solid #e0e0d8;border-radius:7px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:12px;color:#444;resize:none;outline:none;height:52px;-webkit-appearance:none;}
+.ob.dn{background:var(–zc);border-color:var(–zc);color:#fff;}
+.obs{width:100%;margin-top:10px;background:#fff;border:1.5px solid #e0e0d8;border-radius:7px;padding:10px 12px;font-family:‘DM Sans’,sans-serif;font-size:12px;color:#444;resize:none;outline:none;height:52px;-webkit-appearance:none;}
 .obs::placeholder{color:#ccc;}
-.cb{margin-top:8px;width:100%;padding:9px;background:transparent;border:1px solid #e0e0d8;border-radius:7px;font-family:'DM Mono',monospace;font-size:9px;color:#bbb;letter-spacing:1px;cursor:pointer;-webkit-appearance:none;touch-action:manipulation;}
+.cb{margin-top:8px;width:100%;padding:9px;background:transparent;border:1px solid #e0e0d8;border-radius:7px;font-family:‘DM Mono’,monospace;font-size:9px;color:#bbb;letter-spacing:1px;cursor:pointer;-webkit-appearance:none;touch-action:manipulation;}
 .sw{margin-bottom:22px;}
-.sndb{width:100%;padding:16px;background:linear-gradient(135deg,#064e3b,#065f46);border:none;border-radius:12px;font-family:'DM Mono',monospace;font-size:12px;font-weight:500;letter-spacing:2px;color:#fff;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;-webkit-appearance:none;touch-action:manipulation;}
-.sndb:active{opacity:.85;transform:scale(.98);}
+.sndb{width:100%;padding:16px;background:linear-gradient(135deg,#064e3b,#065f46);border:none;border-radius:12px;font-family:‘DM Mono’,monospace;font-size:12px;font-weight:500;letter-spacing:2px;color:#fff;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;-webkit-appearance:none;touch-action:manipulation;}
+.sndb:active{opacity:.85;background:transparent;transform:scale(.98);}
 .sno{text-align:center;margin-top:8px;font-size:11px;color:#aaa;}
 .scb{background:#eef4ff;border:1px solid #c7dafb;border-radius:12px;padding:14px 16px;margin-bottom:14px;}
-.scl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:#3b82f6;text-transform:uppercase;margin-bottom:6px;}
+.scl{font-family:‘DM Mono’,monospace;font-size:9px;letter-spacing:3px;color:#3b82f6;text-transform:uppercase;margin-bottom:6px;}
 .sct{font-size:12px;color:#2c5282;line-height:1.6;}
 .tpb{background:#fff;border:1px solid #e0e0d8;border-radius:12px;padding:14px 16px;margin-bottom:28px;}
-.tpl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--zc);text-transform:uppercase;margin-bottom:6px;}
+.tpl{font-family:‘DM Mono’,monospace;font-size:9px;letter-spacing:3px;color:var(–zc);text-transform:uppercase;margin-bottom:6px;}
 .tpt{font-size:12px;color:#666;line-height:1.6;}
-.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(12px);background:#111;color:#fff;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;padding:12px 22px;border-radius:30px;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(12px);background:#111;color:#fff;font-family:‘DM Mono’,monospace;font-size:11px;letter-spacing:2px;padding:12px 22px;border-radius:30px;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-.pt{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:4px;color:#111;line-height:1;margin-bottom:4px;}
+.pt{font-family:‘Bebas Neue’,sans-serif;font-size:42px;letter-spacing:4px;color:#111;line-height:1;margin-bottom:4px;}
 .ps{font-size:13px;color:#888;margin-bottom:20px;}
 .kg{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:22px;}
 .kc{background:#fff;border:1px solid #e0e0d8;border-radius:12px;padding:14px;}
-.kl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:#bbb;text-transform:uppercase;margin-bottom:4px;}
-.kv{font-family:'Bebas Neue',sans-serif;font-size:26px;color:#111;line-height:1;}
-.kd{font-family:'DM Mono',monospace;font-size:11px;margin-top:3px;font-weight:500;}
+.kl{font-family:‘DM Mono’,monospace;font-size:9px;letter-spacing:2px;color:#bbb;text-transform:uppercase;margin-bottom:4px;}
+.kv{font-family:‘Bebas Neue’,sans-serif;font-size:26px;color:#111;line-height:1;}
+.kd{font-family:‘DM Mono’,monospace;font-size:11px;margin-top:3px;font-weight:500;}
 .kd.g{color:#10b981;}.kd.r{color:#ef4444;}.kd.n{color:#aaa;}
 .cc{background:#fff;border:1px solid #e0e0d8;border-radius:12px;padding:18px;margin-bottom:22px;}
-.cit{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:#10b981;text-transform:uppercase;margin-bottom:16px;font-weight:500;}
+.cit{font-family:‘DM Mono’,monospace;font-size:10px;letter-spacing:3px;color:#10b981;text-transform:uppercase;margin-bottom:16px;font-weight:500;}
 .fr{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
 .fr.one{grid-template-columns:1fr;}
 .fg{display:flex;flex-direction:column;gap:5px;}
-.fl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:#aaa;text-transform:uppercase;}
-.fi{background:#f9f9f6;border:1.5px solid #e0e0d8;border-radius:8px;padding:11px 12px;font-family:'DM Mono',monospace;font-size:14px;color:#111;outline:none;-webkit-appearance:none;width:100%;font-weight:500;}
+.fl{font-family:‘DM Mono’,monospace;font-size:9px;letter-spacing:2px;color:#aaa;text-transform:uppercase;}
+.fi{background:#f9f9f6;border:1.5px solid #e0e0d8;border-radius:8px;padding:11px 12px;font-family:‘DM Mono’,monospace;font-size:14px;color:#111;outline:none;-webkit-appearance:none;width:100%;font-weight:500;}
 .fi:focus{border-color:#10b981;background:#fff;}
 .fi::placeholder{color:#ccc;font-weight:400;}
-.sb{width:100%;margin-top:12px;padding:14px;background:#10b981;border:none;border-radius:8px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:2px;color:#fff;text-transform:uppercase;cursor:pointer;-webkit-appearance:none;touch-action:manipulation;}
+.sb{width:100%;margin-top:12px;padding:14px;background:#10b981;border:none;border-radius:8px;font-family:‘DM Mono’,monospace;font-size:11px;font-weight:500;letter-spacing:2px;color:#fff;text-transform:uppercase;cursor:pointer;-webkit-appearance:none;touch-action:manipulation;}
 .sb.pu{background:#7c3aed;}
-.sm{display:none;text-align:center;margin-top:8px;font-family:'DM Mono',monospace;font-size:11px;color:#10b981;}
+.sm{display:none;text-align:center;margin-top:8px;font-family:‘DM Mono’,monospace;font-size:11px;color:#10b981;}
 .chc{background:#fff;border:1px solid #e0e0d8;border-radius:12px;padding:16px;margin-bottom:14px;}
-.cht{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:#bbb;text-transform:uppercase;margin-bottom:14px;}
+.cht{font-family:‘DM Mono’,monospace;font-size:9px;letter-spacing:3px;color:#bbb;text-transform:uppercase;margin-bottom:14px;}
 .chw{position:relative;height:180px;}
 .hisc{background:#fff;border:1px solid #e0e0d8;border-radius:12px;overflow:hidden;margin-bottom:14px;}
 .hr{display:grid;grid-template-columns:60px 1fr 1fr 1fr 32px;gap:6px;padding:10px 14px;align-items:center;border-bottom:1px solid #f0f0e8;}
 .hr.hd{background:#f9f9f6;}
 .hr:last-child{border-bottom:none;}
-.hcc{font-family:'DM Mono',monospace;font-size:10px;text-align:center;}
+.hcc{font-family:‘DM Mono’,monospace;font-size:10px;text-align:center;}
 .hcc.lb{color:#bbb;font-size:9px;text-transform:uppercase;}
 .hcc.wk{color:#10b981;font-weight:500;}
 .hcc.vl{color:#333;font-weight:500;}
 .db{width:28px;height:28px;background:transparent;border:1px solid #e0e0d8;border-radius:6px;color:#ccc;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-appearance:none;touch-action:manipulation;}
 .emp{text-align:center;padding:32px 20px;color:#bbb;font-size:13px;line-height:1.6;}
 .hvb{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px 16px;margin-bottom:22px;}
-.hvt{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:#10b981;text-transform:uppercase;margin-bottom:12px;}
+.hvt{font-family:‘DM Mono’,monospace;font-size:9px;letter-spacing:3px;color:#10b981;text-transform:uppercase;margin-bottom:12px;}
 .hvg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
 .hvi{background:#fff;border-radius:8px;padding:10px 8px;text-align:center;border:1px solid #d1fae5;}
-.hvv{font-family:'Bebas Neue',sans-serif;font-size:22px;color:#10b981;line-height:1;display:block;}
-.hvl{font-family:'DM Mono',monospace;font-size:8px;color:#6ee7b7;letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
-.hvbg{display:inline-flex;padding:5px 12px;border-radius:20px;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;margin-top:10px;}
+.hvv{font-family:‘Bebas Neue’,sans-serif;font-size:22px;color:#10b981;line-height:1;display:block;}
+.hvl{font-family:‘DM Mono’,monospace;font-size:8px;color:#6ee7b7;letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+.hvbg{display:inline-flex;padding:5px 12px;border-radius:20px;font-family:‘DM Mono’,monospace;font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;margin-top:10px;}
 .hvbg.mx{background:#dcfce7;color:#16a34a;}
 .hvbg.nm{background:#fef9c3;color:#a16207;}
 .hvbg.lw{background:#fee2e2;color:#dc2626;}
 </style>
+
 </head>
 <body>
 <div class="app">
@@ -156,8 +159,8 @@ const WK=[
   {id:"PUSH-A",label:"PUSH A",title:"PUSH A",sub:"Peito · Ombro · Tríceps",zl:"💪 FORÇA",zc:"#dc2626",s:"5",r:"4–6",d:"2–3 min",
    ex:[
     {n:"01",nm:"Supino Inclinado com Halteres",s:5,r:"4–6",d:"3 min",p:1,no:"Pegada neutra ou semi-pronada. Cotovelo a 45–60° do tronco.",a:"Halteres obrigatórios — cotovelo esquerdo"},
-    {n:"02",nm:"Desenvolvimento com Halteres em Pé",s:5,r:"4–6",d:"2–3 min",p:1,no:"Não bloqueie os cotovelos no topo. Amplitude total.",a:"Halteres obrigatórios — epicondilite"},
-    {n:"03",nm:"Mergulho em Paralelas com Carga",s:4,r:"4–6",d:"2–3 min",no:"Tronco inclinado para frente. Cinto com anilha ou colete.",sh:"Ombro: na descida, não force além do ponto de conforto — extensão excessiva pode irritar o ombro."},
+    {n:"02",nm:"Desenvolvimento com Halteres em Pé",s:5,r:"4–6",d:"2–3 min",p:1,no:"Não bloqueie os cotovelos no topo. Amplitude total.",sh:"Ombro: movimento overhead — monitore o ombro esquerdo. Reduza amplitude se sentir desconforto."},
+    {n:"03",nm:"Mergulho em Paralelas com Carga",s:4,r:"4–6",d:"2–3 min",no:"Tronco inclinado para frente. Cinto com anilha ou colete.",sh:"Ombro: não force a descida além do ponto de conforto — extensão excessiva pode irritar o ombro."},
     {n:"04",nm:"Elevação Lateral com Halteres (Força)",s:4,r:"6–8",d:"90 seg",no:"Amplitude até linha dos ombros. Pausa 1s no topo."},
     {n:"05",nm:"Extensão de Tríceps na Corda (Força)",s:4,r:"6–8",d:"90 seg",p:1,no:"Carga alta. Pronação total no final.",a:"Corda obrigatória — sem barra reta"},
    ],
@@ -167,7 +170,7 @@ const WK=[
    ex:[
     {n:"01",nm:"Supino Reto com Halteres",s:4,r:"10–12",d:"75 seg",p:1,no:"ROM completo. Pausa leve no fundo.",a:"Halteres obrigatórios — cotovelo esquerdo"},
     {n:"02",nm:"Crucifixo Inclinado no Cabo",s:3,r:"12–15",d:"60 seg",no:"Tensão constante. Cotovelo levemente flexionado."},
-    {n:"03",nm:"Desenvolvimento Arnold com Halteres",s:4,r:"10–12",d:"75 seg",no:"Rotação supina na descida.",a:"Halteres obrigatórios"},
+    {n:"03",nm:"Desenvolvimento Arnold com Halteres",s:4,r:"10–12",d:"75 seg",no:"Rotação supina na descida.",sh:"Ombro: rotação sob carga — o movimento mais exigente desta sessão. Reduza se sentir desconforto.",a:"Halteres obrigatórios"},
     {n:"04",nm:"Elevação Lateral no Cabo (unilateral)",s:3,r:"13–15",d:"60 seg",no:"Cabo garante tensão constante em toda amplitude."},
     {n:"05",nm:"Extensão de Tríceps na Corda (Volume)",s:4,r:"12–15",d:"60 seg",p:1,no:"Carga moderada. Foco em contração máxima.",a:"Corda obrigatória"},
     {n:"06",nm:"Tríceps Coice com Haltere (kickback)",s:3,r:"15",d:"45 seg",no:"Supinação completa no final.",a:"Halter — sem pressão no cotovelo"},
@@ -187,14 +190,14 @@ const WK=[
    tip:"STRAPS em todos os puxamentos. Priorize conexão mente-músculo no dorsal."},
   {id:"PULL-B",label:"PULL B",title:"PULL B",sub:"Costas · Bíceps · Trapézio",zl:"💪 FORÇA",zc:"#dc2626",s:"5",r:"4–6",d:"2–3 min",
    ex:[
-    {n:"01",nm:"Barra Fixa com Carga (Weighted Pull-up)",s:5,r:"4–6",d:"3 min",p:1,no:"Amplitude total — braços completamente estendidos no fundo.",sh:"Ombro: se sentir dor no ponto de extensão total, reduza levemente a amplitude final — ainda é seguro."},
+    {n:"01",nm:"Barra Fixa com Carga (Weighted Pull-up)",s:5,r:"4–6",d:"3 min",p:1,no:"Amplitude total — braços completamente estendidos no fundo.",sh:"Ombro: se sentir dor no ponto de extensão total, reduza levemente a amplitude final."},
     {n:"02",nm:"Remada Curvada com Halteres (bilateral)",s:5,r:"4–6",d:"2–3 min",p:1,no:"Tronco a ~45°. STRAPS obrigatório.",a:"Halteres preferidos — preserva cotovelo esquerdo"},
     {n:"03",nm:"Puxada Supinada Pegada Fechada",s:4,r:"6–8",d:"2 min",no:"Bíceps e dorsal em co-ativação máxima."},
     {n:"04",nm:"Rosca Direta com Barra EZ (Força)",s:4,r:"4–6",d:"2 min",p:1,no:"Sem momentum. Carga máxima com técnica perfeita.",a:"EZ bar OBRIGATÓRIA — nunca barra reta"},
     {n:"05",nm:"Rosca Inversa com EZ Bar",s:3,r:"10",d:"75 seg",no:"Reabilitação preventiva. Pegada pronada.",a:"Exercício terapêutico — carga leve a moderada"},
     {n:"06",nm:"Encolhimento com Barra/Halteres (Força)",s:4,r:"6–8",d:"90 seg",no:"Carga máxima. Pausa 2s no topo."},
    ],
-   ref:"Peterson et al. (2011, Clin Orthop Relat Res): Rosca inversa é o exercício mais indicado para epicondilite lateral.",
+   ref:"Peterson et al. (2011, Clin Orthop Relat Res): Progressão controlada em exercícios de puxada com amplitude progressiva é segura e eficaz para atletas com histórico de dor no ombro.",
    tip:"Aqueça o manguito rotador com 2×15 de rotação externa antes de começar."},
   {id:"LEGS-A",label:"LEGS A",title:"LEGS A",sub:"Quadríceps · Panturrilha",zl:"🔁 METABÓLICO",zc:"#d97706",s:"4",r:"15–20",d:"45–60 s",
    ex:[
@@ -211,7 +214,7 @@ const WK=[
    ex:[
     {n:"01",nm:"RDL com Halteres (Romanian Deadlift)",s:4,r:"10–12",d:"90 seg",p:1,no:"Quadril para trás, não para baixo.",a:"Halteres OBRIGATÓRIOS — lombar em recuperação"},
     {n:"02",nm:"Leg Curl Deitado (Femoral)",s:4,r:"10–12",d:"75 seg",p:1,no:"Pés em dorsiflexão. Pausa 1s na contração."},
-    {n:"03",nm:"Hip Thrust com Haltere ou Barra",s:4,r:"10–12",d:"90 seg",no:"Escápulas no banco. Pausa 2s no topo.",a:"Prefira haltere se houver desconforto lombar"},
+    {n:"03",nm:"Hip Thrust com Haltere ou Barra",s:4,r:"10–12",d:"90 seg",no:"Escápulas no banco. Pausa 2s no topo.",sh:"Ombro: se usar barra, posicione o acolchoamento corretamente — evite pressão direta no ombro esquerdo.",a:"Prefira haltere se houver desconforto lombar"},
     {n:"04",nm:"Cadeira Abdutora (Hip Abductor)",s:3,r:"12–15",d:"60 seg",no:"Glúteo médio — essencial para estabilidade do quadril."},
     {n:"05",nm:"Stiff-leg Deadlift com Halteres",s:3,r:"10–12",d:"75 seg",no:"Pernas quase retas. ROM mais amplo que o RDL.",a:"Halteres obrigatórios — coluna neutra"},
     {n:"06",nm:"Panturrilha Unilateral em Pé",s:4,r:"12–15",d:"45 seg",no:"Maior ROM e correção de desequilíbrios. Pausa 1s no topo."},
@@ -349,7 +352,7 @@ var pg=document.createElement(‘div’);pg.className=‘page’+(wi===0?’ act
 var exH=w.ex.map(function(ex){
 var cls=ex.a?‘al’:ex.sh?‘sh’:ex.p?‘pr’:’’;
 var rows=’’;for(var i=0;i<ex.s;i++)rows+=’<div class="sr"><div class="sn">’+(i+1)+’</div><input class="inp" type="number" inputmode="decimal" placeholder="—"><input class="inp" type="number" inputmode="numeric" placeholder="'+ex.r+'"><button class="ob" type="button">○</button></div>’;
-return’<div class="ec '+cls+'"><button class="etb" type="button"><div class="etp"><div style="flex:1"><span class="en" data-base="EX '+ex.n+'">EX ‘+ex.n+’</span><span class="enm">’+ex.nm+’</span><div class="chs"><span class="ch z">’+ex.s+‘×’+ex.r+’</span><span class="ch">⏱ ‘+ex.d+’</span></div></div><div class="aw">▼</div></div>’+(ex.no?’<span class="eno">’+ex.no+’</span>’:’’)+(ex.a?’<div class="ar">⚠️ ‘+ex.a+’</div>’:’’)+(ex.sh?’<div class="sar">🫀 ‘+ex.sh+’</div>’:’’)+(ex.sh?’<div class="sar">🫀 ‘+ex.sh+’</div>’:’’)+’</button><div class="lb"><div class="lc"><div class="clh">Sér</div><div class="clh">KG</div><div class="clh">Reps</div><div class="clh">OK</div></div>’+rows+’<textarea class="obs" placeholder="Observações..."></textarea><button class="cb" type="button">↺ LIMPAR</button></div></div>’;
+return’<div class="ec '+cls+'"><button class="etb" type="button"><div class="etp"><div style="flex:1"><span class="en" data-base="EX '+ex.n+'">EX ‘+ex.n+’</span><span class="enm">’+ex.nm+’</span><div class="chs"><span class="ch z">’+ex.s+‘×’+ex.r+’</span><span class="ch">⏱ ‘+ex.d+’</span></div></div><div class="aw">▼</div></div>’+(ex.no?’<span class="eno">’+ex.no+’</span>’:’’)+(ex.a?’<div class="ar">⚠️ ‘+ex.a+’</div>’:’’)+(ex.sh?’<div class="sar">🫀 ‘+ex.sh+’</div>’:’’)+’</button><div class="lb"><div class="lc"><div class="clh">Sér</div><div class="clh">KG</div><div class="clh">Reps</div><div class="clh">OK</div></div>’+rows+’<textarea class="obs" placeholder="Observações..."></textarea><button class="cb" type="button">↺ LIMPAR</button></div></div>’;
 }).join(’’);
 pg.innerHTML=’<div class="wt">’+w.title+’</div><div class="ws">’+w.sub+’</div><div class="zb">’+w.zl+’</div>’
 +’<div class="stats"><div class="stat"><span class="sv">’+w.s+’</span><div class="sl">Séries</div></div><div class="stat"><span class="sv">’+w.r+’</span><div class="sl">Reps</div></div><div class="stat"><span class="sv">’+w.d+’</span><div class="sl">Descanso</div></div></div>’
