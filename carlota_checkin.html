@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Check-in DUP">
+  <title>Carlota DUP — Check-in</title>
+  <style>
+    :root {
+      --red:#dc2626; --blue:#2563eb; --orange:#d97706;
+      --green:#059669; --bg:#f1f5f9; --card:#fff;
+      --border:#e2e8f0; --text:#0f172a; --muted:#64748b; --r:12px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    html,body{background:var(--bg);color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;}
+    body{padding-bottom:48px;}
+
+    .hdr{background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;
+      padding:max(env(safe-area-inset-top),18px) 16px 18px;}
+    .hdr-logo{font-size:20px;font-weight:800;letter-spacing:-.5px;display:flex;align-items:center;gap:8px;}
+    .hdr-date{font-size:12px;color:#94a3b8;margin-top:4px;}
+    .hdr-alert{display:none;margin-top:10px;background:rgba(124,58,237,.2);
+      border:1px solid rgba(124,58,237,.4);border-radius:8px;padding:8px 10px;
+      font-size:12px;color:#c4b5fd;font-weight:600;}
+
+    .wrap{padding:14px;display:flex;flex-direction:column;gap:10px;}
+
+    .bio{display:flex;background:linear-gradient(135deg,#1e293b,#334155);
+      border-radius:10px;overflow:hidden;}
+    .bio-i{flex:1;padding:10px 4px;text-align:center;
+      border-right:1px solid rgba(255,255,255,.08);}
+    .bio-i:last-child{border-right:none;}
+    .bio-v{font-size:15px;font-weight:800;color:#fff;}
+    .bio-l{font-size:9px;color:#94a3b8;text-transform:uppercase;margin-top:2px;letter-spacing:.3px;}
+    .bio-d{font-size:10px;color:#f87171;margin-top:1px;}
+    .bio-ts{font-size:9px;color:#64748b;text-align:right;padding:3px 8px 0;}
+
+    .alert-band{border-radius:8px;padding:9px 12px;font-size:12px;font-weight:600;
+      background:#fef3c7;color:#92400e;border:1px solid #fde68a;}
+
+    .card{background:var(--card);border-radius:var(--r);padding:14px;
+      border:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.04);}
+    .card-hd{display:flex;align-items:center;gap:7px;margin-bottom:12px;}
+    .card-ic{font-size:17px;}
+    .card-tt{font-size:14px;font-weight:700;}
+    .card-ht{margin-left:auto;font-size:11px;color:var(--muted);}
+
+    .field{margin-bottom:12px;}
+    .field:last-child{margin-bottom:0;}
+    .lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;
+      letter-spacing:.4px;display:flex;justify-content:space-between;
+      align-items:center;margin-bottom:7px;}
+    .lbl-v{font-size:14px;font-weight:800;color:var(--text);}
+
+    .slider{width:100%;height:6px;-webkit-appearance:none;appearance:none;
+      border-radius:3px;outline:none;cursor:pointer;}
+    .slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;
+      border-radius:50%;background:#fff;border:3px solid currentColor;
+      cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.18);}
+    .slider-ends{display:flex;justify-content:space-between;
+      margin-top:3px;font-size:10px;color:#94a3b8;}
+
+    .badges{display:flex;gap:6px;flex-wrap:wrap;}
+    .badge{padding:8px 12px;border-radius:7px;font-size:12px;font-weight:700;
+      cursor:pointer;border:2px solid transparent;transition:all .12s;opacity:.55;user-select:none;}
+    .badge.sel{opacity:1;}
+    .bp {background:#fef2f2;color:var(--red);   border-color:#fecaca;}  .bp.sel {background:var(--red);   color:#fff;}
+    .bl {background:#eff6ff;color:var(--blue);  border-color:#bfdbfe;}  .bl.sel {background:var(--blue);  color:#fff;}
+    .bg_{background:#fffbeb;color:var(--orange);border-color:#fde68a;}  .bg_.sel{background:var(--orange);color:#fff;}
+    .br {background:#f8fafc;color:var(--muted); border-color:var(--border);} .br.sel{background:var(--muted);color:#fff;}
+
+    .div{height:1px;background:var(--border);margin:10px 0;}
+
+    .tog{display:flex;gap:7px;}
+    .tb{flex:1;padding:10px;border:1.5px solid var(--border);border-radius:8px;
+      font-size:13px;font-weight:600;cursor:pointer;background:#fff;
+      color:var(--muted);transition:all .12s;text-align:center;}
+    .tb.ok{border-color:var(--green);background:#f0fdf4;color:var(--green);}
+    .tb.no{border-color:var(--red);  background:#fef2f2;color:var(--red);}
+
+    .pills{display:flex;gap:7px;flex-wrap:wrap;}
+    .pill{padding:7px 13px;border:1.5px solid var(--border);border-radius:20px;
+      font-size:12px;font-weight:600;cursor:pointer;background:#fff;
+      color:var(--muted);transition:all .12s;user-select:none;}
+    .pill.on {border-color:var(--green);background:#f0fdf4;color:var(--green);}
+    .pill.off{border-color:#fca5a5;   background:#fef2f2;color:var(--red);}
+
+    input[type=number],textarea{width:100%;padding:10px 12px;
+      border:1.5px solid var(--border);border-radius:8px;font-size:15px;
+      font-family:inherit;color:var(--text);outline:none;background:#fff;-webkit-appearance:none;}
+    input[type=number]:focus,textarea:focus{border-color:var(--blue);}
+    textarea{resize:vertical;min-height:80px;}
+    textarea::placeholder,input::placeholder{color:#cbd5e1;}
+
+    .btn-main{width:100%;padding:15px;
+      background:linear-gradient(135deg,#0f172a,#1e293b);
+      color:#fff;border:none;border-radius:10px;font-size:16px;
+      font-weight:700;cursor:pointer;letter-spacing:.3px;transition:opacity .12s;}
+    .btn-main:disabled{opacity:.5;cursor:not-allowed;}
+    .btn-reset{width:100%;padding:12px;background:#f1f5f9;
+      border:1px solid var(--border);border-radius:8px;font-size:14px;
+      font-weight:600;cursor:pointer;color:#475569;margin-top:10px;}
+
+    .suc{background:#f0fdf4;border:1.5px solid var(--green);
+      border-radius:var(--r);padding:20px;text-align:center;}
+    .suc-ic{font-size:38px;margin-bottom:8px;}
+    .suc-tt{font-size:16px;font-weight:700;color:var(--green);margin-bottom:4px;}
+    .suc-sb{font-size:12px;color:var(--muted);}
+
+    .err-box{background:#fef2f2;border:1.5px solid #fca5a5;border-radius:8px;
+      padding:12px 14px;font-size:13px;color:#991b1b;margin-top:8px;display:none;}
+
+    #workoutExtra{display:none;}
+    #successView{display:none;padding:14px;}
+
+    #loadingOverlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.6);
+      z-index:99;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
+    #loadingOverlay.show{display:flex;}
+    .spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.2);
+      border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading-txt{color:#fff;font-size:14px;font-weight:600;}
+  </style>
+</head>
+<body>
+
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-txt">Salvando check-in…</div>
+</div>
+
+<div class="hdr">
+  <div class="hdr-logo">⚡ Carlota DUP</div>
+  <div class="hdr-date" id="hDate"></div>
+  <div class="hdr-alert" id="hAlert"></div>
+</div>
+
+<div class="wrap" id="mainForm">
+
+  <div>
+    <div class="bio">
+      <div class="bio-i"><div class="bio-v">72,85 kg</div><div class="bio-l">Peso</div><div class="bio-d">+5,3 kg</div></div>
+      <div class="bio-i"><div class="bio-v">18,7%</div><div class="bio-l">Gordura</div><div class="bio-d">+3,4 pp</div></div>
+      <div class="bio-i"><div class="bio-v">42,1 kg</div><div class="bio-l">Musc. Esq.</div><div class="bio-d">−2,0 kg</div></div>
+      <div class="bio-i"><div class="bio-v">9,0</div><div class="bio-l">Visceral</div><div class="bio-d">meta ≤5</div></div>
+    </div>
+    <div class="bio-ts">📅 Medido 20/04/2026 · variação desde 07/07/2025</div>
+  </div>
+
+  <div class="alert-band">⚠️ Visceral 9,0 · Ideal ≤ 7 · Foco em déficit calórico e consistência.</div>
+
+  <div class="card">
+    <div class="card-hd"><div class="card-ic">💪</div><div class="card-tt">Treino de Ontem</div></div>
+    <div class="field">
+      <div class="lbl">Qual foi o treino?</div>
+      <div class="badges">
+        <div class="badge bp"  onclick="pickTreino('PUSH A',this)">PUSH A</div>
+        <div class="badge bp"  onclick="pickTreino('PUSH B',this)">PUSH B</div>
+        <div class="badge bl"  onclick="pickTreino('PULL A',this)">PULL A</div>
+        <div class="badge bl"  onclick="pickTreino('PULL B',this)">PULL B</div>
+        <div class="badge bg_" onclick="pickTreino('LEGS A',this)">LEGS A</div>
+        <div class="badge bg_" onclick="pickTreino('LEGS B',this)">LEGS B</div>
+        <div class="badge br"  onclick="pickTreino('Descanso',this)">🛋️ Descanso</div>
+      </div>
+    </div>
+    <div id="workoutExtra">
+      <div class="div"></div>
+      <div class="field">
+        <div class="lbl">Performance geral <span class="lbl-v" id="vPerf">7</span></div>
+        <input type="range" min="0" max="10" value="7" class="slider" style="color:var(--red)" oninput="slide('Perf',this,'red')">
+        <div class="slider-ends"><span>0 — Péssimo</span><span>10 — Perfeito</span></div>
+      </div>
+      <div class="field">
+        <div class="lbl">⚠️ Cotovelo esq. (dor) <span class="lbl-v" id="vCot">0</span></div>
+        <input type="range" min="0" max="10" value="0" class="slider" style="color:var(--red)" oninput="slide('Cot',this,'red')">
+        <div class="slider-ends"><span>0 — Sem dor</span><span>10 — Forte</span></div>
+      </div>
+      <div class="field">
+        <div class="lbl">Lombar</div>
+        <div class="tog">
+          <button class="tb ok" id="lomOk"  onclick="setLombar(true)">✅ OK</button>
+          <button class="tb"    id="lomDor" onclick="setLombar(false)">⚠️ Com dor</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd"><div class="card-ic">😴</div><div class="card-tt">Sono</div><div class="card-ht">Meta 7–8h</div></div>
+    <div class="field">
+      <div class="lbl">Horas dormidas <span class="lbl-v" id="vHoras">7h</span></div>
+      <input type="range" min="4" max="10" step="0.5" value="7" class="slider" style="color:var(--blue)" oninput="slide('Horas',this,'blue')">
+      <div class="slider-ends"><span>4h</span><span>10h</span></div>
+    </div>
+    <div class="field">
+      <div class="lbl">Qualidade <span class="lbl-v" id="vQual">7</span></div>
+      <input type="range" min="0" max="10" value="7" class="slider" style="color:var(--blue)" oninput="slide('Qual',this,'blue')">
+      <div class="slider-ends"><span>0 — Péssimo</span><span>10 — Ótimo</span></div>
+    </div>
+    <div class="field">
+      <div class="lbl">HRV (ms) — opcional</div>
+      <input type="number" id="iHrv" placeholder="ex: 65" min="20" max="120" inputmode="numeric">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd"><div class="card-ic">🧠</div><div class="card-tt">Bem-estar</div></div>
+    <div class="field">
+      <div class="lbl">Energia / Humor <span class="lbl-v" id="vEner">7</span></div>
+      <input type="range" min="0" max="10" value="7" class="slider" style="color:var(--green)" oninput="slide('Ener',this,'green')">
+      <div class="slider-ends"><span>0 — No limite</span><span>10 — Excelente</span></div>
+    </div>
+    <div class="field">
+      <div class="lbl">Estresse <span class="lbl-v" id="vEstr">3</span></div>
+      <input type="range" min="0" max="10" value="3" class="slider" style="color:var(--orange)" oninput="slide('Estr',this,'orange')">
+      <div class="slider-ends"><span>0 — Tranquilo</span><span>10 — Alto</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd"><div class="card-ic">🥗</div><div class="card-tt">Nutrição</div><div class="card-ht">1.900–2.000 kcal</div></div>
+    <div class="field">
+      <div class="lbl">Proteína (141–155g) <span class="lbl-v" id="vProt">7</span></div>
+      <input type="range" min="0" max="10" value="7" class="slider" style="color:var(--red)" oninput="slide('Prot',this,'red')">
+      <div class="slider-ends"><span>0 — Longe</span><span>10 — Bati a meta</span></div>
+    </div>
+    <div class="field">
+      <div class="lbl">Calorias no alvo <span class="lbl-v" id="vCal">7</span></div>
+      <input type="range" min="0" max="10" value="7" class="slider" style="color:var(--orange)" oninput="slide('Cal',this,'orange')">
+      <div class="slider-ends"><span>0 — Não controlei</span><span>10 — Perfeito</span></div>
+    </div>
+    <div class="field">
+      <div class="lbl">Suplementos tomados</div>
+      <div class="pills">
+        <div class="pill on"  id="p-creatina" onclick="togglePill('creatina')">💊 Creatina</div>
+        <div class="pill on"  id="p-whey"     onclick="togglePill('whey')">🥤 Whey</div>
+        <div class="pill"     id="p-omega3"   onclick="togglePill('omega3')">🐟 Omega-3</div>
+        <div class="pill"     id="p-vitd"     onclick="togglePill('vitd')">☀️ Vit. D3</div>
+        <div class="pill"     id="p-mag"      onclick="togglePill('mag')">🌙 Magnésio</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd"><div class="card-ic">📝</div><div class="card-tt">Notas do dia</div></div>
+    <textarea id="iNotas" placeholder="Progresso, insight, sentimento, algo fora do protocolo..."></textarea>
+  </div>
+
+  <div class="err-box" id="errBox"></div>
+  <button class="btn-main" id="btnSubmit" onclick="submitCheckin()">⚡ Registrar Check-in</button>
+</div>
+
+<div id="successView">
+  <div class="suc">
+    <div class="suc-ic">✅</div>
+    <div class="suc-tt">Check-in salvo!</div>
+    <div class="suc-sb">Dados registrados na planilha Carlota DUP · Google Sheets</div>
+  </div>
+  <button class="btn-reset" onclick="resetForm()">← Novo check-in</button>
+</div>
+
+<script>
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzPrBH_Oqq159-ymrLTs3Ke6QG3NvDb6qcrjz4S0pz2G2fbgMzbjfAKmM1qMwgFqvEd/exec';
+
+  const S = {
+    treino:null, perf:7, cot:0, lombar:true,
+    horas:7, qual:7, hrv:'',
+    ener:7, estr:3, prot:7, cal:7,
+    sups:{creatina:true,whey:true,omega3:false,vitd:false,mag:false},
+    notas:''
+  };
+
+  const now = new Date();
+  const DIAS  = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+  const MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  document.getElementById('hDate').textContent =
+    DIAS[now.getDay()] + ', ' + now.getDate() + ' de ' + MESES[now.getMonth()] + ' de ' + now.getFullYear();
+  if (now.getDay() === 1) {
+    const a = document.getElementById('hAlert');
+    a.style.display = 'block';
+    a.textContent = '⚖️ Segunda-feira: bioimpedância em jejum às 8h00!';
+  }
+
+  const C = {red:'#dc2626',blue:'#2563eb',green:'#059669',orange:'#d97706'};
+
+  function slide(key, el, color) {
+    const v=parseFloat(el.value), mn=parseFloat(el.min), mx=parseFloat(el.max);
+    S[key.toLowerCase()] = v;
+    const pct = ((v-mn)/(mx-mn)*100).toFixed(1);
+    el.style.background = 'linear-gradient(to right,' + C[color] + ' ' + pct + '%,#e2e8f0 ' + pct + '%)';
+    const lbl = document.getElementById('v'+key);
+    if(lbl) lbl.textContent = key==='Horas' ? v+'h' : v;
+  }
+
+  document.querySelectorAll('.slider').forEach(function(el) {
+    const v=parseFloat(el.value), mn=parseFloat(el.min), mx=parseFloat(el.max);
+    const pct=((v-mn)/(mx-mn)*100).toFixed(1);
+    el.style.background='linear-gradient(to right,'+el.style.color+' '+pct+'%,#e2e8f0 '+pct+'%)';
+  });
+
+  function pickTreino(tipo, el) {
+    S.treino = tipo;
+    document.querySelectorAll('.badge').forEach(function(b){b.classList.remove('sel');});
+    el.classList.add('sel');
+    document.getElementById('workoutExtra').style.display = tipo==='Descanso'?'none':'block';
+  }
+
+  function setLombar(ok) {
+    S.lombar = ok;
+    document.getElementById('lomOk').className  = ok?'tb ok':'tb';
+    document.getElementById('lomDor').className = ok?'tb':'tb no';
+  }
+
+  function togglePill(name) {
+    S.sups[name] = !S.sups[name];
+    document.getElementById('p-'+name).className = 'pill '+(S.sups[name]?'on':'off');
+  }
+
+  async function submitCheckin() {
+    if (!S.treino) { alert('Selecione o treino de ontem (ou Descanso)'); return; }
+    S.notas = document.getElementById('iNotas').value;
+    S.hrv   = document.getElementById('iHrv').value;
+
+    const d  = now.toLocaleDateString('pt-BR');
+    const hr = now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+
+    const payload = {
+      action: 'saveCheckin',
+      data:d, hora:hr, treino:S.treino,
+      performance:  S.treino==='Descanso'?null:S.perf,
+      cotovelo_dor: S.treino==='Descanso'?null:S.cot,
+      lombar_ok:    S.treino==='Descanso'?null:S.lombar,
+      sono_horas:S.horas, sono_qualidade:S.qual, hrv:S.hrv||null,
+      energia:S.ener, estresse:S.estr, proteina:S.prot, calorias:S.cal,
+      creatina:S.sups.creatina, whey:S.sups.whey,
+      omega3:S.sups.omega3, vitd:S.sups.vitd, magnesio:S.sups.mag,
+      notas:S.notas||null
+    };
+
+    document.getElementById('loadingOverlay').classList.add('show');
+    document.getElementById('btnSubmit').disabled = true;
+    document.getElementById('errBox').style.display = 'none';
+
+    try {
+      await fetch(SCRIPT_URL, {
+        method:'POST', mode:'no-cors',
+        headers:{'Content-Type':'text/plain'},
+        body:JSON.stringify(payload)
+      });
+      showSuccess();
+    } catch(e) {
+      document.getElementById('loadingOverlay').classList.remove('show');
+      document.getElementById('btnSubmit').disabled = false;
+      var err = document.getElementById('errBox');
+      err.style.display = 'block';
+      err.textContent = '⚠️ Sem conexão. Verifique sua internet e tente novamente.';
+    }
+  }
+
+  function showSuccess() {
+    document.getElementById('loadingOverlay').classList.remove('show');
+    document.getElementById('mainForm').style.display = 'none';
+    document.getElementById('successView').style.display = 'block';
+    window.scrollTo(0,0);
+  }
+
+  function resetForm() {
+    document.getElementById('mainForm').style.display = 'flex';
+    document.getElementById('successView').style.display = 'none';
+    document.querySelectorAll('.badge').forEach(function(b){b.classList.remove('sel');});
+    document.getElementById('workoutExtra').style.display = 'none';
+    document.getElementById('iNotas').value = '';
+    document.getElementById('iHrv').value = '';
+    document.getElementById('btnSubmit').disabled = false;
+    S.treino = null;
+    window.scrollTo(0,0);
+  }
+</script>
+</body>
+</html>
