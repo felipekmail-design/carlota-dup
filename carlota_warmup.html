@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Carlota · Aquecimento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:        #0a0c10;
+  --surface:   #111318;
+  --border:    #1e2530;
+  --muted:     #3a4150;
+  --text:      #e2e8f0;
+  --dim:       #7c8899;
+  --accent:    #f59e0b;
+  --accent2:   #3b82f6;
+  --green:     #22c55e;
+  --red:       #ef4444;
+  --felipe:    #f59e0b;
+  --julia:     #a78bfa;
+  --radius:    10px;
+  --mono:      'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  min-height: 100vh;
+  padding-bottom: 60px;
+}
+
+/* ── HEADER ── */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 2px;
+  color: var(--accent);
+}
+.logo span { color: var(--dim); font-size: 13px; font-family: 'DM Sans', sans-serif; letter-spacing: 0; font-weight: 300; margin-left: 8px; }
+
+/* ── USER TOGGLE ── */
+.user-toggle {
+  display: flex;
+  gap: 6px;
+}
+.user-btn {
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--muted);
+  background: transparent;
+  color: var(--dim);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+}
+.user-btn.active-felipe { border-color: var(--felipe); color: var(--felipe); background: rgba(245,158,11,.1); }
+.user-btn.active-julia  { border-color: var(--julia);  color: var(--julia);  background: rgba(167,139,250,.1); }
+
+/* ── MAIN CONTAINER ── */
+main { max-width: 540px; margin: 0 auto; padding: 16px; }
+
+/* ── SECTION CARDS ── */
+.section-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 2.5px;
+  color: var(--dim);
+  margin: 20px 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── TREINO SELECTOR ── */
+.treino-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.treino-btn {
+  padding: 10px 4px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all .18s;
+  letter-spacing: .5px;
+}
+.treino-btn:hover { border-color: var(--muted); color: var(--text); }
+.treino-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(245,158,11,.08); }
+
+/* ── EXERCISE CARDS ── */
+.ex-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  overflow: hidden;
+  transition: border-color .2s;
+}
+.ex-card.done { border-color: var(--green); }
+
+.ex-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  user-select: none;
+}
+.ex-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--dim);
+  min-width: 22px;
+}
+.ex-name {
+  flex: 1;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.3;
+}
+.ex-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(245,158,11,.12);
+  color: var(--accent);
+  white-space: nowrap;
+}
+.ex-check {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .2s;
+  flex-shrink: 0;
+}
+.ex-card.done .ex-check {
+  background: var(--green);
+  border-color: var(--green);
+}
+.ex-check::after {
+  content: '✓';
+  font-size: 11px;
+  color: white;
+  opacity: 0;
+  transition: opacity .2s;
+}
+.ex-card.done .ex-check::after { opacity: 1; }
+
+.ex-body {
+  display: none;
+  padding: 0 14px 14px;
+  border-top: 1px solid var(--border);
+}
+.ex-card.open .ex-body { display: block; }
+
+/* ── ALERT COTOVELO ── */
+.alert-cotovelo {
+  background: rgba(239,68,68,.08);
+  border: 1px solid rgba(239,68,68,.25);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 12px;
+  color: #fca5a5;
+  margin: 10px 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.user-julia .alert-cotovelo { display: none; }
+
+/* ── FORM FIELDS ── */
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+.field-row.three { grid-template-columns: 1fr 1fr 1fr; }
+.field-group { display: flex; flex-direction: column; gap: 4px; }
+.field-group label {
+  font-size: 11px;
+  color: var(--dim);
+  font-weight: 500;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+}
+.field-group input,
+.field-group textarea,
+.field-group select {
+  background: var(--bg);
+  border: 1px solid var(--muted);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 8px 10px;
+  transition: border-color .2s;
+  width: 100%;
+}
+.field-group input:focus,
+.field-group textarea:focus,
+.field-group select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.field-group textarea { resize: vertical; min-height: 58px; font-family: 'DM Sans', sans-serif; font-size: 13px; }
+.field-full { grid-column: 1 / -1; }
+
+/* ── TIMER ── */
+.timer-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.timer-display {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 2px;
+  min-width: 70px;
+}
+.timer-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--muted);
+  background: transparent;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+}
+.timer-btn:hover { background: var(--muted); }
+.timer-btn.running { border-color: var(--accent); color: var(--accent); }
+
+/* ── COMPLETE BTN ── */
+.complete-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1.5px solid var(--muted);
+  background: transparent;
+  color: var(--dim);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.complete-btn:hover { border-color: var(--green); color: var(--green); background: rgba(34,197,94,.06); }
+.ex-card.done .complete-btn { border-color: var(--green); color: var(--green); background: rgba(34,197,94,.1); }
+
+/* ── COTOVELO DOR SLIDER (só Felipe) ── */
+.cotovelo-field { margin-top: 10px; }
+.cotovelo-field label {
+  font-size: 11px;
+  color: #fca5a5;
+  font-weight: 500;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+}
+.cotovelo-field input[type=range] {
+  width: 100%;
+  accent-color: var(--red);
+  margin-top: 4px;
+}
+.user-julia .cotovelo-field { display: none; }
+
+/* ── SUMMARY SECTION ── */
+.summary-bar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.summary-stat { text-align: center; }
+.summary-stat .val {
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.summary-stat .lbl {
+  font-size: 10px;
+  color: var(--dim);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-top: 2px;
+}
+
+/* ── SAVE BUTTON ── */
+.save-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius);
+  border: none;
+  background: var(--accent);
+  color: #0a0c10;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all .2s;
+  margin-top: 8px;
+}
+.save-btn:hover { background: #fbbf24; transform: translateY(-1px); }
+.save-btn:disabled { background: var(--muted); color: var(--dim); cursor: not-allowed; transform: none; }
+
+/* ── STATUS TOAST ── */
+#toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+  z-index: 999;
+  white-space: nowrap;
+  box-shadow: 0 8px 32px rgba(0,0,0,.6);
+}
+#toast.show { transform: translateX(-50%) translateY(0); }
+#toast.success { border-color: var(--green); color: var(--green); }
+#toast.error   { border-color: var(--red);   color: var(--red);   }
+#toast.loading { border-color: var(--accent); color: var(--accent); }
+
+/* ── PROGRESS BAR ── */
+.progress-wrap {
+  background: var(--border);
+  border-radius: 4px;
+  height: 4px;
+  margin: 12px 0 6px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width .4s ease;
+}
+
+/* ── INSTRUCTION CHIP ── */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(59,130,246,.1);
+  border: 1px solid rgba(59,130,246,.25);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 11px;
+  color: #93c5fd;
+  margin-bottom: 10px;
+}
+
+/* ── RESPONSIVE TWEAKS ── */
+@media (max-width: 400px) {
+  .treino-grid { grid-template-columns: repeat(3, 1fr); }
+  .ex-name { font-size: 13px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─────────── HEADER ─────────── -->
+<header>
+  <div>
+    <span class="logo">CARLOTA <span>AQUECIMENTO</span></span>
+  </div>
+  <div class="user-toggle">
+    <button class="user-btn active-felipe" id="btn-felipe" onclick="setUser('Felipe')">Felipe</button>
+    <button class="user-btn" id="btn-julia" onclick="setUser('Julia')">Julia</button>
+  </div>
+</header>
+
+<!-- ─────────── MAIN ─────────── -->
+<main id="app-root">
+
+  <!-- Treino selector -->
+  <div class="section-label">Treino do dia</div>
+  <div class="treino-grid">
+    <button class="treino-btn" onclick="selectTreino('PUSH A')">PUSH A</button>
+    <button class="treino-btn" onclick="selectTreino('PUSH B')">PUSH B</button>
+    <button class="treino-btn" onclick="selectTreino('PULL A')">PULL A</button>
+    <button class="treino-btn" onclick="selectTreino('PULL B')">PULL B</button>
+    <button class="treino-btn" onclick="selectTreino('LEGS A')">LEGS A</button>
+    <button class="treino-btn" onclick="selectTreino('LEGS B')">LEGS B</button>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+  <div id="progress-label" style="font-size:11px;color:var(--dim);text-align:right;margin-bottom:4px;">0 / 0 exercícios concluídos</div>
+
+  <!-- Exercise list -->
+  <div id="ex-list"></div>
+
+  <!-- Summary + Save -->
+  <div id="save-section" style="display:none;">
+    <div class="section-label">Resumo da sessão</div>
+    <div class="summary-bar">
+      <div class="summary-stat"><div class="val" id="s-total">0</div><div class="lbl">Exercícios</div></div>
+      <div class="summary-stat"><div class="val" id="s-time">0:00</div><div class="lbl">Tempo total</div></div>
+      <div class="summary-stat"><div class="val" id="s-user">—</div><div class="lbl">Usuário</div></div>
+      <div class="summary-stat"><div class="val" id="s-treino">—</div><div class="lbl">Treino</div></div>
+    </div>
+    <button class="save-btn" id="save-btn" onclick="saveSession()">💾 SALVAR NA DATABASE</button>
+    <p style="font-size:11px;color:var(--dim);text-align:center;margin-top:8px;">Grava na aba <span style="font-family:var(--mono);color:var(--accent)">aquecimento_log</span> da Carlota DUP - Database</p>
+  </div>
+
+</main>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// CONFIG — cole aqui a URL do Web App após publicar no Apps Script
+// ═══════════════════════════════════════════════════════════
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwmUytUYi8GZOIbTOFl-XK7Vk_7kdFbDIjAOEV7cB8JewXWH_Hl_aaBhaXZcuEo0cpX/exec';
+
+// ═══════════════════════════════════════════════════════════
+// ESTADO
+// ═══════════════════════════════════════════════════════════
+let currentUser   = 'Felipe';
+let currentTreino = '';
+let exercises     = [];   // array de objetos com estado por exercício
+let timers        = {};   // timers ativos por índice
+
+// ═══════════════════════════════════════════════════════════
+// DADOS DE AQUECIMENTO por treino
+// ═══════════════════════════════════════════════════════════
+const WARMUP_DATA = {
+  base: [
+    {
+      bloco: 'Ativação Cardiovascular',
+      nome: 'Russian KB Swing',
+      descricao: 'Explosão de quadril — KB sobe até altura dos ombros, cotovelo semiflexionado.',
+      badge: '3×15',
+      series_default: '3',
+      reps_default: '15',
+      carga_default: '16',
+      alerta_cotovelo: true,
+      obs_cotovelo: '⚠️ Cotovelo: manter semiflexionado — evitar extensão completa sob carga.'
+    },
+    {
+      bloco: 'Mobilidade Torácica',
+      nome: 'Rotação Torácica (chão ou banco)',
+      descricao: 'Deitado de lado, joelho superior apoiado. Rotaciona o tronco abrindo o peito.',
+      badge: '1×10 cada',
+      series_default: '1',
+      reps_default: '10',
+      carga_default: '',
+    },
+    {
+      bloco: 'Mobilidade Torácica',
+      nome: 'Círculos de Ombro com Haltere Leve',
+      descricao: 'Haltere de 1–2 kg. Círculos amplos, controlados, sem compensação cervical.',
+      badge: '1×15 cada',
+      series_default: '1',
+      reps_default: '15',
+      carga_default: '2',
+    },
+    {
+      bloco: 'Mobilidade Torácica',
+      nome: 'Dislocação com Elástico ou Bastão',
+      descricao: 'Pegada larga. Leva o elástico/bastão atrás da cabeça de forma controlada.',
+      badge: '1×10–12',
+      series_default: '1',
+      reps_default: '10',
+      carga_default: '',
+    },
+    {
+      bloco: 'Ativação Manguito e Estabilizadores',
+      nome: 'Rotação Externa com Elástico',
+      descricao: 'Cotovelo a 90°, fixado ao lado do tronco. Rotação externa lenta, 2s concêntrico + 2s excêntrico.',
+      badge: '2×15 cada',
+      series_default: '2',
+      reps_default: '15',
+      carga_default: '',
+      alerta_cotovelo: false
+    },
+    {
+      bloco: 'Ativação Manguito e Estabilizadores',
+      nome: 'Face Pull no Cabo (leve)',
+      descricao: 'Carga mínima (~5 kg). Cotovelo alto, puxar até as orelhas. Foco em retração escapular.',
+      badge: '1×20',
+      series_default: '1',
+      reps_default: '20',
+      carga_default: '5',
+    }
+  ],
+  // Exercício de ativação específica — varia por treino
+  specific: {
+    'PUSH A': { nome: 'Série de Ativação: Supino Inclinado com Halteres', badge: '1×20 (~40%)', carga_hint: '~40% da carga planejada' },
+    'PUSH B': { nome: 'Série de Ativação: Supino Reto com Halteres', badge: '1×20 (~40%)', carga_hint: '~40% da carga planejada' },
+    'PULL A': { nome: 'Série de Ativação: Puxada Frontal Pronada', badge: '1×20 (~40%)', carga_hint: '~40% da carga planejada' },
+    'PULL B': { nome: 'Série de Ativação: Barra Fixa Sem Carga', badge: '1×15 fluidas', carga_hint: 'Peso corporal — foco no padrão' },
+    'LEGS A': { nome: 'Série de Ativação: Agachamento Goblet com KB (leve)', badge: '1×20 (~40%)', carga_hint: '~40% da carga planejada' },
+    'LEGS B': { nome: 'Série de Ativação: RDL com Halteres (leve)', badge: '1×20 (~40%)', carga_hint: '~40% da carga planejada' },
+  }
+};
+
+// ═══════════════════════════════════════════════════════════
+// USER
+// ═══════════════════════════════════════════════════════════
+function setUser(u) {
+  currentUser = u;
+  document.getElementById('btn-felipe').className = u === 'Felipe' ? 'user-btn active-felipe' : 'user-btn';
+  document.getElementById('btn-julia').className  = u === 'Julia'  ? 'user-btn active-julia'  : 'user-btn';
+  document.getElementById('app-root').className   = u === 'Julia'  ? 'user-julia' : '';
+  renderExercises();
+}
+
+// ═══════════════════════════════════════════════════════════
+// TREINO SELECTOR
+// ═══════════════════════════════════════════════════════════
+function selectTreino(t) {
+  currentTreino = t;
+  document.querySelectorAll('.treino-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === t);
+  });
+  buildExercises();
+  renderExercises();
+  document.getElementById('save-section').style.display = 'block';
+  updateSummary();
+}
+
+function buildExercises() {
+  const spec = WARMUP_DATA.specific[currentTreino] || WARMUP_DATA.specific['PUSH B'];
+  const all  = [
+    ...WARMUP_DATA.base,
+    {
+      bloco: 'Ativação no Exercício Principal',
+      nome: spec.nome,
+      descricao: spec.carga_hint,
+      badge: spec.badge,
+      series_default: '1',
+      reps_default: '20',
+      carga_default: '',
+    }
+  ];
+  exercises = all.map((ex, i) => ({
+    ...ex,
+    idx: i,
+    done: false,
+    series: ex.series_default || '',
+    reps: ex.reps_default || '',
+    carga: ex.carga_default || '',
+    duracao: 0,
+    obs: '',
+    cotovelo_dor: 0,
+    open: i === 0,
+  }));
+  timers = {};
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════
+function renderExercises() {
+  const list = document.getElementById('ex-list');
+  if (!exercises.length) { list.innerHTML = ''; return; }
+
+  list.innerHTML = exercises.map((ex, i) => {
+    const cardClass = [
+      'ex-card',
+      ex.done ? 'done' : '',
+      ex.open ? 'open' : ''
+    ].filter(Boolean).join(' ');
+
+    const cotoveloHTML = (currentUser === 'Felipe' && ex.alerta_cotovelo !== false) ? `
+      <div class="alert-cotovelo">⚠️ ${ex.obs_cotovelo || 'Monitorar cotovelo esquerdo neste exercício.'}</div>
+      <div class="cotovelo-field">
+        <label>Dor no cotovelo (0–3) <span id="cot-val-${i}">${ex.cotovelo_dor}</span>/3</label>
+        <input type="range" min="0" max="3" step="1" value="${ex.cotovelo_dor}"
+          oninput="updateField(${i},'cotovelo_dor',+this.value);document.getElementById('cot-val-${i}').textContent=this.value"/>
+      </div>` : '';
+
+    const timerState = timers[i] ? 'running' : '';
+    const timerDisplay = fmtTime(ex.duracao);
+
+    return `
+    <div class="${cardClass}" id="card-${i}">
+      <div class="ex-header" onclick="toggleCard(${i})">
+        <span class="ex-num">${String(i+1).padStart(2,'0')}</span>
+        <span class="ex-name">${ex.nome}</span>
+        <span class="ex-badge">${ex.badge}</span>
+        <div class="ex-check"></div>
+      </div>
+      <div class="ex-body">
+        <div class="chip">📋 ${ex.bloco}</div>
+        <p style="font-size:12px;color:var(--dim);margin-bottom:4px;">${ex.descricao}</p>
+        ${cotoveloHTML}
+        <div class="field-row three">
+          <div class="field-group">
+            <label>Séries</label>
+            <input type="number" value="${ex.series}" placeholder="—"
+              oninput="updateField(${i},'series',this.value)"/>
+          </div>
+          <div class="field-group">
+            <label>Reps</label>
+            <input type="text" value="${ex.reps}" placeholder="—"
+              oninput="updateField(${i},'reps',this.value)"/>
+          </div>
+          <div class="field-group">
+            <label>Carga (kg)</label>
+            <input type="number" step="0.5" value="${ex.carga}" placeholder="—"
+              oninput="updateField(${i},'carga',this.value)"/>
+          </div>
+        </div>
+        <div class="timer-row">
+          <div class="timer-display" id="timer-${i}">${timerDisplay}</div>
+          <button class="timer-btn ${timerState}" id="timer-btn-${i}"
+            onclick="toggleTimer(${i})">${timers[i] ? '⏸ Pausar' : '▶ Timer'}</button>
+          <button class="timer-btn" onclick="resetTimer(${i})">↺</button>
+        </div>
+        <div class="field-row">
+          <div class="field-group field-full">
+            <label>Observações</label>
+            <textarea placeholder="Sensações, ajustes de carga, limitações..." rows="2"
+              oninput="updateField(${i},'obs',this.value)">${ex.obs}</textarea>
+          </div>
+        </div>
+        <button class="complete-btn" onclick="toggleDone(${i})">
+          ${ex.done ? '✓ Concluído' : 'Marcar como concluído'}
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+
+  updateProgress();
+}
+
+// ═══════════════════════════════════════════════════════════
+// INTERACTIONS
+// ═══════════════════════════════════════════════════════════
+function toggleCard(i) {
+  exercises[i].open = !exercises[i].open;
+  const card = document.getElementById(`card-${i}`);
+  card.classList.toggle('open', exercises[i].open);
+}
+
+function updateField(i, field, val) {
+  exercises[i][field] = val;
+}
+
+function toggleDone(i) {
+  exercises[i].done = !exercises[i].done;
+  if (exercises[i].done && timers[i]) stopTimer(i);
+  // Auto-abre próximo
+  if (exercises[i].done && i + 1 < exercises.length) {
+    exercises[i].open = false;
+    exercises[i+1].open = true;
+  }
+  renderExercises();
+  updateSummary();
+}
+
+// ═══════════════════════════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════════════════════════
+function toggleTimer(i) {
+  if (timers[i]) {
+    stopTimer(i);
+  } else {
+    startTimer(i);
+  }
+  // Atualiza visual do botão imediatamente
+  const btn = document.getElementById(`timer-btn-${i}`);
+  if (btn) {
+    const running = !!timers[i];
+    btn.textContent = running ? '⏸ Pausar' : '▶ Timer';
+    btn.classList.toggle('running', running);
+  }
+}
+
+function startTimer(i) {
+  const startedAt = Date.now() - (exercises[i].duracao * 1000);
+  timers[i] = setInterval(() => {
+    exercises[i].duracao = Math.floor((Date.now() - startedAt) / 1000);
+    const el = document.getElementById(`timer-${i}`);
+    if (el) el.textContent = fmtTime(exercises[i].duracao);
+  }, 1000);
+}
+
+function stopTimer(i) {
+  clearInterval(timers[i]);
+  delete timers[i];
+}
+
+function resetTimer(i) {
+  stopTimer(i);
+  exercises[i].duracao = 0;
+  const el = document.getElementById(`timer-${i}`);
+  if (el) el.textContent = '0:00';
+  const btn = document.getElementById(`timer-btn-${i}`);
+  if (btn) { btn.textContent = '▶ Timer'; btn.classList.remove('running'); }
+}
+
+function fmtTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${m}:${String(sec).padStart(2,'0')}`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// PROGRESS
+// ═══════════════════════════════════════════════════════════
+function updateProgress() {
+  const done  = exercises.filter(e => e.done).length;
+  const total = exercises.length;
+  const pct   = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `${done} / ${total} exercícios concluídos`;
+}
+
+function updateSummary() {
+  updateProgress();
+  const totalSeg = exercises.reduce((acc, e) => acc + (e.duracao || 0), 0);
+  document.getElementById('s-total').textContent  = exercises.length;
+  document.getElementById('s-time').textContent   = fmtTime(totalSeg);
+  document.getElementById('s-user').textContent   = currentUser;
+  document.getElementById('s-treino').textContent = currentTreino || '—';
+}
+
+// ═══════════════════════════════════════════════════════════
+// SAVE → APPS SCRIPT
+// ═══════════════════════════════════════════════════════════
+async function saveSession() {
+  if (!currentTreino) { showToast('Selecione o treino do dia!', 'error'); return; }
+  if (APPS_SCRIPT_URL === 'COLE_AQUI_A_URL_DO_WEB_APP') {
+    showToast('Configure a URL do Web App primeiro!', 'error'); return;
+  }
+
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true;
+  showToast('Salvando na Database…', 'loading');
+
+  const today = new Date().toLocaleDateString('pt-BR');
+
+  const rows = exercises.map(ex => ({
+    data:         today,
+    usuario:      currentUser,
+    treino_do_dia: currentTreino,
+    bloco:        ex.bloco,
+    exercicio:    ex.nome,
+    series:       ex.series,
+    reps:         ex.reps,
+    carga_kg:     ex.carga,
+    duracao_seg:  ex.duracao,
+    observacoes:  ex.obs,
+    cotovelo_dor: currentUser === 'Felipe' ? ex.cotovelo_dor : ''
+  }));
+
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' }, // Apps Script exige text/plain para evitar preflight CORS
+      body: JSON.stringify({ rows })
+    });
+    const json = await res.json();
+
+    if (json.success) {
+      showToast(`✅ ${json.count} registros salvos!`, 'success');
+      exercises.forEach(e => { e.done = true; });
+      renderExercises();
+      updateSummary();
+    } else {
+      showToast('Erro: ' + (json.error || 'resposta inválida'), 'error');
+    }
+  } catch(err) {
+    showToast('Falha de conexão — verifique a URL', 'error');
+    console.error(err);
+  }
+
+  btn.disabled = false;
+}
+
+// ═══════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════
+function showToast(msg, type = 'loading') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `show ${type}`;
+  if (type !== 'loading') {
+    setTimeout(() => { t.className = ''; }, 3000);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT — auto-seleciona PUSH B hoje (sexta-feira)
+// ═══════════════════════════════════════════════════════════
+(function init() {
+  // Detecta treino do dia pela data — pode ser ajustado manualmente
+  const weekday = new Date().getDay(); // 0=Dom, 5=Sex
+  // Por padrão, abre sem seleção — usuário escolhe
+  // Mas pré-seleciona PUSH B pois é o treino de hoje (configurado na agenda)
+  selectTreino('PUSH B');
+})();
+</script>
+</body>
+</html>
