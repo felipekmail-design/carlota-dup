@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Carlota">
+<title>Carlota · Williams</title>
+
+<!-- Geist (Vercel) via Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Geist', 'ui-sans-serif', 'system-ui'],
+          mono: ['Geist Mono', 'ui-monospace', 'monospace'],
+        }
+      }
+    }
+  }
+</script>
+
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+<!-- React 18 -->
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<style>
+  /* ── GLOBAL ── */
+  * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+  :root { --ac: #F59300; }
+  html, body { background: #000; color: #fff; margin: 0; padding: 0; }
+
+  /* ── SAFE AREA / SCROLLBAR ── */
+  .pb-safe  { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
+  .pt-safe  { padding-top: env(safe-area-inset-top, 0px); }
+  .bnav-pad { padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .no-scroll::-webkit-scrollbar { display: none; }
+  .no-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+
+  /* ── INPUT: remove spinners ── */
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes spin   { to { transform: rotate(360deg); } }
+  @keyframes pulse  { 0%,100%{opacity:1;} 50%{opacity:.25;} }
+  @keyframes fadein { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+
+  .anim-fadein { animation: fadein .2s ease; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CONSTANTS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const API_URL = 'https://script.google.com/macros/s/AKfycbwU-gqpgkdKMgc-XwyHgDNHTCsfkqPL34sj7kEFwE2hgmWaf6Wk0XOnWhOaTsX4YDjj/exec';
+const PROFILE_COLORS = { fk: '#F59300', jrv: '#00C8FF' };
+const ZONE_COLORS = { 'FORÇA': '#F59300', 'HIPERTROFIA': '#818cf8', 'METABÓLICO': '#10b981' };
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// WORKOUT DATA
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const FK_WK = [
+  { id:"F-PUSH-A", label:"PUSH A", title:"PUSH A", sub:"Peito · Ombro · Tríceps", zone:"FORÇA", series:"5", reps:"4–6", rest:"2–3 min", ex:[
+    {n:"01",name:"Supino Inclinado com Halteres",sets:5,rT:"4–6",rest:"3 min",primary:true,note:"Pegada neutra ou semi-pronada. Cotovelo a 45–60° do tronco.",alert:"Halteres obrigatórios — cotovelo esquerdo"},
+    {n:"02",name:"Desenvolvimento com Halteres em Pé",sets:5,rT:"4–6",rest:"2–3 min",primary:true,note:"Não bloqueie os cotovelos no topo. Amplitude total.",alert:"Halteres obrigatórios — epicondilite"},
+    {n:"03",name:"Mergulho em Paralelas com Carga",sets:4,rT:"4–6",rest:"2–3 min",note:"Tronco inclinado para frente. Cinto com anilha ou colete."},
+    {n:"04",name:"Elevação Lateral com Halteres",sets:4,rT:"6–8",rest:"90 seg",note:"Amplitude até linha dos ombros. Pausa 1s no topo."},
+    {n:"05",name:"Extensão de Tríceps na Corda",sets:4,rT:"6–8",rest:"90 seg",primary:true,note:"Carga alta. Pronação total no final.",alert:"Corda obrigatória — sem barra reta"}],
+    ref:"Schoenfeld et al. (2017, JSCR): Protocolo de força (4–6 reps) gera maior ativação das unidades motoras de alto limiar.",
+    tip:"Sessão mais intensa da semana. Aqueça com 2 séries leves antes de carga máxima." },
+  { id:"F-PUSH-B", label:"PUSH B", title:"PUSH B", sub:"Peito · Ombro · Tríceps", zone:"HIPERTROFIA", series:"4", reps:"10–12", rest:"60–90 s", ex:[
+    {n:"01",name:"Supino Reto com Halteres",sets:4,rT:"10–12",rest:"75 seg",primary:true,note:"ROM completo. Pausa leve no fundo.",alert:"Halteres obrigatórios — cotovelo esquerdo"},
+    {n:"02",name:"Crucifixo Inclinado no Cabo",sets:3,rT:"12–15",rest:"60 seg",note:"Tensão constante. Cotovelo levemente flexionado."},
+    {n:"03",name:"Desenvolvimento Arnold com Halteres",sets:4,rT:"10–12",rest:"75 seg",note:"Rotação supina na descida.",alert:"Halteres obrigatórios"},
+    {n:"04",name:"Elevação Lateral no Cabo (unilateral)",sets:3,rT:"13–15",rest:"60 seg",note:"Cabo garante tensão constante em toda amplitude."},
+    {n:"05",name:"Extensão de Tríceps na Corda (Volume)",sets:4,rT:"12–15",rest:"60 seg",primary:true,note:"Carga moderada. Foco em contração máxima.",alert:"Corda obrigatória"},
+    {n:"06",name:"Tríceps Coice com Haltere",sets:3,rT:"15",rest:"45 seg",note:"Supinação completa no final.",alert:"Halter — sem pressão no cotovelo"}],
+    ref:"Burd et al. (2012, J Physiology): Cargas moderadas com alto volume provocam maior síntese proteica muscular.",
+    tip:"Priorize tempo sob tensão — cada rep ~2s na descida e 1s na subida." },
+  { id:"F-PULL-A", label:"PULL A", title:"PULL A", sub:"Costas · Bíceps · Trapézio", zone:"HIPERTROFIA", series:"4", reps:"8–12", rest:"60–90 s", ex:[
+    {n:"01",name:"Puxada Frontal Pronada (Lat Pulldown)",sets:4,rT:"8–12",rest:"90 seg",primary:true,note:"Depressão da escápula antes de puxar."},
+    {n:"02",name:"Remada Unilateral com Haltere",sets:4,rT:"10–12",rest:"75 seg",note:"Apoio no banco. Puxe cotovelo em direção ao quadril.",alert:"Use STRAPS — protege pegada sem sobrecarregar cotovelo"},
+    {n:"03",name:"Pullover no Cabo (braço reto)",sets:3,rT:"12–15",rest:"60 seg",note:"Grande dorsal em amplitude total."},
+    {n:"04",name:"Rosca Scott com Barra EZ",sets:4,rT:"10–12",rest:"60 seg",primary:true,note:"Apoio total no banco. Não solte no fundo.",alert:"EZ bar OBRIGATÓRIA — sem barra reta"},
+    {n:"05",name:"Rosca Martelo com Halteres",sets:3,rT:"12–15",rest:"60 seg",note:"Pegada neutra. Recruta braquial e braquiorradial."},
+    {n:"06",name:"Encolhimento com Halteres (Shrug)",sets:3,rT:"15",rest:"60 seg",note:"Pausa 1s no topo. Sem impulso de joelhos."}],
+    ref:"Kroc et al. (2009, JSCR): Combinação de compostos com isoladores maximiza recrutamento do dorsal.",
+    tip:"STRAPS em todos os puxamentos. Priorize conexão mente-músculo." },
+  { id:"F-PULL-B", label:"PULL B", title:"PULL B", sub:"Costas · Bíceps · Trapézio", zone:"FORÇA", series:"5", reps:"4–6", rest:"2–3 min", ex:[
+    {n:"01",name:"Barra Fixa com Carga (Weighted Pull-up)",sets:5,rT:"4–6",rest:"3 min",primary:true,note:"Amplitude total — braços completamente estendidos no fundo."},
+    {n:"02",name:"Remada Curvada com Halteres (bilateral)",sets:5,rT:"4–6",rest:"2–3 min",primary:true,note:"Tronco a ~45°. STRAPS obrigatório.",alert:"Halteres preferidos — preserva cotovelo esquerdo"},
+    {n:"03",name:"Puxada Supinada Pegada Fechada",sets:4,rT:"6–8",rest:"2 min",note:"Bíceps e dorsal em co-ativação máxima."},
+    {n:"04",name:"Rosca Direta com Barra EZ (Força)",sets:4,rT:"4–6",rest:"2 min",primary:true,note:"Sem momentum. Carga máxima com técnica perfeita.",alert:"EZ bar OBRIGATÓRIA — nunca barra reta"},
+    {n:"05",name:"Rosca Inversa com EZ Bar",sets:3,rT:"10",rest:"75 seg",note:"Reabilitação preventiva. Pegada pronada.",alert:"Exercício terapêutico — carga leve a moderada"},
+    {n:"06",name:"Encolhimento com Barra/Halteres (Força)",sets:4,rT:"6–8",rest:"90 seg",note:"Carga máxima. Pausa 2s no topo."}],
+    ref:"Peterson et al. (2011, Clin Orthop Relat Res): Rosca inversa é o mais indicado para epicondilite lateral.",
+    tip:"Aqueça manguito com 2x15 rotação externa. STRAPS em todos os compostos." },
+  { id:"F-LEGS-A", label:"LEGS A", title:"LEGS A", sub:"Quadríceps · Panturrilha", zone:"METABÓLICO", series:"4", reps:"15–20", rest:"45–60 s", ex:[
+    {n:"01",name:"Leg Press 45°",sets:4,rT:"15–20",rest:"60 seg",primary:true,note:"Posição de pés média-alta. NÃO bloqueie joelhos.",alert:"Lombar: não retire o glúteo do encosto no fundo"},
+    {n:"02",name:"Agachamento Goblet com Kettlebell",sets:4,rT:"15–20",rest:"60 seg",note:"KB no peito. Postura vertical do tronco.",alert:"Lombar: variação segura — sem compressão axial"},
+    {n:"03",name:"Extensão de Quadríceps (Leg Extension)",sets:4,rT:"15–20",rest:"45 seg",note:"Pausa 1s no topo. Descida em 3 segundos."},
+    {n:"04",name:"Hack Squat ou Smith Machine Squat",sets:3,rT:"15",rest:"60 seg",note:"Pés alinhados com ombros, levemente à frente.",alert:"Se dor lombar >3, substitua por Leg Press adicional"},
+    {n:"05",name:"Panturrilha em Pé",sets:4,rT:"20–25",rest:"45 seg",note:"Calcanhar abaixo do degrau. Pausa 1s no topo."},
+    {n:"06",name:"Panturrilha Sentado",sets:3,rT:"20–25",rest:"45 seg",note:"Foco no sóleo. Pausa 2s no pico."}],
+    ref:"Schoenfeld & Contreras (2014, NSCA): Protocolos metabólicos com curto descanso aumentam GH e IGF-1.",
+    tip:"Objetivo é acúmulo metabólico. Não aumente carga se perder as 15 reps mínimas." },
+  { id:"F-LEGS-B", label:"LEGS B", title:"LEGS B", sub:"Posterior · Glúteo · Adutores", zone:"HIPERTROFIA", series:"4", reps:"8–12", rest:"75–90 s", ex:[
+    {n:"01",name:"RDL com Halteres (Romanian Deadlift)",sets:4,rT:"10–12",rest:"90 seg",primary:true,note:"Quadril para trás. Para quando a coluna arredondar.",alert:"Halteres OBRIGATÓRIOS — lombar em recuperação"},
+    {n:"02",name:"Leg Curl Deitado (Femoral)",sets:4,rT:"10–12",rest:"75 seg",primary:true,note:"Pés em dorsiflexão. Pausa 1s na contração."},
+    {n:"03",name:"Hip Thrust com Haltere ou Barra",sets:4,rT:"10–12",rest:"90 seg",note:"Escápulas no banco. Pausa 2s no topo.",alert:"Prefira haltere se houver desconforto lombar"},
+    {n:"04",name:"Cadeira Abdutora (Hip Abductor)",sets:3,rT:"12–15",rest:"60 seg",note:"Glúteo médio — estabilidade do quadril."},
+    {n:"05",name:"Stiff-leg Deadlift com Halteres",sets:3,rT:"10–12",rest:"75 seg",note:"Pernas quase retas. ROM mais amplo que o RDL.",alert:"Halteres obrigatórios — coluna neutra"},
+    {n:"06",name:"Panturrilha Unilateral em Pé",sets:4,rT:"12–15",rest:"45 seg",note:"Maior ROM e correção de desequilíbrios. Pausa 1s no topo."}],
+    ref:"Contreras et al. (2015, JSCR): Hip Thrust apresenta maior ativação EMG do glúteo máximo no pico.",
+    tip:"Ative glúteo antes: 2x20 ponte unilateral. Sábado de manhã é a melhor janela." },
+];
+
+const JRV_WK = [
+  {...FK_WK[0], id:"J-PUSH-A", tip:"Terça S1 · Força pura — cargas suas."},
+  {...FK_WK[1], id:"J-PUSH-B", tip:"Sáb S1/Qui S2 · Hipertrofia — 2s descida."},
+  {...FK_WK[2], id:"J-PULL-A", tip:"Qui S1/Sáb S2 · Hipertrofia — STRAPS sempre."},
+  {...FK_WK[3], id:"J-PULL-B", tip:"Terça S2 · Força — sessão mais pesada. Aqueça manguito."},
+  {...FK_WK[4], id:"J-LEGS-A", tip:"Segunda · Metabólico — mínimo 15 reps."},
+  {...FK_WK[5], id:"J-LEGS-B", tip:"Quarta · Hipertrofia — posterior e glúteo."},
+  { id:"J-LEGS-C", label:"LEGS C", title:"LEGS C", sub:"Full Legs · Metabólico", zone:"METABÓLICO", series:"4", reps:"15–20", rest:"45–60 s", ex:[
+    {n:"01",name:"Agachamento Goblet com Kettlebell",sets:4,rT:"15–20",rest:"60 seg",primary:true,note:"KB no peito. Profundidade máxima."},
+    {n:"02",name:"Leg Press 45° (Volume)",sets:4,rT:"15–20",rest:"60 seg",note:"Carga moderada. Sem travar joelhos."},
+    {n:"03",name:"Stiff-leg Deadlift com Halteres",sets:4,rT:"15",rest:"60 seg",note:"Pernas quase retas. Alongamento dos isquiotibiais."},
+    {n:"04",name:"Extensão de Quadríceps (Metabólico)",sets:3,rT:"20",rest:"45 seg",note:"Carga leve. 20 reps contínuas."},
+    {n:"05",name:"Panturrilha Sentado",sets:4,rT:"20–25",rest:"45 seg",note:"Foco no sóleo. Pausa 2s no pico."}],
+    ref:"Schoenfeld & Contreras (2014, NSCA): Protocolos metabólicos aumentam GH e IGF-1 pós-treino.",
+    tip:"Sexta-feira. Priorize manter as 15 reps mínimas." },
+];
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// API
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+async function apiGet(action, profile) {
+  try {
+    const r = await fetch(`${API_URL}?action=${action}&profile=${profile}`);
+    return await r.json();
+  } catch(e) { return {ok:false}; }
+}
+async function apiPost(body) {
+  try {
+    await fetch(API_URL, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(body)
+    });
+    return {ok:true};
+  } catch(e) { return {ok:false}; }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// UTILS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function fmtDate(iso) {
+  const d = new Date(iso), now = new Date();
+  const diff = Math.floor((now - d) / 86400000);
+  if (diff === 0) return 'hoje';
+  if (diff === 1) return 'ontem';
+  if (diff < 7)  return `há ${diff}d`;
+  if (diff < 14) return 'há 1 sem';
+  if (diff < 30) return `há ${Math.floor(diff/7)} sem`;
+  return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+}
+function fmtD(d) {
+  if (!d) return '—';
+  const s = String(d);
+  if (s.includes('T') || s.includes('-')) {
+    const dt = new Date(s);
+    return isNaN(dt) ? s : dt.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', year:'2-digit'});
+  }
+  return s;
+}
+function fmtN(v) {
+  const n = parseFloat(String(v||'0').replace(',','.'));
+  return (!n || n <= 0) ? '—' : Math.round(n).toLocaleString('pt-BR');
+}
+function num(v) { return parseFloat(String(v||'0').replace(',','.')) || 0; }
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// DESIGN TOKENS (inline style helpers)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const T = {
+  bg:      '#000000',
+  surface: '#0a0a0a',
+  card:    '#111111',
+  border:  '#1c1c1c',
+  border2: '#242424',
+  muted:   '#333333',
+  dim:     '#555555',
+  subtle:  '#888888',
+  text:    '#ffffff',
+  mono:    "'Geist Mono', monospace",
+};
+
+// Reusable components — card wrapper
+function Card({ children, style, accent, left }) {
+  return (
+    <div style={{
+      background: T.surface,
+      border: `1px solid ${T.border}`,
+      borderLeft: left ? `2px solid ${left}` : undefined,
+      borderRadius: left ? '0 12px 12px 0' : 12,
+      ...style
+    }}>
+      {children}
+    </div>
+  );
+}
+
+// Section label
+function SLabel({ children, style }) {
+  return (
+    <div style={{
+      fontFamily: T.mono, fontSize: 9, letterSpacing: '3px',
+      textTransform: 'uppercase', color: T.muted,
+      marginBottom: 10, paddingBottom: 8,
+      borderBottom: `1px solid ${T.border}`,
+      ...style
+    }}>
+      {children}
+    </div>
+  );
+}
+
+// Badge / chip
+function Chip({ children, color, bg }) {
+  return (
+    <span style={{
+      fontFamily: T.mono, fontSize: 8, letterSpacing: '1.5px',
+      textTransform: 'uppercase', padding: '3px 8px',
+      borderRadius: 4, background: bg || T.card,
+      color: color || T.dim, border: `1px solid ${T.border}`
+    }}>
+      {children}
+    </span>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// HEADER
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function Header({ profile, syncStatus, onSwitch }) {
+  const ac = PROFILE_COLORS[profile];
+  const dotColor = syncStatus === 'ok' ? '#10b981' : syncStatus === 'syncing' ? '#fbbf24' : syncStatus === 'error' ? '#ef4444' : T.muted;
+
+  return (
+    <div style={{
+      position: 'sticky', top: 0, zIndex: 50,
+      background: T.bg, borderBottom: `1px solid ${T.border}`
+    }}>
+      {/* Profile bar */}
+      <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', borderBottom:`1px solid ${T.border}`}}>
+        {['fk','jrv'].map(p => {
+          const active = profile === p;
+          const c = PROFILE_COLORS[p];
+          return (
+            <button key={p} onClick={() => onSwitch(p)} style={{
+              padding:'11px 0', border:'none', cursor:'pointer',
+              fontFamily: T.mono, fontSize: 16, letterSpacing:'4px',
+              textTransform:'uppercase', transition:'all .2s',
+              color: active ? '#fff' : T.muted,
+              background: active ? `${c}0d` : 'transparent',
+              borderBottom: `2px solid ${active ? c : 'transparent'}`,
+            }}>
+              {p === 'fk' ? 'F.K.' : 'J.R.V.'}
+            </button>
+          );
+        })}
+      </div>
+      {/* Logo + sync */}
+      <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 16px'}}>
+        <div>
+          <div style={{fontFamily:T.mono, fontSize:8, letterSpacing:'4px', color:T.muted, textTransform:'uppercase', marginBottom:2}}>
+            Performance Tracker
+          </div>
+          <div style={{fontFamily:T.mono, fontSize:20, fontWeight:700, letterSpacing:'5px', lineHeight:1, color:'#fff'}}>
+            CARLOTA
+            <span style={{color:T.border2}}> · </span>
+            <span style={{color:ac}}>WILLIAMS</span>
+          </div>
+        </div>
+        <div style={{display:'flex', alignItems:'center', gap:6}}>
+          <div style={{
+            width:6, height:6, borderRadius:'50%', background:dotColor,
+            animation: syncStatus==='syncing' ? 'spin 1s linear infinite' : syncStatus==='ok' ? 'pulse 2s infinite' : 'none'
+          }}/>
+          <span style={{fontFamily:T.mono, fontSize:9, letterSpacing:'1.5px', textTransform:'uppercase', color:dotColor}}>
+            {syncStatus==='syncing'?'SINC...':syncStatus==='ok'?'NUVEM ✓':syncStatus==='error'?'OFFLINE':'NUVEM'}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// BOTTOM NAV
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const NAV_ITEMS = [
+  { id:'prog',   icon:'◈', label:'PROG'   },
+  { id:'treino', icon:'⬡', label:'TREINO' },
+  { id:'hist',   icon:'≡', label:'HIST'   },
+  { id:'bio',    icon:'◎', label:'BIO'    },
+];
+
+function BottomNav({ active, onChange, profile }) {
+  const ac = PROFILE_COLORS[profile];
+  return (
+    <div style={{
+      position:'fixed', bottom:0, left:0, right:0, zIndex:50,
+      background:T.bg, borderTop:`1px solid ${T.border}`
+    }} className="bnav-pad">
+      <div style={{
+        maxWidth:480, margin:'0 auto',
+        display:'grid', gridTemplateColumns:`repeat(${NAV_ITEMS.length}, 1fr)`
+      }}>
+        {NAV_ITEMS.map(item => {
+          const isActive = active === item.id;
+          return (
+            <button key={item.id} onClick={() => onChange(item.id)} style={{
+              display:'flex', flexDirection:'column', alignItems:'center', gap:4,
+              padding:'10px 0 8px', border:'none', cursor:'pointer',
+              background:'transparent', transition:'all .15s',
+              color: isActive ? ac : T.muted,
+            }}>
+              <span style={{fontSize:18, lineHeight:1, fontWeight: isActive ? 600 : 400}}>{item.icon}</span>
+              <span style={{fontFamily:T.mono, fontSize:8, letterSpacing:'2px'}}>{item.label}</span>
+              {isActive && (
+                <div style={{
+                  width:20, height:1.5, borderRadius:1,
+                  background:ac, marginTop:1
+                }}/>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// EXERCISE CARD
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function ExCard({ ex, profile, wkIdx, exIdx, ac, lastRef }) {
+  const draftKey = `cw_${profile}_${wkIdx}_${exIdx}`;
+  const initSets = () => {
+    try {
+      const raw = localStorage.getItem(draftKey);
+      if (raw) return JSON.parse(raw).sets;
+    } catch(e) {}
+    return Array.from({length: ex.sets}, () => ({kg:'', reps:'', done:false}));
+  };
+  const initObs = () => {
+    try {
+      const raw = localStorage.getItem(draftKey);
+      if (raw) return JSON.parse(raw).obs || '';
+    } catch(e) {}
+    return '';
+  };
+
+  const [open, setOpen] = useState(false);
+  const [sets, setSets] = useState(initSets);
+  const [obs, setObs] = useState(initObs);
+
+  const save = useCallback((s, o) => {
+    try { localStorage.setItem(draftKey, JSON.stringify({sets:s, obs:o})); } catch(e) {}
+  }, [draftKey]);
+
+  const updateSet = (i, field, val) => {
+    const next = sets.map((s,si) => si===i ? {...s,[field]:val} : s);
+    setSets(next); save(next, obs);
+  };
+  const toggleDone = (i) => {
+    const next = sets.map((s,si) => si===i ? {...s, done:!s.done} : s);
+    setSets(next); save(next, obs);
+  };
+  const clear = () => {
+    const next = Array.from({length:ex.sets}, () => ({kg:'',reps:'',done:false}));
+    setSets(next); setObs(''); save(next,'');
+  };
+
+  const done = sets.filter(s=>s.done).length;
+  const leftColor = ex.alert ? '#f59e0b' : ex.primary ? ac : T.border;
+
+  return (
+    <div style={{
+      background: T.surface, borderRadius:'0 12px 12px 0',
+      border:`1px solid ${T.border}`, borderLeft:`2px solid ${leftColor}`,
+      marginBottom:8, overflow:'hidden'
+    }}>
+      {/* Toggle button */}
+      <button onClick={() => setOpen(!open)} style={{
+        width:'100%', textAlign:'left', background:'transparent',
+        border:'none', cursor:'pointer', padding:'12px 14px 10px'
+      }}>
+        <div style={{display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:10}}>
+          <div style={{flex:1, minWidth:0}}>
+            <div style={{fontFamily:T.mono, fontSize:8, letterSpacing:'2px', color:T.muted, textTransform:'uppercase', marginBottom:3}}>
+              EX {ex.n}
+              {done > 0 && <span style={{color:ac, marginLeft:6}}>{done===ex.sets ? '✓' : `${done}/${ex.sets}`}</span>}
+            </div>
+            <div style={{fontSize:13, fontWeight:600, color:'#fff', lineHeight:1.35, marginBottom:8}}>{ex.name}</div>
+            <div style={{display:'flex', gap:6, flexWrap:'wrap'}}>
+              <span style={{
+                fontFamily:T.mono, fontSize:9, padding:'3px 8px', borderRadius:4,
+                background:`${ac}18`, color:ac, border:`1px solid ${ac}30`
+              }}>{ex.sets}×{ex.rT}</span>
+              <span style={{
+                fontFamily:T.mono, fontSize:9, padding:'3px 8px', borderRadius:4,
+                background:T.card, color:T.dim, border:`1px solid ${T.border}`
+              }}>⏱ {ex.rest}</span>
+            </div>
+          </div>
+          <div style={{fontFamily:T.mono, fontSize:10, color:T.muted, marginTop:2, flexShrink:0}}>
+            {open ? '▲' : '▼'}
+          </div>
+        </div>
+        {ex.note && (
+          <div style={{fontSize:10, color:T.dim, lineHeight:1.6, marginTop:8}}>{ex.note}</div>
+        )}
+        {ex.alert && (
+          <div style={{
+            fontSize:10, marginTop:8, padding:'6px 10px', borderRadius:6,
+            background:'#f59e0b0d', border:'1px solid #f59e0b28', color:'#f59e0b',
+            display:'flex', gap:6, lineHeight:1.5
+          }}>⚠ {ex.alert}</div>
+        )}
+      </button>
+
+      {/* Log body */}
+      {open && (
+        <div className="anim-fadein" style={{
+          borderTop:`1px solid ${T.border}`, background:'#050505',
+          padding:'12px 14px 14px'
+        }}>
+          {/* Previous reference */}
+          {lastRef && (
+            <div style={{
+              padding:'8px 10px', borderRadius:8, marginBottom:10,
+              background:'#fbbf2408', border:'1px solid #fbbf2420'
+            }}>
+              <div style={{fontFamily:T.mono, fontSize:8, letterSpacing:'2px', color:'#a16207', textTransform:'uppercase', marginBottom:3}}>
+                🕐 última vez · {fmtDate(lastRef.date)}
+              </div>
+              <div style={{fontFamily:T.mono, fontSize:9, color:'#78450c', lineHeight:1.6}}>
+                {lastRef.sets?.map(s=>`S${s.s}:${s.kg||'?'}kg×${s.reps||'?'}`).join(' · ')}
+              </div>
+            </div>
+          )}
+
+          {/* Column headers */}
+          <div style={{
+            display:'grid', gridTemplateColumns:'22px 1fr 1fr 38px',
+            gap:6, marginBottom:6
+          }}>
+            {['','KG','REPS',''].map((h,i) => (
+              <div key={i} style={{fontFamily:T.mono, fontSize:8, letterSpacing:'2px', color:T.muted, textAlign:'center', textTransform:'uppercase'}}>{h}</div>
+            ))}
+          </div>
+
+          {/* Set rows */}
+          {sets.map((s, i) => (
+            <div key={i} style={{display:'grid', gridTemplateColumns:'22px 1fr 1fr 38px', gap:6, marginBottom:6, alignItems:'center'}}>
+              <div style={{fontFamily:T.mono, fontSize:13, fontWeight:700, textAlign:'center', color:s.done?ac:T.muted}}>{i+1}</div>
+              <input
+                type="number" inputMode="decimal" placeholder="—"
+                value={s.kg} onChange={e => updateSet(i,'kg',e.target.value)}
+                style={{
+                  background:T.card, border:`1.5px solid ${s.done?`${ac}40`:T.border}`,
+                  borderRadius:8, padding:'10px 4px', fontFamily:T.mono,
+                  fontSize:15, fontWeight:600, color:s.done?T.dim:'#fff',
+                  textAlign:'center', outline:'none', width:'100%',
+                  opacity: s.done ? 0.4 : 1, transition:'all .15s'
+                }}
+              />
+              <input
+                type="number" inputMode="numeric" placeholder={ex.rT}
+                value={s.reps} onChange={e => updateSet(i,'reps',e.target.value)}
+                style={{
+                  background:T.card, border:`1.5px solid ${s.done?`${ac}40`:T.border}`,
+                  borderRadius:8, padding:'10px 4px', fontFamily:T.mono,
+                  fontSize:15, fontWeight:600, color:s.done?T.dim:'#fff',
+                  textAlign:'center', outline:'none', width:'100%',
+                  opacity: s.done ? 0.4 : 1, transition:'all .15s'
+                }}
+              />
+              <button onClick={() => toggleDone(i)} style={{
+                width:38, height:40, borderRadius:8, border:`1.5px solid ${s.done?ac:T.border}`,
+                background:s.done?ac:T.card, color:s.done?'#000':T.muted,
+                fontSize:14, fontWeight:700, cursor:'pointer', transition:'all .15s',
+                display:'flex', alignItems:'center', justifyContent:'center'
+              }}>
+                {s.done ? '✓' : '○'}
+              </button>
+            </div>
+          ))}
+
+          <textarea
+            value={obs}
+            onChange={e => { setObs(e.target.value); save(sets, e.target.value); }}
+            placeholder="Observações..."
+            rows={2}
+            style={{
+              width:'100%', marginTop:8, padding:'8px 10px',
+              background:T.card, border:`1px solid ${T.border}`,
+              borderRadius:8, fontFamily:'Geist, sans-serif', fontSize:11,
+              color:T.subtle, resize:'none', outline:'none', lineHeight:1.5
+            }}
+          />
+          <button onClick={clear} style={{
+            marginTop:8, width:'100%', padding:'7px',
+            background:'transparent', border:`1px solid ${T.border}`,
+            borderRadius:8, fontFamily:T.mono, fontSize:8,
+            letterSpacing:'1px', textTransform:'uppercase', color:T.muted,
+            cursor:'pointer'
+          }}>↺ LIMPAR</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PAGE: PROG
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function ProgPage({ profile, state }) {
+  const ac = PROFILE_COLORS[profile];
+  const hk = state.healthkit || [];
+  const latest = hk[0] || null;
+  const hist = state.hist || [];
+  const wks = profile==='fk' ? FK_WK : JRV_WK;
+  const hv = latest ? num(latest.hrv) : 0;
+  const hrvStatus = hv>=60
+    ? {label:'INTENSIDADE MÁXIMA', color:'#10b981', dot:'#10b981'}
+    : hv>=40 ? {label:'INTENSIDADE NORMAL', color:'#fbbf24', dot:'#fbbf24'}
+    : hv>0   ? {label:'REDUZIR INTENSIDADE', color:'#ef4444', dot:'#ef4444'}
+    : null;
+
+  return (
+    <div className="pb-safe" style={{padding:'16px 16px 0'}}>
+
+      {/* ── APPLE HEALTH ── */}
+      <SLabel>Apple Health · Hoje</SLabel>
+
+      {latest ? (
+        <>
+          {/* 4 metric cards */}
+          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:10}}>
+            {[
+              {lbl:'HRV', val:fmtN(latest.hrv), unit:'ms', accent:true},
+              {lbl:'FC Repouso', val:fmtN(latest.restingHR), unit:'bpm'},
+              {lbl:'Cal Ativas', val:fmtN(latest.activeCalories), unit:'kcal'},
+              {lbl:'Passos', val:fmtN(latest.steps), unit:''},
+            ].map(({lbl,val,unit,accent}) => (
+              <Card key={lbl} style={{padding:'12px 10px', textAlign:'center'}}>
+                <div style={{fontFamily:T.mono, fontSize:8, letterSpacing:'2px', textTransform:'uppercase', color:T.muted, marginBottom:4}}>{lbl}</div>
+                <div style={{fontFamily:T.mono, fontSize:28, fontWeight:700, lineHeight:1, color:accent?ac:'#fff'}}>
+                  {val}
+                  {unit && <span style={{fontSize:11, fontWeight:400, color:T.dim, marginLeft:2}}>{unit}</span>}
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          {/* HRV status badge */}
+          {hrvStatus && (
+            <div style={{
+              display:'inline-flex', alignItems:'center', gap:8,
+              padding:'7px 14px', borderRadius:20, marginBottom:16,
+              fontFamily:T.mono, fontSize:9, letterSpacing:'1.5px', textTransform:'uppercase',
+              color:hrvStatus.color, background:`${hrvStatus.color}10`,
+              border:`1px solid ${hrvStatus.color}30`
+            }}>
+              <span style={{width:6,height:6,borderRadius:'50%',background:hrvStatus.dot, flexShrink:0, display:'inline-block'}}/>
+              {hrvStatus.label}
+            </div>
+          )}
+
+          {/* 7-day trend table */}
+          {hk.length > 1 && (
+            <Card style={{overflow:'hidden', marginBottom:20}}>
+              <div style={{fontFamily:T.mono, fontSize:8, letterSpacing:'3px', textTransform:'uppercase', color:T.muted, padding:'10px 12px 6px'}}>
+                Últimos 7 dias
+              </div>
+              <div style={{display:'grid', gridTemplateColumns:'70px 1fr 1fr 1fr', padding:'6px 12px 8px', borderBottom:`1px solid ${T.border}`}}>
+                {['Data','HRV','FC','Cal'].map(h => (
+                  <div key={h} style={{fontFamily:T.mono, fontSize:8, letterSpacing:'2px', textTransform:'uppercase', color:T.muted, textAlign:'center'}}>{h}</div>
+                ))}
+              </div>
+              {hk.slice(0,7).map((h,i) => (
+                <div key={i} style={{
+                  display:'grid', gridTemplateColumns:'70px 1fr 1fr 1fr',
+                  padding:'7px 12px', borderBottom: i<6 ? `1px solid ${T.bg}` : 'none',
+                  alignItems:'center'
+                }}>
+                  <div style={{fontFamily:T.mono, fontSize:9, color:T.dim}}>{fmtD(h.date)}</div>
+                  <div style={{fontFamily:T.mono, fontSize:10, fontWeight:600, color:ac, textAlign:'center'}}>{fmtN(h.hrv)}</div>
+                  <div style={{fontFamily:T.mono, fontSize:10, color:T.subtle, textAlign:'center'}}>{fmtN(h.restingHR)}</div>
+                  <div style={{fontFamily:T.mono, fontSize:10, color:T.subtle, textAlign:'center'}}>{fmtN(h.activeCalories)}</div>
+                </div>
+              ))}
+            </Card>
+          )}
+        </>
+      ) : (
+        <Card style={{textAlign:'center', padding:'40px 20px', marginBottom:20}}>
+          <div style={{fontSize:28, marginBottom:10}}>⌚</div>
+          <div style={{fontFamily:T.mono, fontSize:9, letterSpacing:'2px', textTransform:'uppercase', color:T.muted}}>
+            {profile==='jrv' ? 'Atalho J.R.V. em breve' : 'Dados aparecem após o primeiro check-in'}
+          </div>
+        </Card>
+      )}
+
+      {/* ── WORKOUT EVOLUTION ── */}
+      <SLabel>Evolução por treino</SLabel>
+
+      {hist.length === 0 ? (
+        <Card style={{textAlign:'center', padding:'32px 20px', marginBottom:20}}>
+          <div style={{fontFamily:T.mono, fontSize:9, letterSpacing:'2px', textTransform:'uppercase', color:T.muted}}>
+            Evolução aparece após os primeiros treinos
+          </div>
+        </Card>
+      ) : (
+        wks.map(wk => {
+          const sessions = hist.filter(h => h.wkId === wk.id).slice(0,3);
+          if (!sessions.length) return null;
+          const exMap = {};
+          sessions.forEach(sess => {
+            const dateStr = new Date(sess.date).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+            (sess.exercises||[]).forEach(ex => {
+              if (!exMap[ex.n]) exMap[ex.n] = {name:ex.name, pts:[]};
+              const maxKg = Math.max(...(ex.sets||[]).map(s=>num(s.kg)).filter(v=>v>0));
+              exMap[ex.n].pts.push({date:dateStr, kg:maxKg>0?maxKg:null});
+            });
+          });
+          const zc = ZONE_COLORS[wk.zone] || ac;
+          return (
+            <div key={wk.id} style={{
+              background:T.surface, border:`1px solid ${T.border}`,
+              borderLeft:`2px solid ${zc}`, borderRadius:'0 10px 10px 0',
+              padding:'10px 12px', marginBottom:8
+            }}>
+              <div style={{fontFamily:T.mono, fontSize:11, fontWeight:700, letterSpacing:'2px', color:zc, marginBottom:8, display:'flex', alignItems:'center', gap:8}}>
+                {wk.title}
+                <span style={{fontFamily:T.mono, fontSize:8, letterSpacing:'1px', color:T.muted, fontWeight:400}}>{wk.zone}</span>
+              </div>
+              {Object.values(exMap).map((ex,i) => (
+                <div key={i} style={{paddingBottom:6, marginBottom:6, borderBottom:`1px solid ${T.border}`}}>
+                  <div style={{fontSize:10, fontWeight:600, color:T.subtle, marginBottom:4}}>{ex.name}</div>
+                  <div style={{display:'flex', alignItems:'center', gap:4, flexWrap:'wrap'}}>
+                    {ex.pts.map((pt,j) => (
+                      <React.Fragment key={j}>
+                        <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
+                          <span style={{fontFamily:T.mono, fontSize:7, color:T.muted}}>{pt.date}</span>
+                          <span style={{fontFamily:T.mono, fontSize:10, fontWeight:j===0?700:400, color:j===0?ac:T.dim}}>
+                            {pt.kg!=null ? `${pt.kg}kg` : '—'}
+                          </span>
+                        </div>
+                        {j < ex.pts.length-1 && <span style={{fontSize:9, color:T.border2}}>→</span>}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        })
+      )}
+      <div style={{height:16}}/>
+    </div>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PAGE: TREINO
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function TreinoPage({ profile, state, onSave, savingWk }) {
+  const ac = PROFILE_COLORS[profile];
+  const wks = profile==='fk' ? FK_WK : JRV_WK;
+  const [activeWk, setActiveWk] = useState(0);
+  const wk = wks[activeWk];
+  const last = state.hist.find(h => h.wkId===wk.id);
+  const zc = ZONE_COLORS[wk.zone] || ac;
+  const saveKey = `${profile}-${activeWk}`;
+  const isSaving = savingWk === saveKey;
+
+  return (
+    <div className="pb-safe">
+      {/* Workout tab strip */}
+      <div className="no-scroll" style={{
+        display:'flex', overflowX:'auto',
+        borderBottom:`1px solid ${T.border}`, background:T.bg
+      }}>
+        {wks.map((w,i) => (
+          <button key={w.id} onClick={() => setActiveWk(i)} style={{
+            flexShrink:0, padding:'10px 12px',
+            border:'none', cursor:'pointer', background:'transparent',
+            fontFamily:T.mono, fontSize:9, letterSpacing:'1.5px', textTransform:'uppercase',
+            transition:'all .15s',
+            color: activeWk===i ? ac : T.muted,
+            borderBottom: `2px solid ${activeWk===i ? ac : 'transparent'}`,
+          }}>
+            {w.label}
+          </button>
+        ))}
+      </div>
+
+      <div style={{padding:'16px 16px 0'}}>
+        {/* Workout header — spacious for in-gym use */}
+        <div style={{marginBottom:20}}>
+          <div style={{fontFamily:T.mono, fontSize:38, fontWeight:900, letterSpacing:'4px', lineHeight:1, color:'#fff', marginBottom:4}}>
+            {wk.title}
+          </div>
+          <div style={{fontSize:12, color:T.dim, marginBottom:14}}>{wk.sub}</div>
+
+          <div style={{
+            display:'inline-flex', alignItems:'center', padding:'5px 12px',
+            borderRadius:4, fontFamily:T.mono, fontSize:9, letterSpacing:'2px', textTransform:'uppercase',
+            background:`${zc}18`, color:zc, border:`1px solid ${zc}30`, marginBottom:14
+          }}>
+            {wk.zone}
+          </div>
+
+          {/* Stats grid */}
+          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:8, marginBottom:14}}>
+            {[['Séries',wk.series],['Reps',wk.reps],['Descanso',wk.rest]].map(([lbl,val]) => (
+              <div key={lbl} style={{
+                background:T.surface, border:`1px solid ${T.border}`,
+                borderRadius:10, padding:'10px 6px', textAlign:'center'
+              }}>
+                <div style={{fontFamily:T.mono, fontSize:13, fontWeight:700, color:ac, lineHeight:1.2}}>{val}</div>
+                <div style={{fontFamily:T.mono, fontSize:8, letterSpacing:'2px', textTransform:'uppercase', color:T.muted, marginTop:3}}>{lbl}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Last session reference */}
+          {last && (
+            <div style={{
+              padding:'10px 12px', borderRadius:'0 10px 10px 0', marginBottom:14,
+              background:T.surface, borderLeft:`2px solid ${ac}`,
+              border:`1px solid ${T.border}`, borderLeftWidth:2
+            }}>
+              <div style={{fontFamily:T.mono, fontSize:8, letterSpacing:'2px', textTransform:'uppercase', color:T.muted, marginBottom:3}}>
+                🕐 Último {wk.title}
+              </div>
+              <div style={{fontFamily:T.mono, fontSize:10, color:ac}}>{fmtDate(last.date)}</div>
+              <div style={{fontSize:10, color:T.dim, marginTop:2}}>{(last.exercises||[]).length} exercícios · Ver em HIST</div>
+            </div>
+          )}
+        </div>
+
+        {/* Exercise list */}
+        <SLabel>Exercícios · toque para registrar</SLabel>
+        {wk.ex.map((ex,i) => {
+          const prevEx = last?.exercises?.find(e=>e.n===ex.n);
+          return (
+            <ExCard
+              key={`${profile}-${activeWk}-${i}`}
+              ex={ex} profile={profile} wkIdx={activeWk} exIdx={i} ac={ac}
+              lastRef={prevEx ? {date:last.date, sets:prevEx.sets} : null}
+            />
+          );
+        })}
+
+        {/* Save button */}
+        <div style={{marginBottom:24, marginTop:8}}>
+          <button
+            onClick={() => onSave(profile, activeWk)}
+            disabled={isSaving}
+            style={{
+              width:'100%', padding:'16px',
+              borderRadius:12, border:'none', cursor:'pointer',
+              fontFamily:T.mono, fontSize:11, fontWeight:700,
+              letterSpacing:'3px', textTransform:'uppercase',
+              background: isSaving ? '#10b981' : '#fff',
+              color: '#000',
+              display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+              transition:'all .2s'
+            }}
+          >
+            {isSaving ? '✓ TREINO SALVO' : '↑ SALVAR TREINO'}
+          </button>
+          <div style={{textAlign:'center', marginTop:8, fontFamily:T.mono, fontSize:9, color:T.muted}}>
+            Sincroniza automaticamente com a nuvem
+          </div>
+        </div>
+
+        {/* Scientific refs */}
+        <div style={{padding:'12px 14px', borderRadius:10, marginBottom:10, background:T.surface, border:`1px solid ${T.border}`}}>
+          <div style={{fontFamily:T.mono, fontSize:8, letterSpacing:'3px', textTransform:'uppercase', color:'#3b82f6', marginBottom:6}}>📚 REFERÊNCIA</div>
+          <div style={{fontSize:11, color:'#4a72a8', lineHeight:1.7}}>{wk.ref}</div>
+        </div>
+        <div style={{padding:'12px 14px', borderRadius:'0 10px 10px 0', marginBottom:32, background:T.surface, border:`1px solid ${T.border}`, borderLeft:`2px solid ${ac}`}}>
+          <div style={{fontFamily:T.mono, fontSize:8, letterSpacing:'3px', textTransform:'uppercase', color:ac, marginBottom:6}}>💡 DICA</div>
+          <div style={{fontSize:11, color:T.subtle, lineHeight:1.7}}>{wk.tip}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PAGE: HIST
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function HistPage({ profile, state, onDelete }) {
+  const ac = PROFILE_COLORS[profile];
+  const hist = state.hist;
+  const [openId, setOpenId] = useState(null);
+
+  return (
+    <div className="pb-safe" style={{padding:'16px 16px 0'}}>
+      <div style={{fontFamily:T.mono, fontSize:34, fontWeight:900, letterSpacing:'4px', color:'#fff', lineHeight:1, marginBottom:4}}>HISTÓRICO</div>
+      <div style={{fontSize:12, color:T.dim, marginBottom:20}}>{hist.length} treinos registrados</div>
+
+      {hist.length === 0 ? (
+        <Card style={{textAlign:'center', padding:'48px 20px'}}>
+          <div style={{fontSize:28, marginBottom:12}}>📋</div>
+          <div style={{fontFamily:T.mono, fontSize:9, letterSpacing:'2px', textTransform:'uppercase', color:T.muted}}>
+            Nenhum treino registrado ainda
+          </div>
+        </Card>
+      ) : hist.map(h => {
+        const zc = h.zc || ac;
+        const isOpen = openId === h.id;
+        return (
+          <div key={h.id} style={{
+            background:T.surface, border:`1px solid ${T.border}`,
+            borderLeft:`2px solid ${zc}`, borderRadius:'0 12px 12px 0',
+            marginBottom:8, overflow:'hidden'
+          }}>
+            <button onClick={() => setOpenId(isOpen ? null : h.id)} style={{
+              width:'100%', textAlign:'left', background:'transparent',
+              border:'none', cursor:'pointer', padding:'12px 14px'
+            }}>
+              <div style={{display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:10}}>
+                <div>
+                  <div style={{fontFamily:T.mono, fontSize:18, fontWeight:700, letterSpacing:'2px', color:'#fff', lineHeight:1.2, marginBottom:6}}>
+                    {h.title}
+                  </div>
+                  <div style={{display:'flex', gap:6, flexWrap:'wrap'}}>
+                    <span style={{
+                      fontFamily:T.mono, fontSize:8, padding:'3px 8px', borderRadius:4,
+                      background:`${zc}18`, color:zc, border:`1px solid ${zc}30`
+                    }}>{h.zone}</span>
+                    <span style={{
+                      fontFamily:T.mono, fontSize:8, padding:'3px 8px', borderRadius:4,
+                      background:T.card, color:T.dim, border:`1px solid ${T.border}`
+                    }}>{(h.exercises||[]).length} exerc.</span>
+                  </div>
+                </div>
+                <div style={{textAlign:'right', flexShrink:0}}>
+                  <div style={{fontFamily:T.mono, fontSize:9, color:T.dim}}>{fmtDate(h.date)}</div>
+                  <div style={{fontFamily:T.mono, fontSize:9, color:T.muted, marginTop:2}}>
+                    {new Date(h.date).toLocaleDateString('pt-BR')}
+                  </div>
+                </div>
+              </div>
+            </button>
+
+            {isOpen && (
+              <div className="anim-fadein" style={{borderTop:`1px solid ${T.border}`, padding:'12px 14px 14px'}}>
+                {(h.exercises||[]).map((ex,i) => (
+                  <div key={i} style={{marginBottom:12}}>
+                    <div style={{fontSize:11, fontWeight:600, color:T.subtle, marginBottom:4}}>{ex.n}. {ex.name}</div>
+                    {(ex.sets||[]).map((s,j) => (
+                      <div key={j} style={{fontFamily:T.mono, fontSize:10, color:T.muted, lineHeight:1.7}}>
+                        S{s.s}: {s.kg||'?'}kg × {s.reps||'?'} reps {s.ok?'✓':''}
+                      </div>
+                    ))}
+                    {ex.obs && <div style={{fontSize:10, fontStyle:'italic', color:T.muted, marginTop:2}}>"{ex.obs}"</div>}
+                  </div>
+                ))}
+                <button
+                  onClick={() => onDelete(profile, h.id)}
+                  style={{
+                    width:'100%', marginTop:4, padding:'8px',
+                    background:'transparent', border:`1px solid #ef444430`,
+                    borderRadius:8, fontFamily:T.mono, fontSize:8,
+                    letterSpacing:'1.5px', textTransform:'uppercase',
+                    color:'#ef4444', cursor:'pointer'
+                  }}
+                >
+                  🗑 REMOVER
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })}
+      <div style={{height:16}}/>
+    </div>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PAGE: BIO
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function BioPage({ profile, state, onSavePeso, onSaveMetas }) {
+  const ac = PROFILE_COLORS[profile];
+  const bh = state.bioHistory || [];
+  const metas = state.metas;
+  const pesoData = state.peso || [];
+  const latest = bh[0] || null;
+
+  const [pesoVal, setPesoVal] = useState('');
+  const [pesoSaved, setPesoSaved] = useState(false);
+  const [metasForm, setMetasForm] = useState({peso:'',gordura:'',massaMagra:'',visceral:''});
+  const [metasSaved, setMetasSaved] = useState(false);
+
+  function barPct(cur, meta, goodDown) {
+    if (!meta||!cur) return 50;
+    const start = goodDown ? meta*1.12 : meta*0.88;
+    const range = Math.abs(start-meta);
+    const progress = goodDown ? (start-cur)/range : (cur-start)/range;
+    return Math.max(3, Math.min(97, progress*100));
+  }
+
+  const handleSavePeso = async () => {
+    const val = parseFloat(pesoVal);
+    if (!val||val<20||val>300) { alert('Peso inválido'); return; }
+    await onSavePeso(profile, val);
+    setPesoVal('');
+    setPesoSaved(true);
+    setTimeout(() => setPesoSaved(false), 2000);
+  };
+
+  const handleSaveMetas = async () => {
+    const {peso,gordura,massaMagra,visceral} = metasForm;
+    if (!peso||!gordura||!massaMagra||!visceral) { alert('Preencha todos os campos'); return; }
+    await onSaveMetas(profile, {
+      peso:parseFloat(peso), gordura:parseFloat(gordura),
+      massaMagra:parseFloat(massaMagra), visceral:parseFloat(visceral)
+    });
+    setMetasSaved(true);
+    setTimeout(() => setMetasSaved(false), 2500);
+  };
+
+  const metricItems = metas && latest ? [
+    {lbl:'Peso',     cur:num(latest.peso),     meta:num(metas.peso),       unit:'kg',  goodDown:true},
+    {lbl:'Gordura',  cur:num(latest.gordura),   meta:num(metas.gordura),    unit:'%',   goodDown:true},
+    {lbl:'M.Magra',  cur:num(latest.muscEsq),   meta:num(metas.massaMagra), unit:'kg',  goodDown:false},
+    {lbl:'Visceral', cur:num(latest.visceral),  meta:num(metas.visceral),   unit:'nív', goodDown:true},
+  ] : [];
+
+  return (
+    <div className="pb-safe" style={{padding:'16px 16px 0'}}>
+      <div style={{fontFamily:T.mono, fontSize:34, fontWeight:900, letterSpacing:'4px', color:'#fff', lineHeight:1, marginBottom:4}}>BIOIMPEDÂNCIA</div>
+      <div style={{fontSize:12, color:T.dim, marginBottom:20}}>Metas · Peso diário · Histórico</div>
+
+      {/* ── METAS PROGRESS ── */}
+      <SLabel>Próxima meta</SLabel>
+
+      {metricItems.length > 0 ? (
+        <div style={{
+          background:T.surface, border:`1px solid ${T.border}`,
+          borderLeft:`2px solid ${ac}`, borderRadius:'0 12px 12px 0',
+          padding:'14px 16px', marginBottom:20
+        }}>
+          <div style={{fontFamily:T.mono, fontSize:8, letterSpacing:'3px', textTransform:'uppercase', color:ac, marginBottom:12}}>
+            Ciclo atual
+          </div>
+          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:10}}>
+            {metricItems.map(({lbl,cur,meta,unit,goodDown}) => {
+              const diff = cur-meta;
+              const arrived = Math.abs(diff)<0.15;
+              const needDown = goodDown?diff>0:diff<0;
+              const pct = barPct(cur,meta,goodDown);
+              return (
+                <div key={lbl} style={{background:T.card, borderRadius:10, padding:'10px 12px'}}>
+                  <div style={{fontFamily:T.mono, fontSize:8, letterSpacing:'2px', textTransform:'uppercase', color:T.muted, marginBottom:4}}>{lbl}</div>
+                  <div style={{fontFamily:T.mono, fontSize:22, fontWeight:700, lineHeight:1, color:'#fff', marginBottom:2}}>
+                    {cur?cur.toFixed(1):'—'}
+                    <span style={{fontSize:10, fontWeight:400, color:T.muted, marginLeft:2}}>{unit}</span>
+                  </div>
+                  <div style={{fontFamily:T.mono, fontSize:8, color:T.muted, marginBottom:8}}>meta {meta} {unit}</div>
+                  <div style={{height:2, background:T.border, borderRadius:2, overflow:'hidden', marginBottom:5}}>
+                    <div style={{height:'100%', borderRadius:2, transition:'width .6s ease', width:`${pct}%`, background:arrived?'#10b981':ac}}/>
+                  </div>
+                  <div style={{fontFamily:T.mono, fontSize:8, color:arrived?'#10b981':needDown?'#ef4444':'#10b981'}}>
+                    {arrived ? '✓ meta atingida' : `${needDown?'▼':'▲'} ${Math.abs(diff).toFixed(1)} ${unit}`}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : (
+        <Card style={{textAlign:'center', padding:'28px 20px', marginBottom:20}}>
+          <div style={{fontFamily:T.mono, fontSize:9, letterSpacing:'2px', textTransform:'uppercase', color:T.muted}}>
+            {!metas ? 'Defina as metas abaixo para ver o progresso' : 'Aguardando dados de bioimpedância'}
+          </div>
+        </Card>
+      )}
+
+      {/* ── PESO DIÁRIO ── */}
+      <SLabel>Peso do dia</SLabel>
+      <div style={{background:T.surface, border:`1px solid ${T.border}`, borderRadius:12, padding:'14px 16px', marginBottom:20}}>
+        <div style={{display:'flex', gap:10, alignItems:'stretch'}}>
+          <input
+            type="number" inputMode="decimal" step="0.1" placeholder="83.4 kg"
+            value={pesoVal} onChange={e=>setPesoVal(e.target.value)}
+            style={{
+              flex:1, textAlign:'center', fontFamily:T.mono, fontSize:20, fontWeight:700,
+              padding:'12px 8px', borderRadius:10, outline:'none',
+              background:T.card, border:`1.5px solid ${pesoVal?`${ac}60`:T.border}`,
+              color:'#fff', transition:'border-color .2s'
+            }}
+          />
+          <button onClick={handleSavePeso} style={{
+            padding:'12px 20px', borderRadius:10, border:'none', cursor:'pointer',
+            fontFamily:T.mono, fontSize:10, fontWeight:700, letterSpacing:'1.5px', textTransform:'uppercase',
+            background: pesoSaved?'#10b981':ac, color:'#000', flexShrink:0, transition:'background .2s'
+          }}>
+            {pesoSaved?'✓':'SALVAR'}
+          </button>
+        </div>
+        <div style={{fontFamily:T.mono, fontSize:9, color:T.muted, marginTop:8}}>
+          {pesoData.length>0
+            ? `Último: ${pesoData[0].peso} kg · ${fmtD(pesoData[0].date)}`
+            : 'Nenhum registro ainda.'}
+        </div>
+      </div>
+
+      {/* ── BIO HISTORY ── */}
+      <SLabel>Últimas 3 aferições</SLabel>
+      {bh.length > 0 ? (
+        <>
+          {/* Horizontal scroll cards */}
+          <div className="no-scroll" style={{display:'flex', gap:10, overflowX:'auto', paddingBottom:4, marginBottom:12}}>
+            {bh.map((m,i) => {
+              const prev = bh[i+1];
+              const isLatest = i===0;
+              const fields = [
+                {lbl:'Peso',    val:m.peso,     unit:'kg', prevVal:prev?.peso,     goodDown:false},
+                {lbl:'Gordura', val:m.gordura,  unit:'%',  prevVal:prev?.gordura,  goodDown:true},
+                {lbl:'M.Magra', val:m.muscEsq,  unit:'kg', prevVal:prev?.muscEsq,  goodDown:false},
+                {lbl:'Visceral',val:m.visceral, unit:'',   prevVal:prev?.visceral, goodDown:true},
+              ];
+              return (
+                <div key={i} style={{
+                  background:T.surface, flexShrink:0, minWidth:150,
+                  border:`${isLatest?'1.5px':'1px'} solid ${isLatest?ac:T.border}`,
+                  borderRadius:12, padding:'10px 12px'
+                }}>
+                  {isLatest
+                    ? <div style={{fontFamily:T.mono, fontSize:7, letterSpacing:'1px', textTransform:'uppercase', padding:'2px 8px', borderRadius:20, background:`${ac}18`, color:ac, display:'inline-block', marginBottom:8}}>atual</div>
+                    : <div style={{height:20}}/>}
+                  <div style={{fontFamily:T.mono, fontSize:9, letterSpacing:'1px', textTransform:'uppercase', color:isLatest?ac:T.dim, marginBottom:10}}>{m.date}</div>
+                  {fields.map(({lbl,val,unit,prevVal,goodDown}) => {
+                    const diff = prevVal!=null ? num(val)-num(prevVal) : null;
+                    const good = diff!=null ? (goodDown?diff<=0:diff>=0) : null;
+                    return (
+                      <div key={lbl} style={{display:'flex', justifyContent:'space-between', alignItems:'center', padding:'4px 0', borderBottom:`0.5px solid ${T.bg}`}}>
+                        <span style={{fontFamily:T.mono, fontSize:8, textTransform:'uppercase', color:T.muted}}>{lbl}</span>
+                        <span style={{fontFamily:T.mono, fontSize:10, fontWeight:600, color:T.subtle, display:'flex', alignItems:'center', gap:3}}>
+                          {val}{unit}
+                          {diff!=null && <span style={{fontSize:8, color:good?'#10b981':'#ef4444'}}>{diff>0?'▲':'▼'}{Math.abs(diff).toFixed(1)}</span>}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* KPI deltas */}
+          {bh.length >= 2 && (
+            <div style={{display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8, marginBottom:20}}>
+              {[
+                {lbl:'Peso',    delta:(num(bh[0].peso)   -num(bh[bh.length-1].peso)).toFixed(1),   goodDown:false},
+                {lbl:'Gordura', delta:(num(bh[0].gordura)-num(bh[bh.length-1].gordura)).toFixed(1), goodDown:true},
+                {lbl:'M.Magra', delta:(num(bh[0].muscEsq)-num(bh[bh.length-1].muscEsq)).toFixed(1),goodDown:false},
+              ].map(({lbl,delta,goodDown}) => {
+                const n = parseFloat(delta);
+                const good = goodDown?n<=0:n>=0;
+                return (
+                  <Card key={lbl} style={{padding:'8px', textAlign:'center'}}>
+                    <div style={{fontFamily:T.mono, fontSize:7, letterSpacing:'2px', textTransform:'uppercase', color:T.muted, marginBottom:4}}>{lbl}</div>
+                    <div style={{fontFamily:T.mono, fontSize:18, fontWeight:700, color:good?'#10b981':'#ef4444'}}>
+                      {n>0?'+':''}{delta}
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </>
+      ) : (
+        <Card style={{textAlign:'center', padding:'28px 20px', marginBottom:20}}>
+          <div style={{fontFamily:T.mono, fontSize:9, letterSpacing:'2px', textTransform:'uppercase', color:T.muted}}>
+            Dados aparecem após a sincronização
+          </div>
+        </Card>
+      )}
+
+      {/* ── DEFINIR METAS ── */}
+      <SLabel>Definir metas</SLabel>
+      <div style={{background:T.surface, border:`1px solid ${T.border}`, borderRadius:12, padding:'14px 16px', marginBottom:32}}>
+        <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:12}}>
+          {[
+            {lbl:'Peso meta (kg)', key:'peso'},
+            {lbl:'Gordura (%)',    key:'gordura'},
+            {lbl:'Massa magra (kg)',key:'massaMagra'},
+            {lbl:'Visceral (nív)', key:'visceral'},
+          ].map(({lbl,key}) => (
+            <div key={key}>
+              <div style={{fontFamily:T.mono, fontSize:8, letterSpacing:'2px', textTransform:'uppercase', color:T.muted, marginBottom:6}}>{lbl}</div>
+              <input
+                type="number" step="0.1"
+                placeholder={metas ? String(metas[key]) : '—'}
+                value={metasForm[key]}
+                onChange={e => setMetasForm({...metasForm,[key]:e.target.value})}
+                style={{
+                  width:'100%', textAlign:'center', fontFamily:T.mono, fontSize:16, fontWeight:700,
+                  padding:'10px 6px', borderRadius:8, outline:'none',
+                  background:T.card, border:`1.5px solid ${metasForm[key]?`${ac}60`:T.border}`,
+                  color:'#fff', transition:'border-color .2s'
+                }}
+              />
+            </div>
+          ))}
+        </div>
+        <button onClick={handleSaveMetas} style={{
+          width:'100%', padding:'13px', borderRadius:10, border:'none', cursor:'pointer',
+          fontFamily:T.mono, fontSize:10, fontWeight:700, letterSpacing:'2px', textTransform:'uppercase',
+          background: metasSaved?'#10b981':ac, color:'#000', transition:'background .2s'
+        }}>
+          {metasSaved ? '✓ METAS SALVAS' : 'SALVAR METAS'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// LOADING OVERLAY
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function Loading({ text }) {
+  return (
+    <div style={{
+      position:'fixed', inset:0, zIndex:9999,
+      background:'rgba(0,0,0,0.97)',
+      display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:16
+    }}>
+      <div style={{
+        width:36, height:36, borderRadius:'50%',
+        border:`2px solid ${T.border}`, borderTopColor:'var(--ac)',
+        animation:'spin 1s linear infinite'
+      }}/>
+      <div style={{fontFamily:T.mono, fontSize:10, letterSpacing:'3px', textTransform:'uppercase', color:T.dim}}>
+        {text || 'SINCRONIZANDO...'}
+      </div>
+    </div>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ROOT APP
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function App() {
+  const [profile, setProfile]   = useState('fk');
+  const [activeTab, setActiveTab] = useState('prog');
+  const [syncStatus, setSyncStatus] = useState('idle');
+  const [loading, setLoading]   = useState(true);
+  const [loadingText, setLoadingText] = useState('CARREGANDO...');
+  const [savingWk, setSavingWk] = useState(null);
+  const [state, setState] = useState({
+    fk:  {hist:[],bio:[],hrv:{},healthkit:[],bioHistory:[],metas:null,peso:[]},
+    jrv: {hist:[],bio:[],hrv:{},healthkit:[],bioHistory:[],metas:null,peso:[]},
+  });
+
+  // Sync CSS accent color on profile change
+  useEffect(() => {
+    document.documentElement.style.setProperty('--ac', PROFILE_COLORS[profile]);
+  }, [profile]);
+
+  async function syncDown(p) {
+    setSyncStatus('syncing');
+    try {
+      const [wR,bR,hR,bioR,hkR,mR,pR] = await Promise.all([
+        apiGet('list',p), apiGet('listBio',p), apiGet('listHRV',p),
+        apiGet('getBioHistory',p), apiGet('listHealthKit',p),
+        apiGet('getMetas',p), apiGet('listPeso',p),
+      ]);
+      setState(prev => ({...prev, [p]: {
+        hist:      wR.ok   ? (wR.data||[]).sort((a,b)=>new Date(b.date)-new Date(a.date)) : prev[p].hist,
+        bio:       bR.ok   ? bR.data||[]   : prev[p].bio,
+        hrv:       hR.ok   ? hR.data||{}   : prev[p].hrv,
+        bioHistory:bioR?.ok? bioR.data||[] : prev[p].bioHistory,
+        healthkit: hkR.ok  ? hkR.data||[]  : prev[p].healthkit,
+        metas:     mR.ok   ? mR.data||null : prev[p].metas,
+        peso:      pR.ok   ? pR.data||[]   : prev[p].peso,
+      }}));
+      setSyncStatus('ok');
+    } catch(e) { setSyncStatus('error'); }
+  }
+
+  // Initial load
+  useEffect(() => {
+    (async () => {
+      setLoadingText('CARREGANDO DADOS...');
+      await Promise.all([syncDown('fk'), syncDown('jrv')]);
+      setLoading(false);
+    })();
+  }, []);
+
+  const handleProfileSwitch = async (p) => {
+    if (p === profile) return;
+    setProfile(p);
+    setLoadingText(`CARREGANDO ${p.toUpperCase()}...`);
+    setLoading(true);
+    await syncDown(p);
+    setLoading(false);
+  };
+
+  const handleSaveWorkout = async (p, wkIdx) => {
+    const wks = p==='fk' ? FK_WK : JRV_WK;
+    const wk = wks[wkIdx];
+    const ac = PROFILE_COLORS[p];
+    const exData = [];
+    let hasData = false;
+
+    wk.ex.forEach((ex, i) => {
+      try {
+        const raw = localStorage.getItem(`cw_${p}_${wkIdx}_${i}`);
+        if (!raw) return;
+        const d = JSON.parse(raw);
+        const sets = (d.sets||[]).filter(s=>s.kg||s.reps).map((s,j)=>({s:j+1,...s}));
+        if (sets.length) { hasData=true; exData.push({n:ex.n, name:ex.name, sets, obs:d.obs||''}); }
+      } catch(e) {}
+    });
+
+    if (!hasData) { alert('Registre pelo menos uma carga antes de salvar.'); return; }
+
+    const key = `${p}-${wkIdx}`;
+    setSavingWk(key);
+    const entry = {
+      id: Date.now(), wkId:wk.id, title:wk.title,
+      zone:wk.zone, zc:ac, date:new Date().toISOString(), exercises:exData
+    };
+    await apiPost({action:'saveWorkout', profile:p, workout:entry});
+    setState(prev => ({...prev, [p]: {...prev[p], hist:[entry,...prev[p].hist]}}));
+
+    setTimeout(() => {
+      setSavingWk(null);
+      wk.ex.forEach((_,i) => {
+        try { localStorage.removeItem(`cw_${p}_${wkIdx}_${i}`); } catch(e) {}
+      });
+    }, 2200);
+  };
+
+  const handleDeleteHist = async (p, id) => {
+    if (!confirm('Remover este registro?')) return;
+    setState(prev => ({...prev, [p]: {...prev[p], hist:prev[p].hist.filter(h=>String(h.id)!==String(id))}}));
+    await apiPost({action:'delWorkout', profile:p, id});
+  };
+
+  const handleSavePeso = async (p, val) => {
+    await apiPost({action:'savePeso', profile:p, peso:val});
+    setState(prev => ({...prev, [p]: {...prev[p], peso:[
+      {date:new Date().toISOString().split('T')[0], peso:val, obs:''},
+      ...prev[p].peso
+    ]}}));
+  };
+
+  const handleSaveMetas = async (p, metas) => {
+    await apiPost({action:'saveMetas', profile:p, metas});
+    setState(prev => ({...prev, [p]: {...prev[p], metas}}));
+  };
+
+  return (
+    <div style={{maxWidth:480, margin:'0 auto', minHeight:'100vh', background:T.bg, position:'relative'}}>
+      {loading && <Loading text={loadingText}/>}
+
+      <Header
+        profile={profile}
+        syncStatus={syncStatus}
+        onSwitch={handleProfileSwitch}
+      />
+
+      <main style={{background:T.bg}}>
+        {activeTab==='prog'   && <ProgPage   profile={profile} state={state[profile]} />}
+        {activeTab==='treino' && <TreinoPage profile={profile} state={state[profile]} onSave={handleSaveWorkout} savingWk={savingWk} />}
+        {activeTab==='hist'   && <HistPage   profile={profile} state={state[profile]} onDelete={handleDeleteHist} />}
+        {activeTab==='bio'    && <BioPage    profile={profile} state={state[profile]} onSavePeso={handleSavePeso} onSaveMetas={handleSaveMetas} />}
+      </main>
+
+      <BottomNav active={activeTab} onChange={setActiveTab} profile={profile} />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
