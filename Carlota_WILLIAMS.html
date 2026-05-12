@@ -77,76 +77,87 @@ const ZONE_COLORS = { 'FORÇA': '#F59300', 'HIPERTROFIA': '#818cf8', 'METABÓLIC
 // WORKOUT DATA
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const FK_WK = [
+  // ── SEGUNDA ─────────────────────────────────────────────────────────────────
+  { id:"F-LEGS-A", label:"LEGS A", title:"LEGS A", sub:"Quadríceps · Panturrilha", zone:"METABÓLICO", series:"4–5", reps:"15–20", rest:"45–60 s", ex:[
+    {n:"01",name:"Hack Squat",sets:5,rT:"15–20",rest:"60 seg",primary:true,note:"Pés levemente à frente do corpo. Profundidade paralela ao chão. NÃO trave os joelhos no topo."},
+    {n:"02",name:"Leg Press 45°",sets:4,rT:"15–20",rest:"60 seg",note:"Posição de pés média. Pressione o calcanhar. Expiração na subida."},
+    {n:"03",name:"Avanço Caminhando com Halteres",sets:4,rT:"12 por perna",rest:"60 seg",note:"Passada longa. Joelho da frente alinhado ao pé. Tronco ereto durante todo o movimento."},
+    {n:"04",name:"Extensão de Quadríceps",sets:4,rT:"20",rest:"45 seg",primary:true,note:"Excêntrico de 3s. Pausa 1s no topo com contração máxima do quadríceps."},
+    {n:"05",name:"Panturrilha em Pé",sets:5,rT:"20–25",rest:"45 seg",note:"Calcanhar abaixo do degrau. Amplitude total. Pausa 1s no topo."},
+    {n:"06",name:"Panturrilha Sentado",sets:4,rT:"20–25",rest:"45 seg",note:"Foco no sóleo. Pausa 2s no pico de contração."}],
+    ref:"Schoenfeld & Contreras (2014, NSCA): protocolos metabólicos com descanso de 45–60s elevam GH e IGF-1 pós-treino em até 300%, superiores a protocolos de baixo volume.",
+    tip:"Segunda. Mantenha as 15 reps mínimas em todas as séries — reduza carga antes de perder o volume." },
+
+  // ── TERÇA ────────────────────────────────────────────────────────────────────
   { id:"F-PUSH-A", label:"PUSH A", title:"PUSH A", sub:"Peito · Ombro · Tríceps", zone:"FORÇA", series:"5", reps:"4–6", rest:"2–3 min", ex:[
-    {n:"01",name:"Supino Inclinado com Halteres",sets:5,rT:"4–6",rest:"3 min",primary:true,note:"Pegada neutra ou semi-pronada. Cotovelo a 45–60° do tronco.",alert:"Halteres obrigatórios — cotovelo esquerdo"},
-    {n:"02",name:"Desenvolvimento com Halteres em Pé",sets:5,rT:"4–6",rest:"2–3 min",primary:true,note:"Não bloqueie os cotovelos no topo. Amplitude total.",alert:"Halteres obrigatórios — epicondilite"},
-    {n:"03",name:"Mergulho em Paralelas com Carga",sets:4,rT:"4–6",rest:"2–3 min",note:"Tronco inclinado para frente. Cinto com anilha ou colete."},
-    {n:"04",name:"Elevação Lateral com Halteres",sets:4,rT:"6–8",rest:"90 seg",note:"Amplitude até linha dos ombros. Pausa 1s no topo."},
-    {n:"05",name:"Extensão de Tríceps na Corda",sets:4,rT:"6–8",rest:"90 seg",primary:true,note:"Carga alta. Pronação total no final.",alert:"Corda obrigatória — sem barra reta"}],
-    ref:"Schoenfeld et al. (2017, JSCR): Protocolo de força (4–6 reps) gera maior ativação das unidades motoras de alto limiar.",
-    tip:"Sessão mais intensa da semana. Aqueça com 2 séries leves antes de carga máxima." },
-  { id:"F-PUSH-B", label:"PUSH B", title:"PUSH B", sub:"Peito · Ombro · Tríceps", zone:"HIPERTROFIA", series:"4", reps:"10–12", rest:"60–90 s", ex:[
-    {n:"01",name:"Supino Reto com Halteres",sets:4,rT:"10–12",rest:"75 seg",primary:true,note:"ROM completo. Pausa leve no fundo.",alert:"Halteres obrigatórios — cotovelo esquerdo"},
-    {n:"02",name:"Crucifixo Inclinado no Cabo",sets:3,rT:"12–15",rest:"60 seg",note:"Tensão constante. Cotovelo levemente flexionado."},
-    {n:"03",name:"Desenvolvimento Arnold com Halteres",sets:4,rT:"10–12",rest:"75 seg",note:"Rotação supina na descida.",alert:"Halteres obrigatórios"},
-    {n:"04",name:"Elevação Lateral no Cabo (unilateral)",sets:3,rT:"13–15",rest:"60 seg",note:"Cabo garante tensão constante em toda amplitude."},
-    {n:"05",name:"Extensão de Tríceps na Corda (Volume)",sets:4,rT:"12–15",rest:"60 seg",primary:true,note:"Carga moderada. Foco em contração máxima.",alert:"Corda obrigatória"},
-    {n:"06",name:"Tríceps Coice com Haltere",sets:3,rT:"15",rest:"45 seg",note:"Supinação completa no final.",alert:"Halter — sem pressão no cotovelo"}],
-    ref:"Burd et al. (2012, J Physiology): Cargas moderadas com alto volume provocam maior síntese proteica muscular.",
-    tip:"Priorize tempo sob tensão — cada rep ~2s na descida e 1s na subida." },
+    {n:"01",name:"Supino Inclinado com Halteres",sets:5,rT:"4–6",rest:"3 min",primary:true,note:"Pegada neutra. Cotovelo a 45–60° do tronco. Amplitude total.",alert:"Halteres obrigatórios — epicondilite"},
+    {n:"02",name:"Desenvolvimento com Halteres Sentado",sets:5,rT:"4–6",rest:"2–3 min",primary:true,note:"Coluna neutra encostada no banco. Não bloqueie os cotovelos no topo.",alert:"Halteres obrigatórios — epicondilite"},
+    {n:"03",name:"Mergulho em Paralelas com Carga",sets:4,rT:"4–6",rest:"2–3 min",note:"Tronco levemente inclinado à frente. Cinto com anilha ou colete com peso."},
+    {n:"04",name:"Crucifixo Inverso com Halteres",sets:4,rT:"8–10",rest:"90 seg",note:"Tronco paralelo ao chão. Cotovelo levemente flexionado. Retração escapular no topo."},
+    {n:"05",name:"Extensão de Tríceps na Corda",sets:4,rT:"6–8",rest:"90 seg",primary:true,note:"Carga alta. Dupla pressão para baixo. Pronação total no final do movimento."}],
+    ref:"Barnett et al. (1995, JSCR): supino inclinado com halteres maximiza ativação do peitoral superior e deltóide anterior. Gündüz et al. (2012, Rheumatol Int): trabalho de deltoide posterior reduz desequilíbrio muscular anterior/posterior associado à epicondilite.",
+    tip:"Terça. 2 séries de aquecimento progressivas (50% e 75% da carga) antes de cada composto principal." },
+
+  // ── QUARTA ───────────────────────────────────────────────────────────────────
   { id:"F-PULL-A", label:"PULL A", title:"PULL A", sub:"Costas · Bíceps · Trapézio", zone:"HIPERTROFIA", series:"4", reps:"8–12", rest:"60–90 s", ex:[
-    {n:"01",name:"Puxada Frontal Pronada (Lat Pulldown)",sets:4,rT:"8–12",rest:"90 seg",primary:true,note:"Depressão da escápula antes de puxar."},
-    {n:"02",name:"Remada Unilateral com Haltere",sets:4,rT:"10–12",rest:"75 seg",note:"Apoio no banco. Puxe cotovelo em direção ao quadril.",alert:"Use STRAPS — protege pegada sem sobrecarregar cotovelo"},
-    {n:"03",name:"Pullover no Cabo (braço reto)",sets:3,rT:"12–15",rest:"60 seg",note:"Grande dorsal em amplitude total."},
-    {n:"04",name:"Rosca Scott com Barra EZ",sets:4,rT:"10–12",rest:"60 seg",primary:true,note:"Apoio total no banco. Não solte no fundo.",alert:"EZ bar OBRIGATÓRIA — sem barra reta"},
-    {n:"05",name:"Rosca Martelo com Halteres",sets:3,rT:"12–15",rest:"60 seg",note:"Pegada neutra. Recruta braquial e braquiorradial."},
-    {n:"06",name:"Encolhimento com Halteres (Shrug)",sets:3,rT:"15",rest:"60 seg",note:"Pausa 1s no topo. Sem impulso de joelhos."}],
-    ref:"Kroc et al. (2009, JSCR): Combinação de compostos com isoladores maximiza recrutamento do dorsal.",
-    tip:"STRAPS em todos os puxamentos. Priorize conexão mente-músculo." },
-  { id:"F-PULL-B", label:"PULL B", title:"PULL B", sub:"Costas · Bíceps · Trapézio", zone:"FORÇA", series:"5", reps:"4–6", rest:"2–3 min", ex:[
-    {n:"01",name:"Barra Fixa com Carga (Weighted Pull-up)",sets:5,rT:"4–6",rest:"3 min",primary:true,note:"Amplitude total — braços completamente estendidos no fundo."},
-    {n:"02",name:"Remada Curvada com Halteres (bilateral)",sets:5,rT:"4–6",rest:"2–3 min",primary:true,note:"Tronco a ~45°. STRAPS obrigatório.",alert:"Halteres preferidos — preserva cotovelo esquerdo"},
-    {n:"03",name:"Puxada Supinada Pegada Fechada",sets:4,rT:"6–8",rest:"2 min",note:"Bíceps e dorsal em co-ativação máxima."},
-    {n:"04",name:"Rosca Direta com Barra EZ (Força)",sets:4,rT:"4–6",rest:"2 min",primary:true,note:"Sem momentum. Carga máxima com técnica perfeita.",alert:"EZ bar OBRIGATÓRIA — nunca barra reta"},
-    {n:"05",name:"Rosca Inversa com EZ Bar",sets:3,rT:"10",rest:"75 seg",note:"Reabilitação preventiva. Pegada pronada.",alert:"Exercício terapêutico — carga leve a moderada"},
-    {n:"06",name:"Encolhimento com Barra/Halteres (Força)",sets:4,rT:"6–8",rest:"90 seg",note:"Carga máxima. Pausa 2s no topo."}],
-    ref:"Peterson et al. (2011, Clin Orthop Relat Res): Rosca inversa é o mais indicado para epicondilite lateral.",
-    tip:"Aqueça manguito com 2x15 rotação externa. STRAPS em todos os compostos." },
-  { id:"F-LEGS-A", label:"LEGS A", title:"LEGS A", sub:"Quadríceps · Panturrilha", zone:"METABÓLICO", series:"4", reps:"15–20", rest:"45–60 s", ex:[
-    {n:"01",name:"Leg Press 45°",sets:4,rT:"15–20",rest:"60 seg",primary:true,note:"Posição de pés média-alta. NÃO bloqueie joelhos.",alert:"Lombar: não retire o glúteo do encosto no fundo"},
-    {n:"02",name:"Agachamento Goblet com Kettlebell",sets:4,rT:"15–20",rest:"60 seg",note:"KB no peito. Postura vertical do tronco.",alert:"Lombar: variação segura — sem compressão axial"},
-    {n:"03",name:"Extensão de Quadríceps (Leg Extension)",sets:4,rT:"15–20",rest:"45 seg",note:"Pausa 1s no topo. Descida em 3 segundos."},
-    {n:"04",name:"Hack Squat ou Smith Machine Squat",sets:3,rT:"15",rest:"60 seg",note:"Pés alinhados com ombros, levemente à frente.",alert:"Se dor lombar >3, substitua por Leg Press adicional"},
-    {n:"05",name:"Panturrilha em Pé",sets:4,rT:"20–25",rest:"45 seg",note:"Calcanhar abaixo do degrau. Pausa 1s no topo."},
-    {n:"06",name:"Panturrilha Sentado",sets:3,rT:"20–25",rest:"45 seg",note:"Foco no sóleo. Pausa 2s no pico."}],
-    ref:"Schoenfeld & Contreras (2014, NSCA): Protocolos metabólicos com curto descanso aumentam GH e IGF-1.",
-    tip:"Objetivo é acúmulo metabólico. Não aumente carga se perder as 15 reps mínimas." },
+    {n:"01",name:"Puxada Supinada Pegada Média",sets:4,rT:"8–12",rest:"90 seg",primary:true,note:"Co-ativação máxima de dorsal e bíceps. Depressão escapular antes de puxar. Pausa 1s embaixo."},
+    {n:"02",name:"Remada Curvada com Halteres Bilateral",sets:4,rT:"10–12",rest:"75 seg",primary:true,note:"Tronco a ~45°. Puxe cotovelo para trás e acima do quadril. Pausa 1s na contração.",alert:"Halteres obrigatórios — epicondilite"},
+    {n:"03",name:"Pullover no Cabo com Corda",sets:4,rT:"12–15",rest:"60 seg",note:"Grande dorsal em amplitude total. Costas retas. Braços levemente flexionados no cotovelo."},
+    {n:"04",name:"Rosca Concentrada com Haltere",sets:4,rT:"10–12",rest:"60 seg",primary:true,note:"Cotovelo apoiado na coxa interna. Supinação completa no topo. Pausa 1s na contração."},
+    {n:"05",name:"Rosca Inversa com Barra EZ",sets:4,rT:"12–15",rest:"60 seg",note:"Pegada pronada. Recruta braquiorradial. Exercício preventivo para epicondilite.",alert:"EZ bar OBRIGATÓRIA — nunca barra reta"},
+    {n:"06",name:"Encolhimento com Halteres",sets:4,rT:"15",rest:"60 seg",note:"Pausa 2s no topo. Sem impulso de joelhos. Leve rotação do ombro no pico."}],
+    ref:"Kroc et al. (2009, JSCR): combinação de puxadas compostas com isoladores maximiza recrutamento do grande dorsal. Tyler et al. (2010, J Orthop Sports Phys Ther): rosca inversa com EZ bar é intervenção de primeira linha na prevenção da epicondilite lateral.",
+    tip:"Quarta. Controle o excêntrico em 2–3s em cada exercício. Conexão mente-músculo é o objetivo, não a carga." },
+
+  // ── QUINTA ───────────────────────────────────────────────────────────────────
+  { id:"F-PUSH-B", label:"PUSH B", title:"PUSH B", sub:"Peito · Ombro · Tríceps", zone:"HIPERTROFIA", series:"4", reps:"10–12", rest:"60–90 s", ex:[
+    {n:"01",name:"Supino Reto com Halteres",sets:4,rT:"10–12",rest:"75 seg",primary:true,note:"ROM completo. Pausa 1s no fundo. Cadência 2-1-2.",alert:"Halteres obrigatórios — epicondilite"},
+    {n:"02",name:"Crucifixo no Cabo Cruzado",sets:4,rT:"12–15",rest:"60 seg",note:"Tensão constante em toda amplitude. Cotovelo levemente flexionado. Pausa 1s na contração."},
+    {n:"03",name:"Desenvolvimento Arnold com Halteres",sets:4,rT:"10–12",rest:"75 seg",primary:true,note:"Rotação supina na descida. 2s excêntrico. Não trave no topo.",alert:"Halteres obrigatórios — epicondilite"},
+    {n:"04",name:"Elevação Lateral no Cabo Unilateral",sets:4,rT:"13–15",rest:"60 seg",note:"Cabo garante tensão constante em toda amplitude. Pausa 1s no topo. Descida controlada."},
+    {n:"05",name:"Extensão de Tríceps na Corda (Volume)",sets:4,rT:"12–15",rest:"60 seg",primary:true,note:"Carga moderada. TUT de 2s na descida. Contração máxima no final."},
+    {n:"06",name:"Tríceps Coice com Haltere",sets:4,rT:"15",rest:"45 seg",note:"Cotovelo fixo ao lado do tronco. Supinação completa no final do movimento."}],
+    ref:"Burd et al. (2012, J Physiology): cargas moderadas com alto volume provocam maior síntese proteica muscular pós-exercício. Schoenfeld (2010, JSCR): TUT de 40–60s por série maximiza hipertrofia miofibrilar.",
+    tip:"Quinta. Priorize tempo sob tensão — cadência 2-1-2 em todos os exercícios. Sem momentum." },
+
+  // ── SEXTA ────────────────────────────────────────────────────────────────────
   { id:"F-LEGS-B", label:"LEGS B", title:"LEGS B", sub:"Posterior · Glúteo · Adutores", zone:"HIPERTROFIA", series:"4", reps:"8–12", rest:"75–90 s", ex:[
-    {n:"01",name:"RDL com Halteres (Romanian Deadlift)",sets:4,rT:"10–12",rest:"90 seg",primary:true,note:"Quadril para trás. Para quando a coluna arredondar.",alert:"Halteres OBRIGATÓRIOS — lombar em recuperação"},
-    {n:"02",name:"Leg Curl Deitado (Femoral)",sets:4,rT:"10–12",rest:"75 seg",primary:true,note:"Pés em dorsiflexão. Pausa 1s na contração."},
-    {n:"03",name:"Hip Thrust com Haltere ou Barra",sets:4,rT:"10–12",rest:"90 seg",note:"Escápulas no banco. Pausa 2s no topo.",alert:"Prefira haltere se houver desconforto lombar"},
-    {n:"04",name:"Cadeira Abdutora (Hip Abductor)",sets:3,rT:"12–15",rest:"60 seg",note:"Glúteo médio — estabilidade do quadril."},
-    {n:"05",name:"Stiff-leg Deadlift com Halteres",sets:3,rT:"10–12",rest:"75 seg",note:"Pernas quase retas. ROM mais amplo que o RDL.",alert:"Halteres obrigatórios — coluna neutra"},
-    {n:"06",name:"Panturrilha Unilateral em Pé",sets:4,rT:"12–15",rest:"45 seg",note:"Maior ROM e correção de desequilíbrios. Pausa 1s no topo."}],
-    ref:"Contreras et al. (2015, JSCR): Hip Thrust apresenta maior ativação EMG do glúteo máximo no pico.",
-    tip:"Ative glúteo antes: 2x20 ponte unilateral. Sábado de manhã é a melhor janela." },
+    {n:"01",name:"RDL com Barra",sets:4,rT:"10–12",rest:"90 seg",primary:true,note:"Quadril para trás. Barra próxima às pernas. Para quando a coluna começar a arredondar. Amplitude completa."},
+    {n:"02",name:"Leg Curl Deitado (Femoral)",sets:4,rT:"10–12",rest:"75 seg",primary:true,note:"Pés em dorsiflexão. Pausa 1s na contração máxima. Excêntrico de 3s."},
+    {n:"03",name:"Hip Thrust com Barra",sets:4,rT:"10–12",rest:"90 seg",note:"Escápulas no banco estofado. Extensão completa do quadril. Pausa 2s no topo."},
+    {n:"04",name:"Agachamento Búlgaro com Halteres",sets:4,rT:"10 por perna",rest:"75 seg",note:"Pé traseiro elevado no banco. Joelho 90°. Corrige desequilíbrios laterais de força."},
+    {n:"05",name:"Cadeira Abdutora",sets:4,rT:"15–20",rest:"60 seg",note:"Glúteo médio — estabilidade do quadril. Excêntrico de 2s."},
+    {n:"06",name:"Panturrilha Unilateral em Pé",sets:4,rT:"12–15",rest:"45 seg",note:"ROM máximo. Pausa 1s no topo. Corrige assimetrias laterais."}],
+    ref:"Contreras et al. (2015, JSCR): Hip Thrust com barra apresenta maior ativação EMG do glúteo máximo no pico, superior ao agachamento e ao levantamento terra. Loturco et al. (2019, J Sports Sci): Bulgarian Split Squat é superior ao agachamento bilateral para força unilateral e correção de desequilíbrios.",
+    tip:"Sexta. Lombar recuperada — aproveite amplitude completa no RDL e Hip Thrust. Ative o glúteo antes: 2×20 ponte unilateral." },
+
+  // ── SÁBADO ───────────────────────────────────────────────────────────────────
+  { id:"F-PULL-B", label:"PULL B", title:"PULL B", sub:"Costas · Bíceps · Trapézio", zone:"FORÇA", series:"5", reps:"4–6", rest:"2–3 min", ex:[
+    {n:"01",name:"Barra Fixa com Carga",sets:5,rT:"4–6",rest:"3 min",primary:true,note:"Amplitude total. Braços completamente estendidos no fundo. Cotovelo puxa em direção ao quadril."},
+    {n:"02",name:"Remada Unilateral com Haltere",sets:5,rT:"4–6",rest:"2–3 min",primary:true,note:"Apoio no banco. Puxe cotovelo para trás e acima da linha do quadril. Carga máxima.",alert:"Halteres obrigatórios — epicondilite"},
+    {n:"03",name:"Puxada Pronada Pegada Larga",sets:4,rT:"6–8",rest:"2 min",note:"Depressão escapular antes de puxar. ROM total. Pausa 1s embaixo."},
+    {n:"04",name:"Rosca Direta com Barra EZ",sets:4,rT:"4–6",rest:"2 min",primary:true,note:"Sem momentum. Carga máxima com técnica perfeita. Supinação completa no topo.",alert:"EZ bar OBRIGATÓRIA — nunca barra reta"},
+    {n:"05",name:"Encolhimento com Halteres",sets:4,rT:"6–8",rest:"90 seg",note:"Carga máxima. Pausa 2s no topo. Sem impulso de joelhos."}],
+    ref:"Schoenfeld et al. (2017, JSCR): protocolo de força 4–6 reps gera maior ativação neural e ganho de força máxima. Fenwick et al. (2009, JSCR): remada unilateral com haltere ativa romboides e trapézio médio em níveis superiores à remada bilateral.",
+    tip:"Sábado. Último treino da semana — dê o máximo. Aqueça manguito rotador: 2×15 rotação externa com elástico antes de iniciar." },
 ];
 
 const JRV_WK = [
-  {...FK_WK[0], id:"J-PUSH-A", tip:"Terça S1 · Força pura — cargas suas."},
-  {...FK_WK[1], id:"J-PUSH-B", tip:"Sáb S1/Qui S2 · Hipertrofia — 2s descida."},
-  {...FK_WK[2], id:"J-PULL-A", tip:"Qui S1/Sáb S2 · Hipertrofia — STRAPS sempre."},
-  {...FK_WK[3], id:"J-PULL-B", tip:"Terça S2 · Força — sessão mais pesada. Aqueça manguito."},
-  {...FK_WK[4], id:"J-LEGS-A", tip:"Segunda · Metabólico — mínimo 15 reps."},
-  {...FK_WK[5], id:"J-LEGS-B", tip:"Quarta · Hipertrofia — posterior e glúteo."},
+  {...FK_WK[0], id:"J-LEGS-A", tip:"Segunda · Metabólico — mínimo 15 reps. Mantenha volume antes de carga."},
+  {...FK_WK[1], id:"J-PUSH-A", tip:"Terça · Força — cargas suas, sessão âncora da semana."},
+  {...FK_WK[2], id:"J-PULL-A", tip:"Quarta · Hipertrofia — controle excêntrico em 2–3s."},
+  {...FK_WK[3], id:"J-PUSH-B", tip:"Quinta · Hipertrofia — cadência 2-1-2, sem momentum."},
+  {...FK_WK[4], id:"J-LEGS-B", tip:"Sexta · Hipertrofia — amplitude completa no RDL e Hip Thrust."},
+  {...FK_WK[5], id:"J-PULL-B", tip:"Sábado · Força — última sessão da semana, dê o máximo."},
   { id:"J-LEGS-C", label:"LEGS C", title:"LEGS C", sub:"Full Legs · Metabólico", zone:"METABÓLICO", series:"4", reps:"15–20", rest:"45–60 s", ex:[
-    {n:"01",name:"Agachamento Goblet com Kettlebell",sets:4,rT:"15–20",rest:"60 seg",primary:true,note:"KB no peito. Profundidade máxima."},
-    {n:"02",name:"Leg Press 45° (Volume)",sets:4,rT:"15–20",rest:"60 seg",note:"Carga moderada. Sem travar joelhos."},
-    {n:"03",name:"Stiff-leg Deadlift com Halteres",sets:4,rT:"15",rest:"60 seg",note:"Pernas quase retas. Alongamento dos isquiotibiais."},
-    {n:"04",name:"Extensão de Quadríceps (Metabólico)",sets:3,rT:"20",rest:"45 seg",note:"Carga leve. 20 reps contínuas."},
-    {n:"05",name:"Panturrilha Sentado",sets:4,rT:"20–25",rest:"45 seg",note:"Foco no sóleo. Pausa 2s no pico."}],
-    ref:"Schoenfeld & Contreras (2014, NSCA): Protocolos metabólicos aumentam GH e IGF-1 pós-treino.",
-    tip:"Sexta-feira. Priorize manter as 15 reps mínimas." },
+    {n:"01",name:"Agachamento Goblet com Kettlebell",sets:5,rT:"15–20",rest:"60 seg",primary:true,note:"KB no peito. Profundidade máxima. Postura vertical do tronco."},
+    {n:"02",name:"Leg Press 45° (Volume)",sets:4,rT:"15–20",rest:"60 seg",note:"Carga moderada. Sem travar joelhos. Expiração na subida."},
+    {n:"03",name:"Stiff-leg Deadlift com Halteres",sets:4,rT:"15",rest:"60 seg",note:"Pernas quase retas. Alongamento máximo dos isquiotibiais."},
+    {n:"04",name:"Extensão de Quadríceps",sets:4,rT:"20",rest:"45 seg",note:"Carga leve. 20 reps contínuas. Excêntrico de 2s."},
+    {n:"05",name:"Panturrilha Sentado",sets:4,rT:"20–25",rest:"45 seg",note:"Foco no sóleo. Pausa 2s no pico de contração."},
+    {n:"06",name:"Panturrilha em Pé",sets:4,rT:"20–25",rest:"45 seg",note:"Amplitude total. Calcanhar abaixo do degrau. Pausa 1s no topo."}],
+    ref:"Schoenfeld & Contreras (2014, NSCA): protocolos metabólicos com curto descanso elevam GH e IGF-1 pós-treino.",
+    tip:"Treino extra J.R.V. Priorize manter as 15 reps mínimas em todas as séries." },
 ];
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
