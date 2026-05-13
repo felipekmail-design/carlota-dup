@@ -38,7 +38,7 @@
   /* ── GLOBAL ── */
   * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
   :root { --ac: #F59300; }
-  html, body { background: #000; color: #fff; margin: 0; padding: 0; }
+  html, body { background: #111111; color: #fff; margin: 0; padding: 0; }
 
   /* ── SAFE AREA / SCROLLBAR ── */
   .pb-safe  { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
@@ -209,14 +209,14 @@ function num(v) { return parseFloat(String(v||'0').replace(',','.')) || 0; }
 // DESIGN TOKENS (inline style helpers)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const T = {
-  bg:      '#000000',
-  surface: '#0a0a0a',
-  card:    '#111111',
-  border:  '#1c1c1c',
-  border2: '#242424',
-  muted:   '#333333',
-  dim:     '#555555',
-  subtle:  '#888888',
+  bg:      '#111111',
+  surface: '#1c1c1e',
+  card:    '#242426',
+  border:  '#2c2c2e',
+  border2: '#3a3a3c',
+  muted:   '#636366',
+  dim:     '#8e8e93',
+  subtle:  '#aeaeb2',
   text:    '#ffffff',
   mono:    "'Geist Mono', monospace",
 };
