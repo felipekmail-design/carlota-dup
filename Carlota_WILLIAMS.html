@@ -81,11 +81,11 @@ const FK_WK = [
   { id:"F-LEGS-A", label:"LEGS A", title:"LEGS A", sub:"Quadríceps · Panturrilha", zone:"METABÓLICO", series:"4–5", reps:"15–20", rest:"45–60 s", ex:[
     {n:"01",name:"Hack Squat",sets:5,rT:"15–20",rest:"60 seg",primary:true,note:"Pés levemente à frente do corpo. Profundidade paralela ao chão. NÃO trave os joelhos no topo."},
     {n:"02",name:"Leg Press 45°",sets:4,rT:"15–20",rest:"60 seg",note:"Posição de pés média. Pressione o calcanhar. Expiração na subida."},
-    {n:"03",name:"Avanço Caminhando com Halteres",sets:4,rT:"12 por perna",rest:"60 seg",note:"Passada longa. Joelho da frente alinhado ao pé. Tronco ereto durante todo o movimento."},
+    {n:"03",name:"Agachamento Goblet com Kettlebell",sets:4,rT:"15–20",rest:"60 seg",note:"KB no peito. Profundidade máxima. Postura vertical do tronco. Joelhos acompanham a linha dos pés."},
     {n:"04",name:"Extensão de Quadríceps",sets:4,rT:"20",rest:"45 seg",primary:true,note:"Excêntrico de 3s. Pausa 1s no topo com contração máxima do quadríceps."},
     {n:"05",name:"Panturrilha em Pé",sets:5,rT:"20–25",rest:"45 seg",note:"Calcanhar abaixo do degrau. Amplitude total. Pausa 1s no topo."},
     {n:"06",name:"Panturrilha Sentado",sets:4,rT:"20–25",rest:"45 seg",note:"Foco no sóleo. Pausa 2s no pico de contração."}],
-    ref:"Schoenfeld & Contreras (2014, NSCA): protocolos metabólicos com descanso de 45–60s elevam GH e IGF-1 pós-treino em até 300%, superiores a protocolos de baixo volume.",
+    ref:"Schoenfeld & Contreras (2014, NSCA): protocolos metabólicos com descanso de 45–60s elevam GH e IGF-1 pós-treino em até 300%. Farrokhi et al. (2008, JOSPT): Agachamento Goblet promove maior ativação do vasto medial e menor estresse patelofemoral que o agachamento livre padrão.",
     tip:"Segunda. Mantenha as 15 reps mínimas em todas as séries — reduza carga antes de perder o volume." },
 
   // ── TERÇA ────────────────────────────────────────────────────────────────────
@@ -122,23 +122,23 @@ const FK_WK = [
 
   // ── SEXTA ────────────────────────────────────────────────────────────────────
   { id:"F-LEGS-B", label:"LEGS B", title:"LEGS B", sub:"Posterior · Glúteo · Adutores", zone:"HIPERTROFIA", series:"4", reps:"8–12", rest:"75–90 s", ex:[
-    {n:"01",name:"RDL com Barra",sets:4,rT:"10–12",rest:"90 seg",primary:true,note:"Quadril para trás. Barra próxima às pernas. Para quando a coluna começar a arredondar. Amplitude completa."},
+    {n:"01",name:"RDL com Halteres",sets:4,rT:"10–12",rest:"90 seg",primary:true,note:"Quadril para trás, halteres próximos às pernas. Pegada neutra. Para quando sentir a coluna começar a arredondar. Use straps para proteger a pegada.",alert:"Halteres obrigatórios — epicondilite"},
     {n:"02",name:"Leg Curl Deitado (Femoral)",sets:4,rT:"10–12",rest:"75 seg",primary:true,note:"Pés em dorsiflexão. Pausa 1s na contração máxima. Excêntrico de 3s."},
-    {n:"03",name:"Hip Thrust com Barra",sets:4,rT:"10–12",rest:"90 seg",note:"Escápulas no banco estofado. Extensão completa do quadril. Pausa 2s no topo."},
-    {n:"04",name:"Agachamento Búlgaro com Halteres",sets:4,rT:"10 por perna",rest:"75 seg",note:"Pé traseiro elevado no banco. Joelho 90°. Corrige desequilíbrios laterais de força."},
+    {n:"03",name:"Hip Thrust com Barra",sets:4,rT:"10–12",rest:"90 seg",note:"Escápulas no banco estofado. Extensão completa do quadril. Pausa 2s no topo. Mãos espalmadas na barra — sem grip ativo."},
+    {n:"04",name:"Leg Press com Pés Altos e Afastados",sets:4,rT:"10–12",rest:"75 seg",note:"Pés na parte superior da plataforma, abertura média. Desloca carga para glúteo e posterior do quadríceps. Descida controlada em 2s."},
     {n:"05",name:"Cadeira Abdutora",sets:4,rT:"15–20",rest:"60 seg",note:"Glúteo médio — estabilidade do quadril. Excêntrico de 2s."},
     {n:"06",name:"Panturrilha Unilateral em Pé",sets:4,rT:"12–15",rest:"45 seg",note:"ROM máximo. Pausa 1s no topo. Corrige assimetrias laterais."}],
-    ref:"Contreras et al. (2015, JSCR): Hip Thrust com barra apresenta maior ativação EMG do glúteo máximo no pico, superior ao agachamento e ao levantamento terra. Loturco et al. (2019, J Sports Sci): Bulgarian Split Squat é superior ao agachamento bilateral para força unilateral e correção de desequilíbrios.",
+    ref:"Contreras et al. (2015, JSCR): Hip Thrust com barra apresenta maior ativação EMG do glúteo máximo no pico, superior ao agachamento e ao levantamento terra. Escamilla et al. (2001, Med Sci Sports Exerc): posicionamento alto e afastado dos pés no leg press aumenta ativação do glúteo máximo e isquiotibiais em comparação com posição padrão.",
     tip:"Sexta. Lombar recuperada — aproveite amplitude completa no RDL e Hip Thrust. Ative o glúteo antes: 2×20 ponte unilateral." },
 
   // ── SÁBADO ───────────────────────────────────────────────────────────────────
   { id:"F-PULL-B", label:"PULL B", title:"PULL B", sub:"Costas · Bíceps · Trapézio", zone:"FORÇA", series:"5", reps:"4–6", rest:"2–3 min", ex:[
-    {n:"01",name:"Barra Fixa com Carga",sets:5,rT:"4–6",rest:"3 min",primary:true,note:"Amplitude total. Braços completamente estendidos no fundo. Cotovelo puxa em direção ao quadril."},
+    {n:"01",name:"Barra Fixa com Carga",sets:5,rT:"4–6",rest:"3 min",primary:true,note:"Pegada pronada média (largura dos ombros). Amplitude total — braços completamente estendidos no fundo. Cotovelo puxa para baixo e para trás. Use cinto + straps.",alert:"Use STRAPS — protege pegada sem sobrecarregar cotovelo"},
     {n:"02",name:"Remada Unilateral com Haltere",sets:5,rT:"4–6",rest:"2–3 min",primary:true,note:"Apoio no banco. Puxe cotovelo para trás e acima da linha do quadril. Carga máxima.",alert:"Halteres obrigatórios — epicondilite"},
-    {n:"03",name:"Puxada Pronada Pegada Larga",sets:4,rT:"6–8",rest:"2 min",note:"Depressão escapular antes de puxar. ROM total. Pausa 1s embaixo."},
+    {n:"03",name:"Puxada Neutra Pegada Estreita",sets:4,rT:"6–8",rest:"2 min",note:"Triângulo ou pegada neutra fechada. Isola o dorsal inferior e o braquial. Cotovelos puxam para dentro do corpo. Pausa 1s no fundo."},
     {n:"04",name:"Rosca Direta com Barra EZ",sets:4,rT:"4–6",rest:"2 min",primary:true,note:"Sem momentum. Carga máxima com técnica perfeita. Supinação completa no topo.",alert:"EZ bar OBRIGATÓRIA — nunca barra reta"},
     {n:"05",name:"Encolhimento com Halteres",sets:4,rT:"6–8",rest:"90 seg",note:"Carga máxima. Pausa 2s no topo. Sem impulso de joelhos."}],
-    ref:"Schoenfeld et al. (2017, JSCR): protocolo de força 4–6 reps gera maior ativação neural e ganho de força máxima. Fenwick et al. (2009, JSCR): remada unilateral com haltere ativa romboides e trapézio médio em níveis superiores à remada bilateral.",
+    ref:"Lusk et al. (2010, JSCR): pegada pronada média na barra fixa maximiza produção de força no latissimus dorsi com ROM superior à pegada aberta. Signorile et al. (2002, JSCR): variação de pegada nas puxadas garante recrutamento diferenciado de feixes do dorsal — pegada neutra estreita enfatiza porção inferior e braquial.",
     tip:"Sábado. Último treino da semana — dê o máximo. Aqueça manguito rotador: 2×15 rotação externa com elástico antes de iniciar." },
 ];
 
@@ -329,7 +329,6 @@ const NAV_ITEMS = [
   { id:'prog',   icon:'◈', label:'PROG'   },
   { id:'treino', icon:'⬡', label:'TREINO' },
   { id:'hist',   icon:'≡', label:'HIST'   },
-  { id:'bio',    icon:'◎', label:'BIO'    },
 ];
 
 function BottomNav({ active, onChange, profile }) {
@@ -553,18 +552,36 @@ function ExCard({ ex, profile, wkIdx, exIdx, ac, lastRef }) {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PAGE: PROG
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function ProgPage({ profile, state }) {
+function ProgPage({ profile, state, onSaveMetas }) {
   const ac = PROFILE_COLORS[profile];
   const hk = state.healthkit || [];
   const latest = hk[0] || null;
   const hist = state.hist || [];
   const wks = profile==='fk' ? FK_WK : JRV_WK;
+  const bc = state.bodyComp || [];
+  const metas = state.metas;
   const hv = latest ? num(latest.hrv) : 0;
   const hrvStatus = hv>=60
     ? {label:'INTENSIDADE MÁXIMA', color:'#10b981', dot:'#10b981'}
     : hv>=40 ? {label:'INTENSIDADE NORMAL', color:'#fbbf24', dot:'#fbbf24'}
     : hv>0   ? {label:'REDUZIR INTENSIDADE', color:'#ef4444', dot:'#ef4444'}
     : null;
+
+  const [metasForm, setMetasForm] = React.useState({peso:'',gordura:'',massaMagra:''});
+  const [metasSaved, setMetasSaved] = React.useState(false);
+  const [metasOpen, setMetasOpen] = React.useState(false);
+
+  const handleSaveMetas = async () => {
+    const {peso,gordura,massaMagra} = metasForm;
+    if (!peso||!gordura||!massaMagra) { alert('Preencha os 3 campos'); return; }
+    await onSaveMetas(profile, {
+      peso:parseFloat(peso), gordura:parseFloat(gordura),
+      massaMagra:parseFloat(massaMagra), visceral:0
+    });
+    setMetasSaved(true);
+    setMetasOpen(false);
+    setTimeout(() => setMetasSaved(false), 2500);
+  };
 
   return (
     <div className="pb-safe" style={{padding:'16px 16px 0'}}>
@@ -640,6 +657,144 @@ function ProgPage({ profile, state }) {
           </div>
         </Card>
       )}
+
+      {/* ── COMPOSIÇÃO CORPORAL ── */}
+      <SLabel>Composição Corporal</SLabel>
+      {bc.length > 0 ? (
+        <>
+          {/* Tabela de evolução: linhas = métricas, colunas = datas */}
+          <Card style={{overflow:'hidden', marginBottom:12}}>
+            {/* Header: datas */}
+            <div style={{display:'grid', gridTemplateColumns:'72px repeat(3,1fr)', padding:'8px 12px 6px', borderBottom:`1px solid ${T.border}`}}>
+              <div/>
+              {bc.map((r,i) => (
+                <div key={i} style={{fontFamily:T.mono, fontSize:8, letterSpacing:'1px', color: i===0 ? ac : T.muted, textAlign:'center', textTransform:'uppercase'}}>
+                  {fmtD(r.date)}
+                </div>
+              ))}
+              {[...Array(Math.max(0, 3 - bc.length))].map((_,i) => <div key={'eh'+i}/>)}
+            </div>
+            {/* Linhas: Peso, Gordura, Massa Magra */}
+            {[
+              {lbl:'PESO',   key:'bodyMass',       unit:'kg', goodDown:true},
+              {lbl:'GORDURA',key:'fatPercentage',   unit:'%',  goodDown:true},
+              {lbl:'M.MAGRA',key:'leanMass',        unit:'kg', goodDown:false},
+            ].map(({lbl,key,unit,goodDown},ri) => {
+              const vals = bc.map(r => parseFloat(String(r[key]||'0').replace(',','.')));
+              const first = vals[0]||0;
+              const last  = vals[vals.length-1]||0;
+              const trend = vals.length >= 2 && last > 0 ? first - last : null;
+              const trendGood = trend !== null ? (goodDown ? trend <= 0 : trend >= 0) : null;
+              return (
+                <div key={lbl} style={{
+                  display:'grid', gridTemplateColumns:'72px repeat(3,1fr)',
+                  padding:'9px 12px', borderBottom: ri < 2 ? `1px solid ${T.border}` : 'none',
+                  alignItems:'center'
+                }}>
+                  <div style={{display:'flex', flexDirection:'column', gap:2}}>
+                    <span style={{fontFamily:T.mono, fontSize:7, letterSpacing:'2px', textTransform:'uppercase', color:T.muted}}>{lbl}</span>
+                    {trend !== null && (
+                      <span style={{fontFamily:T.mono, fontSize:8, color: trendGood ? '#10b981' : '#ef4444'}}>
+                        {trendGood ? '↓' : '↑'} {Math.abs(trend).toFixed(1)}{unit}
+                      </span>
+                    )}
+                  </div>
+                  {vals.map((v,i) => (
+                    <div key={i} style={{textAlign:'center'}}>
+                      <span style={{fontFamily:T.mono, fontSize: i===0?14:11, fontWeight: i===0?700:400, color: i===0?'#fff':T.dim}}>
+                        {v > 0 ? v.toFixed(1) : '—'}
+                      </span>
+                      {v > 0 && <span style={{fontFamily:T.mono, fontSize:7, color:T.border2, marginLeft:1}}>{unit}</span>}
+                    </div>
+                  ))}
+                  {[...Array(Math.max(0, 3 - vals.length))].map((_,i) => <div key={'ev'+i}/>)}
+                </div>
+              );
+            })}
+          </Card>
+
+          {/* Deltas em relação à meta */}
+          {metas && (
+            <div style={{display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8, marginBottom:8}}>
+              {[
+                {lbl:'Meta Peso',  cur:parseFloat(String(bc[0].bodyMass||'0')),       meta:num(metas.peso),       unit:'kg', goodDown:true},
+                {lbl:'Meta Gord.', cur:parseFloat(String(bc[0].fatPercentage||'0')),  meta:num(metas.gordura),    unit:'%',  goodDown:true},
+                {lbl:'Meta Magra', cur:parseFloat(String(bc[0].leanMass||'0')),       meta:num(metas.massaMagra), unit:'kg', goodDown:false},
+              ].map(({lbl,cur,meta,unit,goodDown}) => {
+                if (!meta || !cur) return null;
+                const diff = cur - meta;
+                const arrived = Math.abs(diff) < 0.2;
+                const good = arrived || (goodDown ? diff <= 0 : diff >= 0);
+                return (
+                  <Card key={lbl} style={{padding:'10px 8px', textAlign:'center'}}>
+                    <div style={{fontFamily:T.mono, fontSize:7, letterSpacing:'1px', textTransform:'uppercase', color:T.muted, marginBottom:3}}>{lbl}</div>
+                    <div style={{fontFamily:T.mono, fontSize:12, fontWeight:700, color: arrived ? '#10b981' : good ? '#10b981' : '#ef4444'}}>
+                      {arrived ? '✓' : `${diff > 0 ? '+' : ''}${diff.toFixed(1)}${unit}`}
+                    </div>
+                    <div style={{fontFamily:T.mono, fontSize:8, color:T.dim, marginTop:1}}>{meta}{unit}</div>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </>
+      ) : (
+        <Card style={{textAlign:'center', padding:'28px 20px', marginBottom:4}}>
+          <div style={{fontFamily:T.mono, fontSize:9, letterSpacing:'2px', textTransform:'uppercase', color:T.muted}}>
+            {profile==='jrv' ? 'Em breve' : 'Execute o atalho "Carlota Body Sync" para sincronizar'}
+          </div>
+        </Card>
+      )}
+
+      {/* ── METAS ── */}
+      <div style={{marginBottom:20}}>
+        <button
+          onClick={() => setMetasOpen(o => !o)}
+          style={{
+            display:'flex', alignItems:'center', gap:6, background:'transparent',
+            border:'none', cursor:'pointer', padding:'8px 0', width:'100%'
+          }}
+        >
+          <span style={{fontFamily:T.mono, fontSize:8, letterSpacing:'3px', textTransform:'uppercase', color: metasSaved ? '#10b981' : T.muted}}>
+            {metasSaved ? '✓ METAS SALVAS' : '◎ DEFINIR METAS'}
+          </span>
+          <span style={{fontFamily:T.mono, fontSize:9, color:T.border2}}>{metasOpen ? '▲' : '▼'}</span>
+        </button>
+        {metasOpen && (
+          <div style={{background:T.surface, border:`1px solid ${T.border}`, borderRadius:12, padding:'14px 16px'}}>
+            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:8, marginBottom:10}}>
+              {[
+                {lbl:'Peso (kg)',     key:'peso'},
+                {lbl:'Gordura (%)',   key:'gordura'},
+                {lbl:'M.Magra (kg)',  key:'massaMagra'},
+              ].map(({lbl,key}) => (
+                <div key={key}>
+                  <div style={{fontFamily:T.mono, fontSize:7, letterSpacing:'2px', textTransform:'uppercase', color:T.muted, marginBottom:5}}>{lbl}</div>
+                  <input
+                    type="number" step="0.1"
+                    placeholder={metas ? String(metas[key]||'') : '—'}
+                    value={metasForm[key]}
+                    onChange={e => setMetasForm({...metasForm,[key]:e.target.value})}
+                    style={{
+                      width:'100%', textAlign:'center', fontFamily:T.mono, fontSize:15, fontWeight:700,
+                      padding:'9px 4px', borderRadius:8, outline:'none',
+                      background:T.card, border:`1.5px solid ${metasForm[key]?`${ac}60`:T.border}`,
+                      color:'#fff', transition:'border-color .2s', boxSizing:'border-box'
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+            <button onClick={handleSaveMetas} style={{
+              width:'100%', padding:'11px', borderRadius:10, border:'none', cursor:'pointer',
+              fontFamily:T.mono, fontSize:10, fontWeight:700, letterSpacing:'2px', textTransform:'uppercase',
+              background:ac, color:'#000'
+            }}>
+              SALVAR METAS
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* ── WORKOUT EVOLUTION ── */}
       <SLabel>Evolução por treino</SLabel>
@@ -1197,8 +1352,8 @@ function App() {
   const [loadingText, setLoadingText] = useState('CARREGANDO...');
   const [savingWk, setSavingWk] = useState(null);
   const [state, setState] = useState({
-    fk:  {hist:[],bio:[],hrv:{},healthkit:[],bioHistory:[],metas:null,peso:[]},
-    jrv: {hist:[],bio:[],hrv:{},healthkit:[],bioHistory:[],metas:null,peso:[]},
+    fk:  {hist:[],healthkit:[],bodyComp:[],metas:null},
+    jrv: {hist:[],healthkit:[],bodyComp:[],metas:null},
   });
 
   // Sync CSS accent color on profile change
@@ -1209,19 +1364,15 @@ function App() {
   async function syncDown(p) {
     setSyncStatus('syncing');
     try {
-      const [wR,bR,hR,bioR,hkR,mR,pR] = await Promise.all([
-        apiGet('list',p), apiGet('listBio',p), apiGet('listHRV',p),
-        apiGet('getBioHistory',p), apiGet('listHealthKit',p),
-        apiGet('getMetas',p), apiGet('listPeso',p),
+      const [wR,hkR,bcR,mR] = await Promise.all([
+        apiGet('list',p), apiGet('listHealthKit',p),
+        apiGet('listBodyComp',p), apiGet('getMetas',p),
       ]);
       setState(prev => ({...prev, [p]: {
-        hist:      wR.ok   ? (wR.data||[]).sort((a,b)=>new Date(b.date)-new Date(a.date)) : prev[p].hist,
-        bio:       bR.ok   ? bR.data||[]   : prev[p].bio,
-        hrv:       hR.ok   ? hR.data||{}   : prev[p].hrv,
-        bioHistory:bioR?.ok? bioR.data||[] : prev[p].bioHistory,
-        healthkit: hkR.ok  ? hkR.data||[]  : prev[p].healthkit,
-        metas:     mR.ok   ? mR.data||null : prev[p].metas,
-        peso:      pR.ok   ? pR.data||[]   : prev[p].peso,
+        hist:      wR.ok  ? (wR.data||[]).sort((a,b)=>new Date(b.date)-new Date(a.date)) : prev[p].hist,
+        healthkit: hkR.ok ? hkR.data||[]  : prev[p].healthkit,
+        bodyComp:  bcR.ok ? bcR.data||[]  : prev[p].bodyComp,
+        metas:     mR.ok  ? mR.data||null : prev[p].metas,
       }}));
       setSyncStatus('ok');
     } catch(e) { setSyncStatus('error'); }
@@ -1287,14 +1438,6 @@ function App() {
     await apiPost({action:'delWorkout', profile:p, id});
   };
 
-  const handleSavePeso = async (p, val) => {
-    await apiPost({action:'savePeso', profile:p, peso:val});
-    setState(prev => ({...prev, [p]: {...prev[p], peso:[
-      {date:new Date().toISOString().split('T')[0], peso:val, obs:''},
-      ...prev[p].peso
-    ]}}));
-  };
-
   const handleSaveMetas = async (p, metas) => {
     await apiPost({action:'saveMetas', profile:p, metas});
     setState(prev => ({...prev, [p]: {...prev[p], metas}}));
@@ -1311,10 +1454,9 @@ function App() {
       />
 
       <main style={{background:T.bg}}>
-        {activeTab==='prog'   && <ProgPage   profile={profile} state={state[profile]} />}
+        {activeTab==='prog'   && <ProgPage   profile={profile} state={state[profile]} onSaveMetas={handleSaveMetas} />}
         {activeTab==='treino' && <TreinoPage profile={profile} state={state[profile]} onSave={handleSaveWorkout} savingWk={savingWk} />}
         {activeTab==='hist'   && <HistPage   profile={profile} state={state[profile]} onDelete={handleDeleteHist} />}
-        {activeTab==='bio'    && <BioPage    profile={profile} state={state[profile]} onSavePeso={handleSavePeso} onSaveMetas={handleSaveMetas} />}
       </main>
 
       <BottomNav active={activeTab} onChange={setActiveTab} profile={profile} />
