@@ -943,12 +943,21 @@ function TreinoPage({ profile, state, onSave, savingWk }) {
         {/* Exercise list */}
         <SLabel>Exercícios · toque para registrar</SLabel>
         {wk.ex.map((ex,i) => {
-          const prevEx = last?.exercises?.find(e=>e.n===ex.n);
+          // Busca por NOME do exercício em todo o histórico (ordem: mais recente primeiro)
+          // Garante que a referência seja sempre daquele exercício específico,
+          // independente da posição ou do treino em que foi feito
+          const lastExRef = (() => {
+            for (const wkEntry of (state.hist||[])) {
+              const found = (wkEntry.exercises||[]).find(e => e.name === ex.name);
+              if (found) return { date: wkEntry.date, sets: found.sets };
+            }
+            return null;
+          })();
           return (
             <ExCard
               key={`${profile}-${activeWk}-${i}`}
               ex={ex} profile={profile} wkIdx={activeWk} exIdx={i} ac={ac}
-              lastRef={prevEx ? {date:last.date, sets:prevEx.sets} : null}
+              lastRef={lastExRef}
             />
           );
         })}
