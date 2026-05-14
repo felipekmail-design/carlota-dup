@@ -193,6 +193,11 @@ function fmtDate(iso) {
 function fmtD(d) {
   if (!d) return '—';
   const s = String(d);
+  // Data pura "yyyy-MM-dd" — parsear sem conversão de timezone
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    const [y, m, day] = s.split('-');
+    return `${day}/${m}/${y.slice(2)}`;
+  }
   if (s.includes('T') || s.includes('-')) {
     const dt = new Date(s);
     return isNaN(dt) ? s : dt.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', year:'2-digit'});
@@ -240,7 +245,7 @@ function Card({ children, style, accent, left }) {
 function SLabel({ children, style }) {
   return (
     <div style={{
-      fontFamily: T.mono, fontSize: 9, letterSpacing: '3px',
+      fontFamily: T.mono, fontSize: 11, letterSpacing: '3px',
       textTransform: 'uppercase', color: T.muted,
       marginBottom: 10, paddingBottom: 8,
       borderBottom: `1px solid ${T.border}`,
@@ -255,7 +260,7 @@ function SLabel({ children, style }) {
 function Chip({ children, color, bg }) {
   return (
     <span style={{
-      fontFamily: T.mono, fontSize: 8, letterSpacing: '1.5px',
+      fontFamily: T.mono, fontSize: 10, letterSpacing: '1.5px',
       textTransform: 'uppercase', padding: '3px 8px',
       borderRadius: 4, background: bg || T.card,
       color: color || T.dim, border: `1px solid ${T.border}`
@@ -299,7 +304,7 @@ function Header({ profile, syncStatus, onSwitch }) {
       {/* Logo + sync */}
       <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 16px'}}>
         <div>
-          <div style={{fontFamily:T.mono, fontSize:8, letterSpacing:'4px', color:T.muted, textTransform:'uppercase', marginBottom:2}}>
+          <div style={{fontFamily:T.mono, fontSize:10, letterSpacing:'4px', color:T.muted, textTransform:'uppercase', marginBottom:2}}>
             Performance Tracker
           </div>
           <div style={{fontFamily:T.mono, fontSize:20, fontWeight:700, letterSpacing:'5px', lineHeight:1, color:'#fff'}}>
@@ -313,7 +318,7 @@ function Header({ profile, syncStatus, onSwitch }) {
             width:6, height:6, borderRadius:'50%', background:dotColor,
             animation: syncStatus==='syncing' ? 'spin 1s linear infinite' : syncStatus==='ok' ? 'pulse 2s infinite' : 'none'
           }}/>
-          <span style={{fontFamily:T.mono, fontSize:9, letterSpacing:'1.5px', textTransform:'uppercase', color:dotColor}}>
+          <span style={{fontFamily:T.mono, fontSize:10, letterSpacing:'1.5px', textTransform:'uppercase', color:dotColor}}>
             {syncStatus==='syncing'?'SINC...':syncStatus==='ok'?'NUVEM ✓':syncStatus==='error'?'OFFLINE':'NUVEM'}
           </span>
         </div>
@@ -352,7 +357,7 @@ function BottomNav({ active, onChange, profile }) {
               color: isActive ? ac : T.muted,
             }}>
               <span style={{fontSize:18, lineHeight:1, fontWeight: isActive ? 600 : 400}}>{item.icon}</span>
-              <span style={{fontFamily:T.mono, fontSize:8, letterSpacing:'2px'}}>{item.label}</span>
+              <span style={{fontFamily:T.mono, fontSize:10, letterSpacing:'2px'}}>{item.label}</span>
               {isActive && (
                 <div style={{
                   width:20, height:1.5, borderRadius:1,
@@ -424,18 +429,18 @@ function ExCard({ ex, profile, wkIdx, exIdx, ac, lastRef }) {
       }}>
         <div style={{display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:10}}>
           <div style={{flex:1, minWidth:0}}>
-            <div style={{fontFamily:T.mono, fontSize:8, letterSpacing:'2px', color:T.muted, textTransform:'uppercase', marginBottom:3}}>
+            <div style={{fontFamily:T.mono, fontSize:10, letterSpacing:'2px', color:T.muted, textTransform:'uppercase', marginBottom:3}}>
               EX {ex.n}
               {done > 0 && <span style={{color:ac, marginLeft:6}}>{done===ex.sets ? '✓' : `${done}/${ex.sets}`}</span>}
             </div>
             <div style={{fontSize:13, fontWeight:600, color:'#fff', lineHeight:1.35, marginBottom:8}}>{ex.name}</div>
             <div style={{display:'flex', gap:6, flexWrap:'wrap'}}>
               <span style={{
-                fontFamily:T.mono, fontSize:9, padding:'3px 8px', borderRadius:4,
+                fontFamily:T.mono, fontSize:10, padding:'3px 8px', borderRadius:4,
                 background:`${ac}18`, color:ac, border:`1px solid ${ac}30`
               }}>{ex.sets}×{ex.rT}</span>
               <span style={{
-                fontFamily:T.mono, fontSize:9, padding:'3px 8px', borderRadius:4,
+                fontFamily:T.mono, fontSize:10, padding:'3px 8px', borderRadius:4,
                 background:T.card, color:T.dim, border:`1px solid ${T.border}`
               }}>⏱ {ex.rest}</span>
             </div>
@@ -468,10 +473,10 @@ function ExCard({ ex, profile, wkIdx, exIdx, ac, lastRef }) {
               padding:'8px 10px', borderRadius:8, marginBottom:10,
               background:'#fbbf2408', border:'1px solid #fbbf2420'
             }}>
-              <div style={{fontFamily:T.mono, fontSize:8, letterSpacing:'2px', color:'#a16207', textTransform:'uppercase', marginBottom:3}}>
+              <div style={{fontFamily:T.mono, fontSize:10, letterSpacing:'2px', color:'#a16207', textTransform:'uppercase', marginBottom:3}}>
                 🕐 última vez · {fmtDate(lastRef.date)}
               </div>
-              <div style={{fontFamily:T.mono, fontSize:9, color:'#78450c', lineHeight:1.6}}>
+              <div style={{fontFamily:T.mono, fontSize:10, color:'#78450c', lineHeight:1.6}}>
                 {lastRef.sets?.map(s=>`S${s.s}:${s.kg||'?'}kg×${s.reps||'?'}`).join(' · ')}
               </div>
             </div>
@@ -483,7 +488,7 @@ function ExCard({ ex, profile, wkIdx, exIdx, ac, lastRef }) {
             gap:6, marginBottom:6
           }}>
             {['','KG','REPS',''].map((h,i) => (
-              <div key={i} style={{fontFamily:T.mono, fontSize:8, letterSpacing:'2px', color:T.muted, textAlign:'center', textTransform:'uppercase'}}>{h}</div>
+              <div key={i} style={{fontFamily:T.mono, fontSize:10, letterSpacing:'2px', color:T.muted, textAlign:'center', textTransform:'uppercase'}}>{h}</div>
             ))}
           </div>
 
@@ -600,7 +605,7 @@ function ProgPage({ profile, state, onSaveMetas }) {
               {lbl:'Passos', val:fmtN(latest.steps), unit:''},
             ].map(({lbl,val,unit,accent}) => (
               <Card key={lbl} style={{padding:'12px 10px', textAlign:'center'}}>
-                <div style={{fontFamily:T.mono, fontSize:8, letterSpacing:'2px', textTransform:'uppercase', color:T.muted, marginBottom:4}}>{lbl}</div>
+                <div style={{fontFamily:T.mono, fontSize:10, letterSpacing:'2px', textTransform:'uppercase', color:T.dim, marginBottom:6}}>{lbl}</div>
                 <div style={{fontFamily:T.mono, fontSize:28, fontWeight:700, lineHeight:1, color:accent?ac:'#fff'}}>
                   {val}
                   {unit && <span style={{fontSize:11, fontWeight:400, color:T.dim, marginLeft:2}}>{unit}</span>}
@@ -626,12 +631,12 @@ function ProgPage({ profile, state, onSaveMetas }) {
           {/* 7-day trend table */}
           {hk.length > 1 && (
             <Card style={{overflow:'hidden', marginBottom:20}}>
-              <div style={{fontFamily:T.mono, fontSize:8, letterSpacing:'3px', textTransform:'uppercase', color:T.muted, padding:'10px 12px 6px'}}>
+              <div style={{fontFamily:T.mono, fontSize:10, letterSpacing:'3px', textTransform:'uppercase', color:T.muted, padding:'10px 12px 6px'}}>
                 Últimos 7 dias
               </div>
               <div style={{display:'grid', gridTemplateColumns:'70px 1fr 1fr 1fr', padding:'6px 12px 8px', borderBottom:`1px solid ${T.border}`}}>
                 {['Data','HRV','FC','Cal'].map(h => (
-                  <div key={h} style={{fontFamily:T.mono, fontSize:8, letterSpacing:'2px', textTransform:'uppercase', color:T.muted, textAlign:'center'}}>{h}</div>
+                  <div key={h} style={{fontFamily:T.mono, fontSize:10, letterSpacing:'2px', textTransform:'uppercase', color:T.muted, textAlign:'center'}}>{h}</div>
                 ))}
               </div>
               {hk.slice(0,7).map((h,i) => (
@@ -640,7 +645,7 @@ function ProgPage({ profile, state, onSaveMetas }) {
                   padding:'7px 12px', borderBottom: i<6 ? `1px solid ${T.bg}` : 'none',
                   alignItems:'center'
                 }}>
-                  <div style={{fontFamily:T.mono, fontSize:9, color:T.dim}}>{fmtD(h.date)}</div>
+                  <div style={{fontFamily:T.mono, fontSize:10, color:T.dim}}>{fmtD(h.date)}</div>
                   <div style={{fontFamily:T.mono, fontSize:10, fontWeight:600, color:ac, textAlign:'center'}}>{fmtN(h.hrv)}</div>
                   <div style={{fontFamily:T.mono, fontSize:10, color:T.subtle, textAlign:'center'}}>{fmtN(h.restingHR)}</div>
                   <div style={{fontFamily:T.mono, fontSize:10, color:T.subtle, textAlign:'center'}}>{fmtN(h.activeCalories)}</div>
@@ -652,7 +657,7 @@ function ProgPage({ profile, state, onSaveMetas }) {
       ) : (
         <Card style={{textAlign:'center', padding:'40px 20px', marginBottom:20}}>
           <div style={{fontSize:28, marginBottom:10}}>⌚</div>
-          <div style={{fontFamily:T.mono, fontSize:9, letterSpacing:'2px', textTransform:'uppercase', color:T.muted}}>
+          <div style={{fontFamily:T.mono, fontSize:10, letterSpacing:'2px', textTransform:'uppercase', color:T.muted}}>
             {profile==='jrv' ? 'Atalho J.R.V. em breve' : 'Dados aparecem após o primeiro check-in'}
           </div>
         </Card>
@@ -668,7 +673,7 @@ function ProgPage({ profile, state, onSaveMetas }) {
             <div style={{display:'grid', gridTemplateColumns:'72px repeat(3,1fr)', padding:'8px 12px 6px', borderBottom:`1px solid ${T.border}`}}>
               <div/>
               {bc.map((r,i) => (
-                <div key={i} style={{fontFamily:T.mono, fontSize:8, letterSpacing:'1px', color: i===0 ? ac : T.muted, textAlign:'center', textTransform:'uppercase'}}>
+                <div key={i} style={{fontFamily:T.mono, fontSize:10, letterSpacing:'1px', color: i===0 ? ac : T.muted, textAlign:'center', textTransform:'uppercase'}}>
                   {fmtD(r.date)}
                 </div>
               ))}
@@ -692,9 +697,9 @@ function ProgPage({ profile, state, onSaveMetas }) {
                   alignItems:'center'
                 }}>
                   <div style={{display:'flex', flexDirection:'column', gap:2}}>
-                    <span style={{fontFamily:T.mono, fontSize:7, letterSpacing:'2px', textTransform:'uppercase', color:T.muted}}>{lbl}</span>
+                    <span style={{fontFamily:T.mono, fontSize:10, letterSpacing:'2px', textTransform:'uppercase', color:T.dim}}>{lbl}</span>
                     {trend !== null && (
-                      <span style={{fontFamily:T.mono, fontSize:8, color: trendGood ? '#10b981' : '#ef4444'}}>
+                      <span style={{fontFamily:T.mono, fontSize:10, color: trendGood ? '#10b981' : '#ef4444'}}>
                         {trendGood ? '↓' : '↑'} {Math.abs(trend).toFixed(1)}{unit}
                       </span>
                     )}
@@ -704,7 +709,7 @@ function ProgPage({ profile, state, onSaveMetas }) {
                       <span style={{fontFamily:T.mono, fontSize: i===0?14:11, fontWeight: i===0?700:400, color: i===0?'#fff':T.dim}}>
                         {v > 0 ? v.toFixed(1) : '—'}
                       </span>
-                      {v > 0 && <span style={{fontFamily:T.mono, fontSize:7, color:T.border2, marginLeft:1}}>{unit}</span>}
+                      {v > 0 && <span style={{fontFamily:T.mono, fontSize:10, color:T.muted, marginLeft:1}}>{unit}</span>}
                     </div>
                   ))}
                   {[...Array(Math.max(0, 3 - vals.length))].map((_,i) => <div key={'ev'+i}/>)}
@@ -727,11 +732,11 @@ function ProgPage({ profile, state, onSaveMetas }) {
                 const good = arrived || (goodDown ? diff <= 0 : diff >= 0);
                 return (
                   <Card key={lbl} style={{padding:'10px 8px', textAlign:'center'}}>
-                    <div style={{fontFamily:T.mono, fontSize:7, letterSpacing:'1px', textTransform:'uppercase', color:T.muted, marginBottom:3}}>{lbl}</div>
+                    <div style={{fontFamily:T.mono, fontSize:10, letterSpacing:'1px', textTransform:'uppercase', color:T.dim, marginBottom:4}}>{lbl}</div>
                     <div style={{fontFamily:T.mono, fontSize:12, fontWeight:700, color: arrived ? '#10b981' : good ? '#10b981' : '#ef4444'}}>
                       {arrived ? '✓' : `${diff > 0 ? '+' : ''}${diff.toFixed(1)}${unit}`}
                     </div>
-                    <div style={{fontFamily:T.mono, fontSize:8, color:T.dim, marginTop:1}}>{meta}{unit}</div>
+                    <div style={{fontFamily:T.mono, fontSize:10, color:T.dim, marginTop:1}}>{meta}{unit}</div>
                   </Card>
                 );
               })}
@@ -740,7 +745,7 @@ function ProgPage({ profile, state, onSaveMetas }) {
         </>
       ) : (
         <Card style={{textAlign:'center', padding:'28px 20px', marginBottom:4}}>
-          <div style={{fontFamily:T.mono, fontSize:9, letterSpacing:'2px', textTransform:'uppercase', color:T.muted}}>
+          <div style={{fontFamily:T.mono, fontSize:10, letterSpacing:'2px', textTransform:'uppercase', color:T.muted}}>
             {profile==='jrv' ? 'Em breve' : 'Execute o atalho "Carlota Body Sync" para sincronizar'}
           </div>
         </Card>
@@ -755,10 +760,10 @@ function ProgPage({ profile, state, onSaveMetas }) {
             border:'none', cursor:'pointer', padding:'8px 0', width:'100%'
           }}
         >
-          <span style={{fontFamily:T.mono, fontSize:8, letterSpacing:'3px', textTransform:'uppercase', color: metasSaved ? '#10b981' : T.muted}}>
+          <span style={{fontFamily:T.mono, fontSize:10, letterSpacing:'3px', textTransform:'uppercase', color: metasSaved ? '#10b981' : T.muted}}>
             {metasSaved ? '✓ METAS SALVAS' : '◎ DEFINIR METAS'}
           </span>
-          <span style={{fontFamily:T.mono, fontSize:9, color:T.border2}}>{metasOpen ? '▲' : '▼'}</span>
+          <span style={{fontFamily:T.mono, fontSize:10, color:T.border2}}>{metasOpen ? '▲' : '▼'}</span>
         </button>
         {metasOpen && (
           <div style={{background:T.surface, border:`1px solid ${T.border}`, borderRadius:12, padding:'14px 16px'}}>
@@ -769,7 +774,7 @@ function ProgPage({ profile, state, onSaveMetas }) {
                 {lbl:'M.Magra (kg)',  key:'massaMagra'},
               ].map(({lbl,key}) => (
                 <div key={key}>
-                  <div style={{fontFamily:T.mono, fontSize:7, letterSpacing:'2px', textTransform:'uppercase', color:T.muted, marginBottom:5}}>{lbl}</div>
+                  <div style={{fontFamily:T.mono, fontSize:10, letterSpacing:'2px', textTransform:'uppercase', color:T.muted, marginBottom:5}}>{lbl}</div>
                   <input
                     type="number" step="0.1"
                     placeholder={metas ? String(metas[key]||'') : '—'}
@@ -1351,6 +1356,8 @@ function App() {
   const [loading, setLoading]   = useState(true);
   const [loadingText, setLoadingText] = useState('CARREGANDO...');
   const [savingWk, setSavingWk] = useState(null);
+  // Rastreia quais perfis já foram carregados (evita re-fetch desnecessário)
+  const [loadedProfiles, setLoadedProfiles] = useState(new Set());
   const [state, setState] = useState({
     fk:  {hist:[],healthkit:[],bodyComp:[],metas:null},
     jrv: {hist:[],healthkit:[],bodyComp:[],metas:null},
@@ -1375,25 +1382,29 @@ function App() {
         metas:     mR.ok  ? mR.data||null : prev[p].metas,
       }}));
       setSyncStatus('ok');
+      setLoadedProfiles(prev => new Set([...prev, p]));
     } catch(e) { setSyncStatus('error'); }
   }
 
-  // Initial load
+  // Initial load — só carrega o perfil ativo (fk)
+  // O perfil jrv é carregado lazily na primeira troca
   useEffect(() => {
     (async () => {
       setLoadingText('CARREGANDO DADOS...');
-      await Promise.all([syncDown('fk'), syncDown('jrv')]);
+      await syncDown('fk');
       setLoading(false);
     })();
   }, []);
 
   const handleProfileSwitch = async (p) => {
     if (p === profile) return;
-    setProfile(p);
-    setLoadingText(`CARREGANDO ${p.toUpperCase()}...`);
-    setLoading(true);
-    await syncDown(p);
-    setLoading(false);
+    setProfile(p); // troca imediata — sem tela de loading bloqueante
+
+    // Só faz fetch se este perfil ainda não foi carregado
+    if (!loadedProfiles.has(p)) {
+      setSyncStatus('syncing');
+      await syncDown(p);
+    }
   };
 
   const handleSaveWorkout = async (p, wkIdx) => {
