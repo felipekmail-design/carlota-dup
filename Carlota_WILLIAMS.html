@@ -943,13 +943,26 @@ function TreinoPage({ profile, state, onSave, savingWk }) {
         {/* Exercise list */}
         <SLabel>Exercícios · toque para registrar</SLabel>
         {wk.ex.map((ex,i) => {
-          // Busca por NOME do exercício em todo o histórico (ordem: mais recente primeiro)
-          // Garante que a referência seja sempre daquele exercício específico,
-          // independente da posição ou do treino em que foi feito
+          // Busca em cascata — mais específico → menos específico:
+          // 1º: mesmo exercício + mesmo treino (wkId)   → carga mais relevante
+          // 2º: mesmo exercício + mesma zona (FORÇA etc) → mesma intensidade, treino diferente
+          // 3º: sem referência                           → exercício nunca feito nessa intensidade
           const lastExRef = (() => {
-            for (const wkEntry of (state.hist||[])) {
-              const found = (wkEntry.exercises||[]).find(e => e.name === ex.name);
-              if (found) return { date: wkEntry.date, sets: found.sets };
+            const hist = state.hist || [];
+            const byName = (entry) => (entry.exercises||[]).find(e => e.name === ex.name);
+            // Nível 1: mesmo wkId
+            for (const wkEntry of hist) {
+              if (wkEntry.wkId === wk.id) {
+                const found = byName(wkEntry);
+                if (found) return { date: wkEntry.date, sets: found.sets };
+              }
+            }
+            // Nível 2: mesma zone
+            for (const wkEntry of hist) {
+              if (wkEntry.zone === wk.zone) {
+                const found = byName(wkEntry);
+                if (found) return { date: wkEntry.date, sets: found.sets };
+              }
             }
             return null;
           })();
