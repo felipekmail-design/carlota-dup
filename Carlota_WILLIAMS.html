@@ -752,7 +752,7 @@ function RecoveryScoreCard({ score, healthkit, hist, ac }) {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PAGE: PROG
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function ProgPage({ profile, state, onSaveMetas, fetchedAt }) {
+function ProgPage({ profile, state, onSaveMetas }) {
   const ac = PROFILE_COLORS[profile];
   const hk = state.healthkit || [];
   const latest = hk[0] || null;
@@ -794,7 +794,18 @@ function ProgPage({ profile, state, onSaveMetas, fetchedAt }) {
       )}
 
       {/* ── APPLE HEALTH ── */}
-      <SLabel>Apple Health · {fetchedAt ? fetchedAt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : 'Hoje'}</SLabel>
+      {(() => {
+        let hkLabel = 'Hoje';
+        if (latest && latest.date) {
+          const d = new Date(String(latest.date).substring(0,10) + 'T12:00:00');
+          const now = new Date();
+          const diff = Math.round((new Date(now.getFullYear(),now.getMonth(),now.getDate()) - new Date(d.getFullYear(),d.getMonth(),d.getDate())) / 86400000);
+          if      (diff === 0) hkLabel = latest.syncedAt ? `Hoje · ${latest.syncedAt}` : 'Hoje';
+          else if (diff === 1) hkLabel = latest.syncedAt ? `Ontem · ${latest.syncedAt}` : 'Ontem';
+          else                 hkLabel = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+        }
+        return <SLabel>Apple Health · {hkLabel}</SLabel>;
+      })()}
 
       {latest ? (
         <>
@@ -1816,7 +1827,6 @@ function App() {
   const [splashVisible, setSplashVisible] = useState(true);
   // Rastreia quais perfis já foram carregados (evita re-fetch desnecessário)
   const [loadedProfiles, setLoadedProfiles] = useState(new Set());
-  const [fetchedAt, setFetchedAt] = useState(null);
   const [activeWk, setActiveWk] = useState(0); // compartilhado entre perfis
   const [state, setState] = useState({
     fk:  {hist:[],healthkit:[],bodyComp:[],metas:null},
@@ -1842,7 +1852,6 @@ function App() {
         metas:     mR.ok  ? mR.data||null : prev[p].metas,
       }}));
       setSyncStatus('ok');
-      setFetchedAt(new Date());
       setLoadedProfiles(prev => new Set([...prev, p]));
     } catch(e) { setSyncStatus('error'); }
   }
@@ -1942,7 +1951,7 @@ function App() {
       />
 
       <main style={{background:T.bg}}>
-        {activeTab==='prog'   && <ProgPage   profile={profile} state={state[profile]} onSaveMetas={handleSaveMetas} fetchedAt={fetchedAt} />}
+        {activeTab==='prog'   && <ProgPage   profile={profile} state={state[profile]} onSaveMetas={handleSaveMetas} />}
         {activeTab==='treino' && <TreinoPage profile={profile} state={state[profile]} onSave={handleSaveWorkout} savingWk={savingWk} activeWk={activeWk} setActiveWk={setActiveWk} />}
         {activeTab==='hist'   && <HistPage   profile={profile} state={state[profile]} onDelete={handleDeleteHist} />}
       </main>
