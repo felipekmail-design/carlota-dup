@@ -569,7 +569,8 @@ function ExCard({ ex, profile, wkIdx, exIdx, ac, lastRef }) {
             <div key={i} style={{display:'grid', gridTemplateColumns:'22px 1fr 1fr 38px', gap:6, marginBottom:6, alignItems:'center'}}>
               <div style={{fontFamily:T.mono, fontSize:13, fontWeight:700, textAlign:'center', color:s.done?ac:T.muted}}>{i+1}</div>
               <input
-                type="number" inputMode="decimal" placeholder="—"
+                type="number" inputMode="decimal"
+                placeholder={lastRef?.sets?.find(ls => ls.s === i+1)?.kg || '—'}
                 value={s.kg} onChange={e => updateSet(i,'kg',e.target.value)}
                 style={{
                   background:T.card, border:`1.5px solid ${s.done?`${ac}40`:T.border}`,
@@ -1068,14 +1069,15 @@ function ProgPage({ profile, state, onSaveMetas, fetchedAt }) {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PAGE: TREINO
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function TreinoPage({ profile, state, onSave, savingWk }) {
+function TreinoPage({ profile, state, onSave, savingWk, activeWk, setActiveWk }) {
   const ac = PROFILE_COLORS[profile];
   const wks = profile==='fk' ? FK_WK : JRV_WK;
-  const [activeWk, setActiveWk] = useState(0);
-  const wk = wks[activeWk];
+  // activeWk é controlado pelo App — mantém o mesmo card ao trocar de perfil
+  const safeWk = Math.min(activeWk, wks.length - 1);
+  const wk = wks[safeWk];
   const last = state.hist.find(h => h.wkId===wk.id);
   const zc = ZONE_COLORS[wk.zone] || ac;
-  const saveKey = `${profile}-${activeWk}`;
+  const saveKey = `${profile}-${safeWk}`;
   const isSaving = savingWk === saveKey;
 
   return (
@@ -1091,8 +1093,8 @@ function TreinoPage({ profile, state, onSave, savingWk }) {
             border:'none', cursor:'pointer', background:'transparent',
             fontFamily:T.mono, fontSize:9, letterSpacing:'1.5px', textTransform:'uppercase',
             transition:'all .15s',
-            color: activeWk===i ? ac : T.muted,
-            borderBottom: `2px solid ${activeWk===i ? ac : 'transparent'}`,
+            color: safeWk===i ? ac : T.muted,
+            borderBottom: `2px solid ${safeWk===i ? ac : 'transparent'}`,
           }}>
             {w.label}
           </button>
@@ -1172,8 +1174,8 @@ function TreinoPage({ profile, state, onSave, savingWk }) {
           })();
           return (
             <ExCard
-              key={`${profile}-${activeWk}-${i}`}
-              ex={ex} profile={profile} wkIdx={activeWk} exIdx={i} ac={ac}
+              key={`${profile}-${safeWk}-${i}`}
+              ex={ex} profile={profile} wkIdx={safeWk} exIdx={i} ac={ac}
               lastRef={lastExRef}
             />
           );
@@ -1182,7 +1184,7 @@ function TreinoPage({ profile, state, onSave, savingWk }) {
         {/* Save button */}
         <div style={{marginBottom:24, marginTop:8}}>
           <button
-            onClick={() => onSave(profile, activeWk)}
+            onClick={() => onSave(profile, safeWk)}
             disabled={isSaving}
             style={{
               width:'100%', padding:'16px',
@@ -1809,6 +1811,7 @@ function App() {
   // Rastreia quais perfis já foram carregados (evita re-fetch desnecessário)
   const [loadedProfiles, setLoadedProfiles] = useState(new Set());
   const [fetchedAt, setFetchedAt] = useState(null);
+  const [activeWk, setActiveWk] = useState(0); // compartilhado entre perfis
   const [state, setState] = useState({
     fk:  {hist:[],healthkit:[],bodyComp:[],metas:null},
     jrv: {hist:[],healthkit:[],bodyComp:[],metas:null},
@@ -1934,7 +1937,7 @@ function App() {
 
       <main style={{background:T.bg}}>
         {activeTab==='prog'   && <ProgPage   profile={profile} state={state[profile]} onSaveMetas={handleSaveMetas} fetchedAt={fetchedAt} />}
-        {activeTab==='treino' && <TreinoPage profile={profile} state={state[profile]} onSave={handleSaveWorkout} savingWk={savingWk} />}
+        {activeTab==='treino' && <TreinoPage profile={profile} state={state[profile]} onSave={handleSaveWorkout} savingWk={savingWk} activeWk={activeWk} setActiveWk={setActiveWk} />}
         {activeTab==='hist'   && <HistPage   profile={profile} state={state[profile]} onDelete={handleDeleteHist} />}
       </main>
 
