@@ -644,7 +644,8 @@ function RecoveryScoreCard({ score, healthkit, hist, ac }) {
   const daysSince = hist && hist.length > 0
     ? Math.floor((Date.now() - new Date(hist[0].date)) / 86400000)
     : null;
-  const lastZone = hist && hist.length > 0 ? hist[0].zone : null;
+  const lastZone  = hist && hist.length > 0 ? hist[0].zone  : null;
+  const lastTitle = hist && hist.length > 0 ? (hist[0].title || hist[0].wkId || null) : null;
   const zc = lastZone ? (ZONE_COLORS[lastZone] || ac) : ac;
 
   const pct = score; // 0–100
@@ -722,11 +723,12 @@ function RecoveryScoreCard({ score, healthkit, hist, ac }) {
             subColor: lastZone ? zc : T.muted,
           },
           {
-            lbl: 'Zona anterior',
-            val: lastZone || '—',
-            sub: lastZone === 'FORÇA' ? 'alta demanda' : lastZone === 'HIPERTROFIA' ? 'demanda moderada' : lastZone === 'METABÓLICO' ? 'baixa demanda' : '',
-            good: lastZone ? (lastZone === 'METABÓLICO' ? true : lastZone === 'HIPERTROFIA' ? null : false) : null,
+            lbl: 'Treino anterior',
+            val: lastTitle || '—',
+            sub: lastZone || '',
+            good: null,
             color: lastZone ? zc : T.subtle,
+            subColor: lastZone ? zc : T.muted,
           },
         ].map(({ lbl, val, sub, good, color, subColor }) => (
           <div key={lbl} style={{ background: T.card, borderRadius: 10, padding: '8px 10px' }}>
@@ -750,7 +752,7 @@ function RecoveryScoreCard({ score, healthkit, hist, ac }) {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PAGE: PROG
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function ProgPage({ profile, state, onSaveMetas }) {
+function ProgPage({ profile, state, onSaveMetas, fetchedAt }) {
   const ac = PROFILE_COLORS[profile];
   const hk = state.healthkit || [];
   const latest = hk[0] || null;
@@ -792,7 +794,7 @@ function ProgPage({ profile, state, onSaveMetas }) {
       )}
 
       {/* ── APPLE HEALTH ── */}
-      <SLabel>Apple Health · Hoje</SLabel>
+      <SLabel>Apple Health · {fetchedAt ? fetchedAt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : 'Hoje'}</SLabel>
 
       {latest ? (
         <>
@@ -1015,12 +1017,14 @@ function ProgPage({ profile, state, onSaveMetas }) {
           const sessions = hist.filter(h => h.wkId === wk.id).slice(0,3);
           if (!sessions.length) return null;
           const exMap = {};
-          sessions.forEach(sess => {
+          // Sessões mais recentes primeiro → inverter para construir em ordem cronológica
+          sessions.slice().reverse().forEach(sess => {
             const dateStr = new Date(sess.date).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
             (sess.exercises||[]).forEach(ex => {
-              if (!exMap[ex.n]) exMap[ex.n] = {name:ex.name, pts:[]};
+              const key = ex.name; // agrupa por nome — evita cruzar exercícios renomeados entre sessões
+              if (!exMap[key]) exMap[key] = {name:ex.name, pts:[]};
               const maxKg = Math.max(...(ex.sets||[]).map(s=>num(s.kg)).filter(v=>v>0));
-              exMap[ex.n].pts.push({date:dateStr, kg:maxKg>0?maxKg:null});
+              exMap[key].pts.push({date:dateStr, kg:maxKg>0?maxKg:null});
             });
           });
           const zc = ZONE_COLORS[wk.zone] || ac;
@@ -1042,7 +1046,7 @@ function ProgPage({ profile, state, onSaveMetas }) {
                       <React.Fragment key={j}>
                         <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
                           <span style={{fontFamily:T.mono, fontSize:7, color:T.muted}}>{pt.date}</span>
-                          <span style={{fontFamily:T.mono, fontSize:10, fontWeight:j===0?700:400, color:j===0?ac:T.dim}}>
+                          <span style={{fontFamily:T.mono, fontSize:10, fontWeight:j===ex.pts.length-1?700:400, color:j===ex.pts.length-1?ac:T.dim}}>
                             {pt.kg!=null ? `${pt.kg}kg` : '—'}
                           </span>
                         </div>
@@ -1804,6 +1808,7 @@ function App() {
   const [splashVisible, setSplashVisible] = useState(true);
   // Rastreia quais perfis já foram carregados (evita re-fetch desnecessário)
   const [loadedProfiles, setLoadedProfiles] = useState(new Set());
+  const [fetchedAt, setFetchedAt] = useState(null);
   const [state, setState] = useState({
     fk:  {hist:[],healthkit:[],bodyComp:[],metas:null},
     jrv: {hist:[],healthkit:[],bodyComp:[],metas:null},
@@ -1828,6 +1833,7 @@ function App() {
         metas:     mR.ok  ? mR.data||null : prev[p].metas,
       }}));
       setSyncStatus('ok');
+      setFetchedAt(new Date());
       setLoadedProfiles(prev => new Set([...prev, p]));
     } catch(e) { setSyncStatus('error'); }
   }
@@ -1927,7 +1933,7 @@ function App() {
       />
 
       <main style={{background:T.bg}}>
-        {activeTab==='prog'   && <ProgPage   profile={profile} state={state[profile]} onSaveMetas={handleSaveMetas} />}
+        {activeTab==='prog'   && <ProgPage   profile={profile} state={state[profile]} onSaveMetas={handleSaveMetas} fetchedAt={fetchedAt} />}
         {activeTab==='treino' && <TreinoPage profile={profile} state={state[profile]} onSave={handleSaveWorkout} savingWk={savingWk} />}
         {activeTab==='hist'   && <HistPage   profile={profile} state={state[profile]} onDelete={handleDeleteHist} />}
       </main>
