@@ -447,7 +447,7 @@ function BottomNav({ active, onChange, profile }) {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // EXERCISE CARD
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function ExCard({ ex, profile, wkIdx, exIdx, ac, lastRef }) {
+function ExCard({ ex, profile, wkIdx, exIdx, ac, lastRef, isOpen, onToggle }) {
   const draftKey = `cw_${profile}_${wkIdx}_${exIdx}`;
   const initSets = () => {
     try {
@@ -464,7 +464,6 @@ function ExCard({ ex, profile, wkIdx, exIdx, ac, lastRef }) {
     return '';
   };
 
-  const [open, setOpen] = useState(false);
   const [sets, setSets] = useState(initSets);
   const [obs, setObs] = useState(initObs);
 
@@ -495,7 +494,7 @@ function ExCard({ ex, profile, wkIdx, exIdx, ac, lastRef }) {
       marginBottom:8, overflow:'hidden'
     }}>
       {/* Toggle button */}
-      <button onClick={() => setOpen(!open)} style={{
+      <button onClick={onToggle} style={{
         width:'100%', textAlign:'left', background:'transparent',
         border:'none', cursor:'pointer', padding:'12px 14px 10px'
       }}>
@@ -518,7 +517,7 @@ function ExCard({ ex, profile, wkIdx, exIdx, ac, lastRef }) {
             </div>
           </div>
           <div style={{fontFamily:T.mono, fontSize:10, color:T.muted, marginTop:2, flexShrink:0}}>
-            {open ? '▲' : '▼'}
+            {isOpen ? '▲' : '▼'}
           </div>
         </div>
         {ex.note && (
@@ -534,7 +533,7 @@ function ExCard({ ex, profile, wkIdx, exIdx, ac, lastRef }) {
       </button>
 
       {/* Log body */}
-      {open && (
+      {isOpen && (
         <div className="anim-fadein" style={{
           borderTop:`1px solid ${T.border}`, background:'#050505',
           padding:'12px 14px 14px'
@@ -1080,6 +1079,11 @@ function TreinoPage({ profile, state, onSave, savingWk, activeWk, setActiveWk })
   const saveKey = `${profile}-${safeWk}`;
   const isSaving = savingWk === saveKey;
 
+  // openExIdx vive aqui (acima dos ExCard) — sobrevive à troca de perfil
+  const [openExIdx, setOpenExIdx] = useState(null);
+  // Ao mudar de treino, fecha o card aberto
+  useEffect(() => { setOpenExIdx(null); }, [safeWk]);
+
   return (
     <div className="pb-safe">
       {/* Workout tab strip */}
@@ -1177,6 +1181,8 @@ function TreinoPage({ profile, state, onSave, savingWk, activeWk, setActiveWk })
               key={`${profile}-${safeWk}-${i}`}
               ex={ex} profile={profile} wkIdx={safeWk} exIdx={i} ac={ac}
               lastRef={lastExRef}
+              isOpen={openExIdx === i}
+              onToggle={() => setOpenExIdx(openExIdx === i ? null : i)}
             />
           );
         })}
