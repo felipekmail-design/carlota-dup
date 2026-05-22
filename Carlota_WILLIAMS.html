@@ -2022,24 +2022,32 @@ function App() {
     } catch(e) { setSyncStatus('error'); }
   }
 
-  // Initial load — carrega fk, depois determina próxima tela (pin ou app)
+  // Initial load — carrega o perfil ativo primeiro, o outro em background
   useEffect(() => {
     (async () => {
-      // Garante splash visível por pelo menos 1.4s (visual polish)
-      const [, ] = await Promise.all([
-        syncDown('fk'),
+      const activeProfile = isAuthed() ? getAuthedProfile() : 'fk';
+      const otherProfile  = activeProfile === 'fk' ? 'jrv' : 'fk';
+
+      // Sincroniza perfil ativo + splash em paralelo (bloqueante)
+      await Promise.all([
+        syncDown(activeProfile),
         new Promise(r => setTimeout(r, 1400)),
       ]);
+
       // Fade out splash
       setSplashVisible(false);
       await new Promise(r => setTimeout(r, 600));
-      // Verificar autenticação — se já autenticado, carrega o perfil salvo
+
+      // Determina próxima tela
       if (isAuthed()) {
         setProfile(getAuthedProfile());
         setScreen('app');
       } else {
         setScreen('pin');
       }
+
+      // Sincroniza o outro perfil em background (não bloqueante)
+      syncDown(otherProfile);
     })();
   }, []);
 
