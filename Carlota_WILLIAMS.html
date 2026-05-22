@@ -585,7 +585,7 @@ function ExCard({ ex, profile, wkIdx, exIdx, ac, lastRef, isOpen, onToggle }) {
                 }}
               />
               <input
-                type="number" inputMode="numeric" placeholder={ex.rT}
+                type="number" inputMode="numeric" placeholder={lastRef?.sets?.find(ls => ls.s === i+1)?.reps || ex.rT}
                 value={s.reps} onChange={e => updateSet(i,'reps',e.target.value)}
                 style={{
                   background:T.card, border:`1.5px solid ${s.done?`${ac}40`:T.border}`,
