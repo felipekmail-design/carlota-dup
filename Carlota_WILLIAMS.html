@@ -980,7 +980,7 @@ function ProgPage({ profile, state, onSaveMetas }) {
             {[
               {lbl:'PESO',   key:'bodyMass',       unit:'kg', goodDown:true},
               {lbl:'GORDURA',key:'fatPercentage',   unit:'%',  goodDown:true},
-              {lbl:'M.MAGRA',key:'leanMass',        unit:'kg', goodDown:false},
+              {lbl:'LBM',    key:'leanMass',        unit:'kg', goodDown:false},
             ].map(({lbl,key,unit,goodDown},ri) => {
               const vals = bc.map(r => parseFloat(String(r[key]||'0').replace(',','.')));
               const first = vals[0]||0;
@@ -997,7 +997,7 @@ function ProgPage({ profile, state, onSaveMetas }) {
                     <span style={{fontFamily:T.mono, fontSize:10, letterSpacing:'2px', textTransform:'uppercase', color:T.dim}}>{lbl}</span>
                     {trend !== null && (
                       <span style={{fontFamily:T.mono, fontSize:10, color: trendGood ? '#10b981' : '#ef4444'}}>
-                        {trendGood ? '↓' : '↑'} {Math.abs(trend).toFixed(1)}{unit}
+                        {trend > 0 ? '↑' : '↓'} {Math.abs(trend).toFixed(1)}{unit}
                       </span>
                     )}
                   </div>
@@ -1100,7 +1100,7 @@ function ProgPage({ profile, state, onSaveMetas }) {
               {[
                 {lbl:'Meta Peso',  cur:parseFloat(String(bc[0].bodyMass||'0')),       meta:num(metas.peso),       unit:'kg', goodDown:true},
                 {lbl:'Meta Gord.', cur:parseFloat(String(bc[0].fatPercentage||'0')),  meta:num(metas.gordura),    unit:'%',  goodDown:true},
-                {lbl:'Meta Magra', cur:parseFloat(String(bc[0].leanMass||'0')),       meta:num(metas.massaMagra), unit:'kg', goodDown:false},
+                {lbl:'Meta LBM',   cur:parseFloat(String(bc[0].leanMass||'0')),       meta:num(metas.massaMagra), unit:'kg', goodDown:false},
               ].map(({lbl,cur,meta,unit,goodDown}) => {
                 if (!meta || !cur) return null;
                 const diff = cur - meta;
