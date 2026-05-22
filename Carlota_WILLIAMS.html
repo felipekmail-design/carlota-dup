@@ -800,8 +800,9 @@ function ProgPage({ profile, state, onSaveMetas }) {
           const d = new Date(String(latest.date).substring(0,10) + 'T12:00:00');
           const now = new Date();
           const diff = Math.round((new Date(now.getFullYear(),now.getMonth(),now.getDate()) - new Date(d.getFullYear(),d.getMonth(),d.getDate())) / 86400000);
-          if      (diff === 0) hkLabel = latest.syncedAt ? `Hoje · ${latest.syncedAt}` : 'Hoje';
-          else if (diff === 1) hkLabel = latest.syncedAt ? `Ontem · ${latest.syncedAt}` : 'Ontem';
+          const t = latest.syncedAt || '—:—';
+          if      (diff === 0) hkLabel = `Hoje · ${t}`;
+          else if (diff === 1) hkLabel = `Ontem · ${t}`;
           else                 hkLabel = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
         }
         return <SLabel>Apple Health · {hkLabel}</SLabel>;
