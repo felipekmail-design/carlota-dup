@@ -260,7 +260,8 @@ function calcRecoveryScore(healthkit, hist) {
   // Fator 3: Recência de treino (0–25 pts)
   let recencyPts = 20;
   if (hist && hist.length > 0) {
-    const daysSince = Math.floor((Date.now() - new Date(hist[0].date)) / 86400000);
+    const fmt = d => new Date(d).toLocaleDateString('en-CA', {timeZone:'America/Sao_Paulo'});
+    const daysSince = Math.round((new Date(fmt(Date.now())) - new Date(fmt(hist[0].date))) / 86400000);
     if      (daysSince === 0) recencyPts = 12; // treinou hoje
     else if (daysSince === 1) recencyPts = 17; // ontem
     else if (daysSince === 2) recencyPts = 22; // 2 dias
@@ -647,7 +648,12 @@ function RecoveryScoreCard({ score, healthkit, hist, ac }) {
   const hrvAvg = hrvVals.length ? Math.round(hrvVals.reduce((a,b) => a+b) / hrvVals.length) : null;
   const rhrAvg = rhrVals.length ? Math.round(rhrVals.reduce((a,b) => a+b) / rhrVals.length) : null;
   const daysSince = hist && hist.length > 0
-    ? Math.floor((Date.now() - new Date(hist[0].date)) / 86400000)
+    ? (() => {
+        const fmt = d => new Date(d).toLocaleDateString('en-CA', {timeZone:'America/Sao_Paulo'});
+        const todayStr = fmt(Date.now());
+        const lastStr  = fmt(hist[0].date);
+        return Math.round((new Date(todayStr) - new Date(lastStr)) / 86400000);
+      })()
     : null;
   const lastZone  = hist && hist.length > 0 ? hist[0].zone  : null;
   const lastTitle = hist && hist.length > 0 ? (hist[0].title || hist[0].wkId || null) : null;
