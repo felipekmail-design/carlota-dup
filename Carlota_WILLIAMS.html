@@ -700,6 +700,30 @@ function RecoveryScoreCard({ score, healthkit, hist, ac }) {
         }}/>
       </div>
 
+      {/* Insight científico dinâmico */}
+      {(() => {
+        const hrvRatio = hrv > 0 && hrvAvg ? hrv / hrvAvg : null;
+        const rhrRatio = rhr > 0 && rhrAvg ? rhr / rhrAvg : null;
+        let txt = '';
+        if (score >= 70) {
+          if (hrvRatio && hrvRatio > 1.15) txt = 'HRV significativamente acima da média — sistema nervoso parassimpático ativo. Janela ideal para alta intensidade ou volume elevado.';
+          else if (rhrRatio && rhrRatio < 0.95) txt = 'FC de repouso abaixo da sua média — coração mais eficiente. Boa recuperação cardiovascular confirmada.';
+          else txt = 'Métricas autonômicas estáveis e dentro da janela ótima. Condição favorável para treino de qualidade.';
+        } else if (score >= 40) {
+          if (daysSince === 0) txt = 'Treino recente detectado — musculatura ainda em fase de reparação (síntese proteica ativa nas próximas 24–48h). Volume moderado recomendado.';
+          else if (rhrRatio && rhrRatio > 1.06) txt = 'FC repouso acima da média — sinal clássico de estresse cumulativo ou sono inadequado. Priorize recuperação.';
+          else if (hrvRatio && hrvRatio < 0.85) txt = 'HRV suprimido — sistema nervoso ainda sob carga. Reduza intensidade e monitore qualidade do sono.';
+          else txt = 'Recuperação parcial. Intensidade e volume moderados preservam a adaptação sem sobrecarga adicional.';
+        } else {
+          txt = 'HRV abaixo da média — atividade simpática elevada indica fadiga acumulada. Treino leve ou descanso ativo protege a adaptação a longo prazo.';
+        }
+        return (
+          <div style={{ fontSize: 11, color: T.dim, lineHeight: 1.6, marginBottom: 12, paddingTop: 2 }}>
+            {txt}
+          </div>
+        );
+      })()}
+
       {/* Fatores */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
         {[
@@ -719,7 +743,11 @@ function RecoveryScoreCard({ score, healthkit, hist, ac }) {
             lbl: 'Último treino',
             val: daysSince === null ? '—' : daysSince === 0 ? 'hoje' : daysSince === 1 ? 'ontem' : `há ${daysSince}d`,
             sub: lastZone || '',
-            good: daysSince !== null ? (daysSince >= 2 && daysSince <= 5) : null,
+            good: null,
+            color: daysSince === null ? T.subtle
+                 : daysSince >= 2 && daysSince <= 5 ? '#10b981'
+                 : daysSince === 0 || daysSince === 1 ? '#fbbf24'
+                 : T.muted,
             subColor: lastZone ? zc : T.muted,
           },
           {
@@ -843,30 +871,91 @@ function ProgPage({ profile, state, onSaveMetas }) {
           )}
 
           {/* 7-day trend table */}
-          {hk.length > 1 && (
-            <Card style={{overflow:'hidden', marginBottom:20}}>
-              <div style={{fontFamily:T.mono, fontSize:10, letterSpacing:'3px', textTransform:'uppercase', color:T.muted, padding:'10px 12px 6px'}}>
-                Últimos 7 dias
-              </div>
-              <div style={{display:'grid', gridTemplateColumns:'70px 1fr 1fr 1fr', padding:'6px 12px 8px', borderBottom:`1px solid ${T.border}`}}>
-                {['Data','HRV','FC','Cal'].map(h => (
-                  <div key={h} style={{fontFamily:T.mono, fontSize:10, letterSpacing:'2px', textTransform:'uppercase', color:T.muted, textAlign:'center'}}>{h}</div>
-                ))}
-              </div>
-              {hk.slice(0,7).map((h,i) => (
-                <div key={i} style={{
-                  display:'grid', gridTemplateColumns:'70px 1fr 1fr 1fr',
-                  padding:'7px 12px', borderBottom: i<6 ? `1px solid ${T.bg}` : 'none',
-                  alignItems:'center'
-                }}>
-                  <div style={{fontFamily:T.mono, fontSize:10, color:T.dim}}>{fmtD(h.date)}</div>
-                  <div style={{fontFamily:T.mono, fontSize:10, fontWeight:600, color:ac, textAlign:'center'}}>{fmtN(h.hrv)}</div>
-                  <div style={{fontFamily:T.mono, fontSize:10, color:T.subtle, textAlign:'center'}}>{fmtN(h.restingHR)}</div>
-                  <div style={{fontFamily:T.mono, fontSize:10, color:T.subtle, textAlign:'center'}}>{fmtN(h.activeCalories)}</div>
+          {hk.length > 1 && (() => {
+            const rows = hk.slice(0,7);
+            const hrvVals  = rows.map(h=>num(h.hrv)).filter(v=>v>0);
+            const rhrVals  = rows.map(h=>num(h.restingHR)).filter(v=>v>0);
+            const calVals  = rows.map(h=>num(h.activeCalories)).filter(v=>v>0);
+            const avgHrv   = hrvVals.length  ? Math.round(hrvVals.reduce((a,b)=>a+b)/hrvVals.length)  : null;
+            const avgRhr   = rhrVals.length  ? Math.round(rhrVals.reduce((a,b)=>a+b)/rhrVals.length)  : null;
+            const avgCal   = calVals.length  ? Math.round(calVals.reduce((a,b)=>a+b)/calVals.length)  : null;
+            // Tendência HRV: compara média dos últimos 3 vs anterior
+            const hrvTrend = (() => {
+              if (hrvVals.length < 4) return null;
+              const recent = hrvVals.slice(0,3).reduce((a,b)=>a+b)/3;
+              const older  = hrvVals.slice(3).reduce((a,b)=>a+b)/hrvVals.slice(3).length;
+              return recent > older * 1.05 ? 'up' : recent < older * 0.95 ? 'down' : 'stable';
+            })();
+            const hkInsight = (() => {
+              if (!avgHrv) return null;
+              if (hrvTrend === 'up')     return `HRV em alta nos últimos 3 dias (+tendência positiva) — adaptação ao treino progredindo bem.`;
+              if (hrvTrend === 'down')   return `HRV em queda — monitorar carga total de treino e qualidade do sono esta semana.`;
+              if (avgCal && calVals[0] < avgCal * 0.5) return `Calorias hoje abaixo da média semanal — dados do dia ainda sendo registrados pelo Apple Watch.`;
+              return `HRV estável na semana (média ${avgHrv} ms) — sistema nervoso autônomo bem adaptado.`;
+            })();
+            return (
+              <Card style={{overflow:'hidden', marginBottom: hkInsight ? 8 : 20}}>
+                <div style={{fontFamily:T.mono, fontSize:10, letterSpacing:'3px', textTransform:'uppercase', color:T.muted, padding:'10px 12px 6px'}}>
+                  Últimos 7 dias
                 </div>
-              ))}
-            </Card>
-          )}
+                <div style={{display:'grid', gridTemplateColumns:'70px 1fr 1fr 1fr', padding:'6px 12px 8px', borderBottom:`1px solid ${T.border}`}}>
+                  {['Data','HRV','FC','Cal'].map(h => (
+                    <div key={h} style={{fontFamily:T.mono, fontSize:10, letterSpacing:'2px', textTransform:'uppercase', color:T.muted, textAlign:'center'}}>{h}</div>
+                  ))}
+                </div>
+                {rows.map((h,i) => (
+                  <div key={i} style={{
+                    display:'grid', gridTemplateColumns:'70px 1fr 1fr 1fr',
+                    padding:'7px 12px', borderBottom:`1px solid ${T.bg}`,
+                    alignItems:'center'
+                  }}>
+                    <div style={{fontFamily:T.mono, fontSize:10, color:T.dim}}>{fmtD(h.date)}</div>
+                    <div style={{fontFamily:T.mono, fontSize:10, fontWeight:600, color:ac, textAlign:'center'}}>{fmtN(h.hrv)}</div>
+                    <div style={{fontFamily:T.mono, fontSize:10, color:T.subtle, textAlign:'center'}}>{fmtN(h.restingHR)}</div>
+                    <div style={{fontFamily:T.mono, fontSize:10, color:T.subtle, textAlign:'center'}}>{fmtN(h.activeCalories)}</div>
+                  </div>
+                ))}
+                {/* Linha de médias */}
+                {avgHrv && (
+                  <div style={{
+                    display:'grid', gridTemplateColumns:'70px 1fr 1fr 1fr',
+                    padding:'7px 12px', borderTop:`1px solid ${T.border}`,
+                    background:'#ffffff06', alignItems:'center'
+                  }}>
+                    <div style={{fontFamily:T.mono, fontSize:9, letterSpacing:'1px', textTransform:'uppercase', color:T.muted}}>MÉDIA</div>
+                    <div style={{fontFamily:T.mono, fontSize:10, fontWeight:700, color:ac, textAlign:'center'}}>{avgHrv}</div>
+                    <div style={{fontFamily:T.mono, fontSize:10, fontWeight:700, color:T.subtle, textAlign:'center'}}>{avgRhr||'—'}</div>
+                    <div style={{fontFamily:T.mono, fontSize:10, fontWeight:700, color:T.subtle, textAlign:'center'}}>{avgCal||'—'}</div>
+                  </div>
+                )}
+              </Card>
+            );
+          })()}
+          {/* Insight HealthKit */}
+          {hk.length > 1 && (() => {
+            const rows = hk.slice(0,7);
+            const hrvVals = rows.map(h=>num(h.hrv)).filter(v=>v>0);
+            const calVals = rows.map(h=>num(h.activeCalories)).filter(v=>v>0);
+            const avgHrv  = hrvVals.length ? Math.round(hrvVals.reduce((a,b)=>a+b)/hrvVals.length) : null;
+            const avgCal  = calVals.length ? Math.round(calVals.reduce((a,b)=>a+b)/calVals.length) : null;
+            const hrvTrend = (() => {
+              if (hrvVals.length < 4) return null;
+              const recent = hrvVals.slice(0,3).reduce((a,b)=>a+b)/3;
+              const older  = hrvVals.slice(3).reduce((a,b)=>a+b)/hrvVals.slice(3).length;
+              return recent > older * 1.05 ? 'up' : recent < older * 0.95 ? 'down' : 'stable';
+            })();
+            let txt = null;
+            if      (hrvTrend === 'up')   txt = `HRV em alta nos últimos 3 dias — adaptação ao treino progredindo. Sinal de supercompensação ativa.`;
+            else if (hrvTrend === 'down') txt = `HRV em queda na semana — monitorar carga total e sono. Considere sessão de recuperação ativa.`;
+            else if (avgHrv && calVals[0] && calVals[0] < avgCal * 0.5) txt = `Calorias hoje abaixo da média (${avgCal} kcal) — dados do dia ainda em andamento no Apple Watch.`;
+            else if (avgHrv) txt = `HRV médio semanal: ${avgHrv} ms — variabilidade estável indica boa adaptação ao estímulo de treino.`;
+            if (!txt) return null;
+            return (
+              <div style={{fontSize:11, color:T.dim, lineHeight:1.6, marginBottom:16, paddingLeft:2}}>
+                {txt}
+              </div>
+            );
+          })()}
         </>
       ) : (
         <Card style={{textAlign:'center', padding:'40px 20px', marginBottom:20}}>
@@ -931,6 +1020,40 @@ function ProgPage({ profile, state, onSaveMetas }) {
               );
             })}
           </Card>
+
+          {/* Narrativa interpretativa */}
+          {bc.length >= 2 && (() => {
+            const p0  = parseFloat(bc[0].bodyMass||0),      pN = parseFloat(bc[bc.length-1].bodyMass||0);
+            const g0  = parseFloat(bc[0].fatPercentage||0), gN = parseFloat(bc[bc.length-1].fatPercentage||0);
+            const m0  = parseFloat(bc[0].leanMass||0),      mN = parseFloat(bc[bc.length-1].leanMass||0);
+            const dP  = p0 - pN, dG = g0 - gN, dM = m0 - mN;
+            const lines = [];
+            // Tendência geral
+            if (dP > 0 && dM > 0 && dG > 0) {
+              const ratio = dM / dP;
+              if (ratio >= 0.5) lines.push(`Ganho de ${dP.toFixed(1)}kg com ${(ratio*100).toFixed(0)}% em massa magra — rácio aceitável para fase de construção (meta: >50%).`);
+              else              lines.push(`Ganho de ${dP.toFixed(1)}kg com apenas ${(ratio*100).toFixed(0)}% em massa magra — proporção de gordura acima do ideal. Revise superávit calórico.`);
+            } else if (dP > 0 && dM > 0 && dG <= 0) {
+              lines.push(`Recomposição corporal confirmada — massa magra ↑${dM.toFixed(1)}kg e gordura ↓${Math.abs(dG).toFixed(1)}%. Resposta positiva ao protocolo.`);
+            } else if (dP <= 0 && dM >= 0) {
+              lines.push(`Redução de massa gorda com preservação muscular — déficit bem calibrado.`);
+            }
+            // Contexto de metas
+            if (metas) {
+              const distM = num(metas.massaMagra) - m0;
+              const distG = g0 - num(metas.gordura);
+              if (distM > 0.5 && distG > 1)  lines.push(`Faltam ${distM.toFixed(1)}kg de massa magra e ${distG.toFixed(1)}% de gordura para as metas — fase de recomposição progressiva.`);
+              else if (distM > 0.5)           lines.push(`A ${distM.toFixed(1)}kg da meta de massa magra (${num(metas.massaMagra)}kg) — foco em progressão de cargas e ingestão proteica adequada.`);
+              else if (distG > 1)             lines.push(`Gordura ${distG.toFixed(1)}% acima da meta — manter déficit moderado (~200–300 kcal) sem comprometer performance.`);
+              else                            lines.push(`Métricas próximas das metas — fase de ajuste fino e manutenção.`);
+            }
+            if (!lines.length) return null;
+            return (
+              <div style={{fontSize:11, color:T.dim, lineHeight:1.7, marginBottom:12, paddingLeft:2}}>
+                {lines.map((l,i) => <div key={i}>{l}</div>)}
+              </div>
+            );
+          })()}
 
           {/* Deltas em relação à meta */}
           {metas && (
