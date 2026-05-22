@@ -798,7 +798,24 @@ function ProgPage({ profile, state, onSaveMetas }) {
   const latest = hk[0] || null;
   const hist = state.hist || [];
   const wks = profile==='fk' ? FK_WK : JRV_WK;
-  const bc = state.bodyComp || [];
+  // Usa bodyComp (atalho iOS) como fonte primária; bioHistory (Drive) como fallback
+  const bc = (state.bodyComp && state.bodyComp.length > 0)
+    ? state.bodyComp
+    : (state.bioHistory || []).map(r => {
+        // Normaliza data DD/MM/YYYY → YYYY-MM-DD
+        const raw = String(r.date || '');
+        const date = /^\d{2}\/\d{2}\/\d{4}$/.test(raw)
+          ? `${raw.slice(6)}-${raw.slice(3,5)}-${raw.slice(0,2)}`
+          : raw.substring(0, 10);
+        const bm = parseFloat(r.peso  || 0);
+        const fp = parseFloat(r.gordura || 0);
+        return {
+          date,
+          bodyMass:      bm,
+          fatPercentage: fp,
+          leanMass:      bm > 0 && fp > 0 ? parseFloat((bm * (1 - fp / 100)).toFixed(1)) : 0,
+        };
+      });
   const metas = state.metas;
   const hv = latest ? num(latest.hrv) : 0;
 
@@ -1995,8 +2012,8 @@ function App() {
   const [loadedProfiles, setLoadedProfiles] = useState(new Set());
   const [activeWk, setActiveWk] = useState(0); // compartilhado entre perfis
   const [state, setState] = useState({
-    fk:  {hist:[],healthkit:[],bodyComp:[],metas:null},
-    jrv: {hist:[],healthkit:[],bodyComp:[],metas:null},
+    fk:  {hist:[],healthkit:[],bodyComp:[],bioHistory:[],metas:null},
+    jrv: {hist:[],healthkit:[],bodyComp:[],bioHistory:[],metas:null},
   });
 
   // Sync CSS accent color on profile change
@@ -2007,15 +2024,17 @@ function App() {
   async function syncDown(p) {
     setSyncStatus('syncing');
     try {
-      const [wR,hkR,bcR,mR] = await Promise.all([
+      const [wR,hkR,bcR,mR,bhR] = await Promise.all([
         apiGet('list',p), apiGet('listHealthKit',p),
         apiGet('listBodyComp',p), apiGet('getMetas',p),
+        apiGet('getBioHistory',p),
       ]);
       setState(prev => ({...prev, [p]: {
-        hist:      wR.ok  ? (wR.data||[]).sort((a,b)=>new Date(b.date)-new Date(a.date)) : prev[p].hist,
-        healthkit: hkR.ok ? hkR.data||[]  : prev[p].healthkit,
-        bodyComp:  bcR.ok ? bcR.data||[]  : prev[p].bodyComp,
-        metas:     mR.ok  ? mR.data||null : prev[p].metas,
+        hist:       wR.ok  ? (wR.data||[]).sort((a,b)=>new Date(b.date)-new Date(a.date)) : prev[p].hist,
+        healthkit:  hkR.ok ? hkR.data||[]  : prev[p].healthkit,
+        bodyComp:   bcR.ok ? bcR.data||[]  : prev[p].bodyComp,
+        bioHistory: bhR.ok ? bhR.data||[]  : prev[p].bioHistory,
+        metas:      mR.ok  ? mR.data||null : prev[p].metas,
       }}));
       setSyncStatus('ok');
       setLoadedProfiles(prev => new Set([...prev, p]));
