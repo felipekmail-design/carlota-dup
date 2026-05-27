@@ -1645,19 +1645,17 @@ function CustomWorkoutBuilder({ profile, onSaveCustom, savingWk, ac }) {
             ))}
           </div>
 
-          {/* Zone info — reps e descanso sugeridos */}
-          <div style={{
-            display:'flex',gap:8,marginBottom:14,alignItems:'center'
-          }}>
-            <span style={{
-              fontFamily:T.mono,fontSize:9,padding:'3px 10px',borderRadius:4,
-              background:`${ZONE_COLORS[zone]}12`,color:ZONE_COLORS[zone],
-              border:`1px solid ${ZONE_COLORS[zone]}25`
-            }}>{zoneInfo.reps}</span>
-            <span style={{
-              fontFamily:T.mono,fontSize:9,padding:'3px 10px',borderRadius:4,
-              background:T.surface,color:T.dim,border:`1px solid ${T.border}`
-            }}>⏱ {zoneInfo.rest}</span>
+          {/* Zone info — reps e descanso no mesmo padrão visual dos treinos programados */}
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:14}}>
+            {[['Reps', zoneInfo.reps],['Descanso', zoneInfo.rest]].map(([lbl,val]) => (
+              <div key={lbl} style={{
+                background:T.surface,border:`1px solid ${T.border}`,
+                borderRadius:10,padding:'10px 6px',textAlign:'center'
+              }}>
+                <div style={{fontFamily:T.mono,fontSize:13,fontWeight:700,color:ZONE_COLORS[zone],lineHeight:1.2}}>{val}</div>
+                <div style={{fontFamily:T.mono,fontSize:8,letterSpacing:'2px',textTransform:'uppercase',color:T.muted,marginTop:3}}>{lbl}</div>
+              </div>
+            ))}
           </div>
 
           {/* Toggle compartilhado */}
