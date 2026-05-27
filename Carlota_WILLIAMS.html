@@ -1275,6 +1275,399 @@ function ProgPage({ profile, state, onSaveMetas }) {
 // PAGE: TREINO
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// EXERCISE LIBRARY — biblioteca de nomes canônicos de exercícios
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const EX_LIB_KEY = 'carlota_ex_lib';
+const PT_SKIP    = new Set(['com','de','do','da','dos','das','em','e','a','o','os','as','por','para','no','na','nos','nas','ao','aos']);
+
+function normalizeExName(raw) {
+  return raw.trim().replace(/\s+/g,' ')
+    .split(' ')
+    .map((w,i) => (i===0 || !PT_SKIP.has(w.toLowerCase()))
+      ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+      : w.toLowerCase())
+    .join(' ');
+}
+
+function getExLib() {
+  try {
+    const raw = localStorage.getItem(EX_LIB_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  // Pré-popula com todos os exercícios do FK_WK
+  const names = new Set();
+  FK_WK.forEach(wk => wk.ex.forEach(ex => names.add(ex.name)));
+  const lib = [...names].sort((a,b) => a.localeCompare(b,'pt-BR'));
+  try { localStorage.setItem(EX_LIB_KEY, JSON.stringify(lib)); } catch(e) {}
+  return lib;
+}
+
+function saveToExLib(name) {
+  const lib  = getExLib();
+  const norm = normalizeExName(name);
+  if (!lib.some(n => n.toLowerCase() === norm.toLowerCase())) {
+    lib.push(norm);
+    lib.sort((a,b) => a.localeCompare(b,'pt-BR'));
+    try { localStorage.setItem(EX_LIB_KEY, JSON.stringify(lib)); } catch(e) {}
+  }
+  return norm;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// EXERCISE SEARCH MODAL — bottom sheet com busca na biblioteca
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function ExerciseSearchModal({ onSelect, onClose }) {
+  const [query, setQuery] = React.useState('');
+  const lib = React.useMemo(() => getExLib(), []);
+
+  const filtered = query.length < 1
+    ? lib
+    : lib.filter(n => n.toLowerCase().includes(query.toLowerCase()));
+
+  const trimmed  = query.trim();
+  const canAdd   = trimmed.length > 2 &&
+                   !lib.some(n => n.toLowerCase() === trimmed.toLowerCase());
+
+  const handleSelect = (name) => { saveToExLib(name); onSelect(name); };
+  const handleAddNew = () => { onSelect(saveToExLib(trimmed)); };
+
+  return (
+    <div style={{position:'fixed',inset:0,zIndex:999,background:'rgba(0,0,0,.8)',display:'flex',flexDirection:'column'}}
+         onClick={e => { if(e.target===e.currentTarget) onClose(); }}>
+      <div style={{
+        background:T.surface, borderRadius:'20px 20px 0 0',
+        marginTop:'auto', maxHeight:'78vh', display:'flex', flexDirection:'column',
+        border:`1px solid ${T.border}`, borderBottom:'none'
+      }}>
+        {/* Header */}
+        <div style={{padding:'16px 16px 12px',display:'flex',alignItems:'center',gap:10,borderBottom:`1px solid ${T.border}`}}>
+          <input
+            autoFocus
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Buscar exercício..."
+            style={{
+              flex:1, background:T.card, border:`1px solid ${T.border}`,
+              borderRadius:10, padding:'10px 14px', fontFamily:'Geist,sans-serif',
+              fontSize:14, color:'#fff', outline:'none'
+            }}
+          />
+          <button onClick={onClose} style={{
+            background:'transparent',border:'none',color:T.muted,
+            fontFamily:T.mono,fontSize:12,cursor:'pointer',padding:'8px',flexShrink:0
+          }}>✕</button>
+        </div>
+        {/* List */}
+        <div style={{overflowY:'auto',flex:1}}>
+          {canAdd && (
+            <button onClick={handleAddNew} style={{
+              width:'100%',textAlign:'left',padding:'14px 16px',
+              background:'transparent',border:'none',borderBottom:`1px solid ${T.border}`,
+              cursor:'pointer',fontFamily:'Geist,sans-serif',fontSize:13,
+              color:'#a3e635',display:'flex',alignItems:'center',gap:10
+            }}>
+              <span style={{
+                fontFamily:T.mono,fontSize:9,background:'#a3e63520',
+                padding:'2px 8px',borderRadius:4,border:'1px solid #a3e63540',flexShrink:0
+              }}>+ NOVO</span>
+              {normalizeExName(trimmed)}
+            </button>
+          )}
+          {filtered.map(name => (
+            <button key={name} onClick={() => handleSelect(name)} style={{
+              width:'100%',textAlign:'left',padding:'14px 16px',
+              background:'transparent',border:'none',borderBottom:`1px solid ${T.border}`,
+              cursor:'pointer',fontFamily:'Geist,sans-serif',fontSize:13,color:'#fff'
+            }}>
+              {name}
+            </button>
+          ))}
+          {filtered.length === 0 && !canAdd && (
+            <div style={{padding:'32px 16px',textAlign:'center',fontFamily:T.mono,fontSize:11,color:T.muted}}>
+              Nenhum exercício encontrado
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CUSTOM EX CARD — exercício com sets dinâmicos (add/remove por série)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function CustomExCard({ exIdx, name, sets, obs, onUpdate, onRemove, isOpen, onToggle, ac }) {
+  const done = sets.filter(s => s.done).length;
+
+  const updateSet = (i, field, val) =>
+    onUpdate(sets.map((s,si) => si===i ? {...s,[field]:val} : s), obs);
+
+  const toggleDone = (i) => {
+    const next = sets.map((s,si) => {
+      if (si !== i) return s;
+      if (!s.done) return {...s, done:true};
+      return {...s, done:false};
+    });
+    onUpdate(next, obs);
+  };
+
+  const addSet = () => {
+    const last = sets[sets.length-1] || {};
+    onUpdate([...sets, {kg: last.kg||'', reps: last.reps||'', done:false}], obs);
+  };
+
+  const removeSet = (i) => {
+    if (sets.length <= 1) return;
+    onUpdate(sets.filter((_,si) => si!==i), obs);
+  };
+
+  return (
+    <div style={{
+      background:T.surface, borderRadius:'0 12px 12px 0',
+      border:`1px solid ${T.border}`, borderLeft:`2px solid ${ac}`,
+      marginBottom:8, overflow:'hidden'
+    }}>
+      <button onClick={onToggle} style={{
+        width:'100%',textAlign:'left',background:'transparent',
+        border:'none',cursor:'pointer',padding:'12px 14px 10px'
+      }}>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10}}>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontFamily:T.mono,fontSize:10,letterSpacing:'2px',color:T.muted,textTransform:'uppercase',marginBottom:3}}>
+              EX {String(exIdx+1).padStart(2,'0')}
+              {done > 0 && <span style={{color:ac,marginLeft:6}}>{done===sets.length?'✓':`${done}/${sets.length}`}</span>}
+            </div>
+            <div style={{fontSize:13,fontWeight:600,color:'#fff',lineHeight:1.35}}>{name}</div>
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:8}}>
+            <button
+              onClick={e=>{e.stopPropagation();onRemove();}}
+              style={{
+                background:'transparent',border:`1px solid ${T.border}`,borderRadius:6,
+                color:T.muted,fontSize:11,cursor:'pointer',padding:'3px 8px',fontFamily:T.mono
+              }}
+            >✕</button>
+            <div style={{fontFamily:T.mono,fontSize:10,color:T.muted,flexShrink:0}}>{isOpen?'▲':'▼'}</div>
+          </div>
+        </div>
+      </button>
+
+      {isOpen && (
+        <div className="anim-fadein" style={{
+          borderTop:`1px solid ${T.border}`,background:'#050505',padding:'12px 14px 14px'
+        }}>
+          {/* Column headers */}
+          <div style={{display:'grid',gridTemplateColumns:'22px 1fr 1fr 38px 30px',gap:6,marginBottom:6}}>
+            {['','KG','REPS','',''].map((h,i)=>(
+              <div key={i} style={{fontFamily:T.mono,fontSize:10,letterSpacing:'2px',color:T.muted,textAlign:'center',textTransform:'uppercase'}}>{h}</div>
+            ))}
+          </div>
+
+          {sets.map((s,i) => (
+            <div key={i} style={{display:'grid',gridTemplateColumns:'22px 1fr 1fr 38px 30px',gap:6,marginBottom:6,alignItems:'center'}}>
+              <div style={{fontFamily:T.mono,fontSize:13,fontWeight:700,textAlign:'center',color:s.done?ac:T.muted}}>{i+1}</div>
+              <input
+                type="number" inputMode="decimal"
+                placeholder="kg"
+                value={s.kg} onChange={e=>updateSet(i,'kg',e.target.value)}
+                style={{
+                  background:T.card,border:`1.5px solid ${s.done?`${ac}40`:T.border}`,
+                  borderRadius:8,padding:'10px 4px',fontFamily:T.mono,
+                  fontSize:15,fontWeight:600,color:s.done?T.dim:'#fff',
+                  textAlign:'center',outline:'none',width:'100%',
+                  opacity:s.done?0.4:1,transition:'all .15s'
+                }}
+              />
+              <input
+                type="number" inputMode="numeric"
+                placeholder="reps"
+                value={s.reps} onChange={e=>updateSet(i,'reps',e.target.value)}
+                style={{
+                  background:T.card,border:`1.5px solid ${s.done?`${ac}40`:T.border}`,
+                  borderRadius:8,padding:'10px 4px',fontFamily:T.mono,
+                  fontSize:15,fontWeight:600,color:s.done?T.dim:'#fff',
+                  textAlign:'center',outline:'none',width:'100%',
+                  opacity:s.done?0.4:1,transition:'all .15s'
+                }}
+              />
+              <button onClick={()=>toggleDone(i)} style={{
+                width:38,height:40,borderRadius:8,border:`1.5px solid ${s.done?ac:T.border}`,
+                background:s.done?ac:T.card,color:s.done?'#000':T.muted,
+                fontSize:14,fontWeight:700,cursor:'pointer',transition:'all .15s',
+                display:'flex',alignItems:'center',justifyContent:'center'
+              }}>{s.done?'✓':'○'}</button>
+              <button onClick={()=>removeSet(i)} style={{
+                width:30,height:40,borderRadius:8,border:`1px solid ${T.border}`,
+                background:'transparent',color:T.muted,fontSize:18,cursor:sets.length<=1?'not-allowed':'pointer',
+                display:'flex',alignItems:'center',justifyContent:'center',
+                opacity:sets.length<=1?0.3:1
+              }}>−</button>
+            </div>
+          ))}
+
+          <button onClick={addSet} style={{
+            width:'100%',marginTop:4,padding:'8px',
+            background:'transparent',border:`1px dashed ${ac}40`,
+            borderRadius:8,fontFamily:T.mono,fontSize:9,
+            letterSpacing:'1px',textTransform:'uppercase',color:ac,cursor:'pointer'
+          }}>+ SÉRIE</button>
+
+          <textarea
+            value={obs}
+            onChange={e=>onUpdate(sets,e.target.value)}
+            placeholder="Observações..."
+            rows={2}
+            style={{
+              width:'100%',marginTop:8,padding:'8px 10px',
+              background:T.card,border:`1px solid ${T.border}`,
+              borderRadius:8,fontFamily:'Geist,sans-serif',fontSize:11,
+              color:T.subtle,resize:'none',outline:'none',lineHeight:1.5
+            }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CUSTOM WORKOUT BUILDER — montagem do treino personalizado do dia
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function CustomWorkoutBuilder({ profile, onSaveCustom, savingWk, ac }) {
+  const STORAGE_KEY  = `cw_${profile}_CUSTOM`;
+  const ZONE_OPTIONS = ['FORÇA','HIPERTROFIA','METABÓLICO'];
+
+  const [exercises, setExercises] = React.useState(() => {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { return []; }
+  });
+  const [zone,       setZone]       = React.useState('HIPERTROFIA');
+  const [showSearch, setShowSearch] = React.useState(false);
+  const [openExIdx,  setOpenExIdx]  = React.useState(null);
+
+  const isSaving = savingWk === `${profile}-CUSTOM`;
+
+  const persist = (exs) => {
+    setExercises(exs);
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(exs)); } catch(e) {}
+  };
+
+  const addExercise = (name) => {
+    const newEx = {
+      name,
+      sets: [{kg:'',reps:'',done:false},{kg:'',reps:'',done:false},{kg:'',reps:'',done:false}],
+      obs: ''
+    };
+    const next = [...exercises, newEx];
+    persist(next);
+    setOpenExIdx(next.length - 1);
+    setShowSearch(false);
+  };
+
+  const updateExercise = (i, sets, obs) =>
+    persist(exercises.map((ex,ei) => ei===i ? {...ex,sets,obs} : ex));
+
+  const removeExercise = (i) => {
+    persist(exercises.filter((_,ei) => ei!==i));
+    setOpenExIdx(idx => idx===i ? null : idx>i ? idx-1 : idx);
+  };
+
+  const handleSave = () => onSaveCustom(profile, exercises, zone);
+
+  const zc = ZONE_COLORS[zone] || ac;
+
+  return (
+    <div className="pb-safe">
+      {/* Tab strip placeholder — mantém alinhamento com os outros treinos */}
+      <div style={{padding:'16px 16px 0'}}>
+        {/* Header */}
+        <div style={{marginBottom:20}}>
+          <div style={{fontFamily:T.mono,fontSize:38,fontWeight:900,letterSpacing:'4px',lineHeight:1,color:'#fff',marginBottom:4}}>
+            CUSTOM
+          </div>
+          <div style={{fontSize:12,color:T.dim,marginBottom:14}}>Treino personalizado do dia</div>
+
+          {/* Zone selector */}
+          <div style={{display:'flex',gap:6,marginBottom:14,flexWrap:'wrap'}}>
+            {ZONE_OPTIONS.map(z => (
+              <button key={z} onClick={() => setZone(z)} style={{
+                padding:'5px 12px',borderRadius:4,fontFamily:T.mono,
+                fontSize:9,letterSpacing:'2px',textTransform:'uppercase',
+                cursor:'pointer',transition:'all .15s',
+                background: zone===z ? `${ZONE_COLORS[z]}18` : 'transparent',
+                color:       zone===z ? ZONE_COLORS[z] : T.muted,
+                border:      `1px solid ${zone===z ? ZONE_COLORS[z]+'30' : T.border}`
+              }}>{z}</button>
+            ))}
+          </div>
+        </div>
+
+        {/* Exercise list */}
+        {exercises.length > 0 && (
+          <>
+            <SLabel>Exercícios · toque para registrar</SLabel>
+            {exercises.map((ex,i) => (
+              <CustomExCard
+                key={i}
+                exIdx={i}
+                name={ex.name}
+                sets={ex.sets}
+                obs={ex.obs}
+                ac={ac}
+                isOpen={openExIdx===i}
+                onToggle={() => setOpenExIdx(openExIdx===i ? null : i)}
+                onUpdate={(sets,obs) => updateExercise(i,sets,obs)}
+                onRemove={() => removeExercise(i)}
+              />
+            ))}
+          </>
+        )}
+
+        {exercises.length === 0 && (
+          <div style={{
+            textAlign:'center',padding:'48px 0 32px',
+            color:T.muted,fontFamily:T.mono,fontSize:11,lineHeight:1.8
+          }}>
+            Nenhum exercício adicionado<br/>
+            <span style={{color:T.border}}>Toque em "+ Adicionar Exercício" para começar</span>
+          </div>
+        )}
+
+        {/* Add exercise */}
+        <button onClick={() => setShowSearch(true)} style={{
+          width:'100%',marginBottom:16,padding:'14px',borderRadius:12,
+          border:`1px dashed ${ac}50`,background:'transparent',
+          fontFamily:T.mono,fontSize:10,letterSpacing:'2px',textTransform:'uppercase',
+          color:ac,cursor:'pointer'
+        }}>+ Adicionar Exercício</button>
+
+        {/* Save button */}
+        {exercises.length > 0 && (
+          <div style={{marginBottom:24}}>
+            <button
+              onClick={handleSave}
+              disabled={isSaving}
+              style={{
+                width:'100%',padding:'16px',borderRadius:12,border:'none',cursor:'pointer',
+                fontFamily:T.mono,fontSize:11,fontWeight:700,
+                letterSpacing:'3px',textTransform:'uppercase',
+                background:isSaving?'#10b981':'#fff',color:'#000',transition:'all .2s'
+              }}
+            >
+              {isSaving ? '✓ TREINO SALVO' : '↑ SALVAR TREINO'}
+            </button>
+            <div style={{textAlign:'center',marginTop:8,fontFamily:T.mono,fontSize:9,color:T.muted}}>
+              {exercises.length} exercício{exercises.length!==1?'s':''} · zona {zone}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {showSearch && <ExerciseSearchModal onSelect={addExercise} onClose={() => setShowSearch(false)} />}
+    </div>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // INSIGHT CARD — card individual (usado no carrossel em modo compacto/expandido)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function InsightCard({ insightData, expanded, onToggle }) {
@@ -1472,16 +1865,19 @@ function InsightsCarousel({ insights, ac }) {
   );
 }
 
-function TreinoPage({ profile, state, onSave, savingWk, activeWk, setActiveWk }) {
-  const ac = PROFILE_COLORS[profile];
+function TreinoPage({ profile, state, onSave, onSaveCustom, savingWk, activeWk, setActiveWk }) {
+  const ac  = PROFILE_COLORS[profile];
   const wks = profile==='fk' ? FK_WK : JRV_WK;
+  const CUSTOM_IDX = wks.length;
+  const isCustom   = activeWk === CUSTOM_IDX;
+
   // activeWk é controlado pelo App — mantém o mesmo card ao trocar de perfil
-  const safeWk = Math.min(activeWk, wks.length - 1);
-  const wk = wks[safeWk];
-  const last = state.hist.find(h => h.wkId===wk.id);
-  const zc = ZONE_COLORS[wk.zone] || ac;
-  const saveKey = `${profile}-${safeWk}`;
-  const isSaving = savingWk === saveKey;
+  const safeWk = isCustom ? CUSTOM_IDX : Math.min(activeWk, wks.length - 1);
+  const wk     = isCustom ? null : wks[safeWk];
+  const last   = wk ? state.hist.find(h => h.wkId===wk.id) : null;
+  const zc     = wk ? (ZONE_COLORS[wk.zone] || ac) : ac;
+  const saveKey   = `${profile}-${safeWk}`;
+  const isSaving  = savingWk === saveKey;
 
   // openExIdx vive aqui (acima dos ExCard) — sobrevive à troca de perfil
   const [openExIdx, setOpenExIdx] = useState(null);
@@ -1501,15 +1897,33 @@ function TreinoPage({ profile, state, onSave, savingWk, activeWk, setActiveWk })
             border:'none', cursor:'pointer', background:'transparent',
             fontFamily:T.mono, fontSize:9, letterSpacing:'1.5px', textTransform:'uppercase',
             transition:'all .15s',
-            color: safeWk===i ? ac : T.muted,
-            borderBottom: `2px solid ${safeWk===i ? ac : 'transparent'}`,
+            color: (!isCustom && safeWk===i) ? ac : T.muted,
+            borderBottom: `2px solid ${(!isCustom && safeWk===i) ? ac : 'transparent'}`,
           }}>
             {w.label}
           </button>
         ))}
+        {/* Tab CUSTOM */}
+        <button onClick={() => setActiveWk(CUSTOM_IDX)} style={{
+          flexShrink:0, padding:'10px 12px',
+          border:'none', cursor:'pointer', background:'transparent',
+          fontFamily:T.mono, fontSize:9, letterSpacing:'1.5px', textTransform:'uppercase',
+          transition:'all .15s',
+          color: isCustom ? ac : T.muted,
+          borderBottom: `2px solid ${isCustom ? ac : 'transparent'}`,
+        }}>+ CUSTOM</button>
       </div>
 
-      <div style={{padding:'16px 16px 0'}}>
+      {/* Tela de montagem do treino personalizado */}
+      {isCustom && (
+        <CustomWorkoutBuilder
+          profile={profile}
+          onSaveCustom={onSaveCustom}
+          savingWk={savingWk}
+          ac={ac}
+        />
+      )}
+      {!isCustom && <div style={{padding:'16px 16px 0'}}>
         {/* Workout header — spacious for in-gym use */}
         <div style={{marginBottom:20}}>
           <div style={{fontFamily:T.mono, fontSize:38, fontWeight:900, letterSpacing:'4px', lineHeight:1, color:'#fff', marginBottom:4}}>
@@ -1628,7 +2042,7 @@ function TreinoPage({ profile, state, onSave, savingWk, activeWk, setActiveWk })
           <div style={{fontFamily:T.mono, fontSize:8, letterSpacing:'3px', textTransform:'uppercase', color:ac, marginBottom:6}}>💡 DICA</div>
           <div style={{fontSize:11, color:T.subtle, lineHeight:1.7}}>{wk.tip}</div>
         </div>
-      </div>
+      </div>}
     </div>
   );
 }
@@ -2337,6 +2751,35 @@ function App() {
     }, 2200);
   };
 
+  const handleSaveCustomWorkout = async (p, exercises, zone) => {
+    if (!exercises.length) { alert('Adicione pelo menos um exercício.'); return; }
+    const ac = PROFILE_COLORS[p];
+    const exData = exercises
+      .map((ex, i) => {
+        const sets = (ex.sets||[])
+          .filter(s => s.done || s.kg || s.reps)
+          .map((s, j) => ({s:j+1, kg:s.kg||'', reps:s.reps||'', done:s.done||false}));
+        return sets.length ? {n:String(i+1).padStart(2,'0'), name:ex.name, sets, obs:ex.obs||''} : null;
+      })
+      .filter(Boolean);
+
+    if (!exData.length) { alert('Registre pelo menos uma série antes de salvar.'); return; }
+
+    const key = `${p}-CUSTOM`;
+    setSavingWk(key);
+    const entry = {
+      id: Date.now(), wkId:'CUSTOM', title:'Personalizado',
+      zone, zc:ac, date:new Date().toISOString(), exercises:exData
+    };
+    await apiPost({action:'saveWorkout', profile:p, workout:entry});
+    setState(prev => ({...prev, [p]: {...prev[p], hist:[entry,...prev[p].hist]}}));
+
+    setTimeout(() => {
+      setSavingWk(null);
+      try { localStorage.removeItem(`cw_${p}_CUSTOM`); } catch(e) {}
+    }, 2200);
+  };
+
   const handleDeleteHist = async (p, id) => {
     if (!confirm('Remover este registro?')) return;
     setState(prev => ({...prev, [p]: {...prev[p], hist:prev[p].hist.filter(h=>String(h.id)!==String(id))}}));
@@ -2366,7 +2809,7 @@ function App() {
 
       <main style={{background:T.bg}}>
         {activeTab==='prog'   && <ProgPage   profile={profile} state={state[profile]} onSaveMetas={handleSaveMetas} />}
-        {activeTab==='treino' && <TreinoPage profile={profile} state={state[profile]} onSave={handleSaveWorkout} savingWk={savingWk} activeWk={activeWk} setActiveWk={setActiveWk} />}
+        {activeTab==='treino' && <TreinoPage profile={profile} state={state[profile]} onSave={handleSaveWorkout} onSaveCustom={handleSaveCustomWorkout} savingWk={savingWk} activeWk={activeWk} setActiveWk={setActiveWk} />}
         {activeTab==='hist'   && <HistPage   profile={profile} state={state[profile]} onDelete={handleDeleteHist} />}
       </main>
 
