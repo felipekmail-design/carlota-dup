@@ -1621,11 +1621,11 @@ function CustomWorkoutBuilder({ profile, onSaveCustom, savingWk, ac }) {
           {sharedBy && (
             <div style={{
               padding:'8px 12px',borderRadius:8,marginBottom:12,
-              background:'#a3e63510',border:'1px solid #a3e63530',
+              background:`${ac}10`,border:`1px solid ${ac}30`,
               display:'flex',alignItems:'center',gap:8
             }}>
               <span style={{fontSize:12}}>🔗</span>
-              <div style={{fontFamily:T.mono,fontSize:9,color:'#a3e635',letterSpacing:'1px'}}>
+              <div style={{fontFamily:T.mono,fontSize:9,color:ac,letterSpacing:'1px'}}>
                 Exercícios compartilhados por {sharedBy.toUpperCase()} · Preencha sua própria carga
               </div>
             </div>
@@ -1662,13 +1662,13 @@ function CustomWorkoutBuilder({ profile, onSaveCustom, savingWk, ac }) {
 
           {/* Toggle compartilhado */}
           <button onClick={toggleShared} style={{
-            display:'flex',alignItems:'center',gap:8,
-            background:'transparent',border:`1px solid ${shared?'#a3e63540':T.border}`,
-            borderRadius:8,padding:'8px 12px',cursor:'pointer',width:'100%',marginBottom:4
+            display:'flex',alignItems:'center',gap:10,
+            background:'transparent',border:`1px solid ${shared?ac+'40':T.border}`,
+            borderRadius:8,padding:'10px 14px',cursor:'pointer',width:'100%',marginTop:8
           }}>
             <div style={{
               width:32,height:18,borderRadius:9,transition:'all .2s',position:'relative',
-              background:shared?'#a3e635':'#333',flexShrink:0
+              background:shared?ac:'#333',flexShrink:0
             }}>
               <div style={{
                 position:'absolute',top:2,left:shared?14:2,
@@ -1676,11 +1676,11 @@ function CustomWorkoutBuilder({ profile, onSaveCustom, savingWk, ac }) {
               }}/>
             </div>
             <div style={{textAlign:'left'}}>
-              <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:'1px',textTransform:'uppercase',color:shared?'#a3e635':T.muted}}>
+              <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:'1px',textTransform:'uppercase',color:shared?ac:T.muted}}>
                 {shared ? 'Compartilhado com '+OTHER.toUpperCase() : 'Só para mim'}
               </div>
               {shared && (
-                <div style={{fontFamily:T.mono,fontSize:8,color:T.muted,marginTop:1}}>
+                <div style={{fontFamily:T.mono,fontSize:8,color:T.muted,marginTop:2}}>
                   {OTHER.toUpperCase()} verá os exercícios e preencherá a própria carga
                 </div>
               )}
@@ -1744,7 +1744,7 @@ function CustomWorkoutBuilder({ profile, onSaveCustom, savingWk, ac }) {
             </button>
             <div style={{textAlign:'center',marginTop:8,fontFamily:T.mono,fontSize:9,color:T.muted}}>
               {exercises.length} exercício{exercises.length!==1?'s':''} · zona {zone}
-              {shared && <span style={{color:'#a3e635',marginLeft:6}}>· compartilhado</span>}
+              {shared && <span style={{color:ac,marginLeft:6}}>· compartilhado</span>}
             </div>
           </div>
         )}
