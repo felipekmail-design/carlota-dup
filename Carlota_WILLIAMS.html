@@ -1396,17 +1396,21 @@ function ExerciseSearchModal({ onSelect, onClose }) {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // CUSTOM EX CARD — exercício com sets dinâmicos (add/remove por série)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function CustomExCard({ exIdx, name, sets, obs, onUpdate, onRemove, isOpen, onToggle, ac }) {
+function CustomExCard({ exIdx, name, sets, obs, onUpdate, onRemove, isOpen, onToggle, ac, lastRef }) {
   const done = sets.filter(s => s.done).length;
 
   const updateSet = (i, field, val) =>
     onUpdate(sets.map((s,si) => si===i ? {...s,[field]:val} : s), obs);
 
   const toggleDone = (i) => {
-    const next = sets.map((s,si) => {
+    const next = sets.map((s, si) => {
       if (si !== i) return s;
-      if (!s.done) return {...s, done:true};
-      return {...s, done:false};
+      if (!s.done) {
+        const phKg   = String(lastRef?.sets?.find(ls => ls.s === i+1)?.kg   || '');
+        const phReps = String(lastRef?.sets?.find(ls => ls.s === i+1)?.reps || '');
+        return { ...s, done: true, kg: s.kg || phKg, reps: s.reps || phReps };
+      }
+      return { ...s, done: false };
     });
     onUpdate(next, obs);
   };
@@ -1456,6 +1460,20 @@ function CustomExCard({ exIdx, name, sets, obs, onUpdate, onRemove, isOpen, onTo
         <div className="anim-fadein" style={{
           borderTop:`1px solid ${T.border}`,background:'#050505',padding:'12px 14px 14px'
         }}>
+          {/* Referência da última vez */}
+          {lastRef && (
+            <div style={{
+              padding:'8px 10px',borderRadius:8,marginBottom:10,
+              background:'#fbbf2408',border:'1px solid #fbbf2420'
+            }}>
+              <div style={{fontFamily:T.mono,fontSize:10,letterSpacing:'2px',color:'#a16207',textTransform:'uppercase',marginBottom:3}}>
+                🕐 última vez · {fmtDate(lastRef.date)}
+              </div>
+              <div style={{fontFamily:T.mono,fontSize:10,color:'#78450c',lineHeight:1.6}}>
+                {lastRef.sets?.map(s=>`S${s.s}:${s.kg||'?'}kg×${s.reps||'?'}`).join(' · ')}
+              </div>
+            </div>
+          )}
           {/* Column headers */}
           <div style={{display:'grid',gridTemplateColumns:'22px 1fr 1fr 38px 30px',gap:6,marginBottom:6}}>
             {['','KG','REPS','',''].map((h,i)=>(
@@ -1468,7 +1486,7 @@ function CustomExCard({ exIdx, name, sets, obs, onUpdate, onRemove, isOpen, onTo
               <div style={{fontFamily:T.mono,fontSize:13,fontWeight:700,textAlign:'center',color:s.done?ac:T.muted}}>{i+1}</div>
               <input
                 type="number" inputMode="decimal"
-                placeholder="kg"
+                placeholder={lastRef?.sets?.find(ls => ls.s === i+1)?.kg || '—'}
                 value={s.kg} onChange={e=>updateSet(i,'kg',e.target.value)}
                 style={{
                   background:T.card,border:`1.5px solid ${s.done?`${ac}40`:T.border}`,
@@ -1480,7 +1498,7 @@ function CustomExCard({ exIdx, name, sets, obs, onUpdate, onRemove, isOpen, onTo
               />
               <input
                 type="number" inputMode="numeric"
-                placeholder="reps"
+                placeholder={lastRef?.sets?.find(ls => ls.s === i+1)?.reps || '—'}
                 value={s.reps} onChange={e=>updateSet(i,'reps',e.target.value)}
                 style={{
                   background:T.card,border:`1.5px solid ${s.done?`${ac}40`:T.border}`,
@@ -1533,7 +1551,7 @@ function CustomExCard({ exIdx, name, sets, obs, onUpdate, onRemove, isOpen, onTo
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // CUSTOM WORKOUT BUILDER — montagem do treino personalizado do dia
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function CustomWorkoutBuilder({ profile, onSaveCustom, savingWk, ac }) {
+function CustomWorkoutBuilder({ profile, state, onSaveCustom, savingWk, ac }) {
   const STORAGE_KEY  = `cw_${profile}_CUSTOM`;
   const OTHER        = profile === 'fk' ? 'jrv' : 'fk';
   const OTHER_KEY    = `cw_${OTHER}_CUSTOM`;
@@ -1607,6 +1625,16 @@ function CustomWorkoutBuilder({ profile, onSaveCustom, savingWk, ac }) {
 
   const handleSave = () => onSaveCustom(profile, exercises, zone);
 
+  // Busca última referência de um exercício pelo nome no histórico
+  const getLastRef = (name) => {
+    const hist = state?.hist || [];
+    for (const entry of hist) {
+      const found = (entry.exercises||[]).find(e => e.name === name);
+      if (found) return { date: entry.date, sets: found.sets };
+    }
+    return null;
+  };
+
   return (
     <div className="pb-safe">
       <div style={{padding:'16px 16px 0'}}>
@@ -1617,22 +1645,8 @@ function CustomWorkoutBuilder({ profile, onSaveCustom, savingWk, ac }) {
           </div>
           <div style={{fontSize:12,color:T.dim,marginBottom:14}}>Treino personalizado do dia</div>
 
-          {/* Aviso de treino compartilhado recebido */}
-          {sharedBy && (
-            <div style={{
-              padding:'8px 12px',borderRadius:8,marginBottom:12,
-              background:`${ac}10`,border:`1px solid ${ac}30`,
-              display:'flex',alignItems:'center',gap:8
-            }}>
-              <span style={{fontSize:12}}>🔗</span>
-              <div style={{fontFamily:T.mono,fontSize:9,color:ac,letterSpacing:'1px'}}>
-                Exercícios compartilhados por {sharedBy.toUpperCase()} · Preencha sua própria carga
-              </div>
-            </div>
-          )}
-
-          {/* Zone selector */}
-          <div style={{display:'flex',gap:6,marginBottom:8,flexWrap:'wrap'}}>
+          {/* Zone selector — mesmo estilo do badge de zona dos treinos programados */}
+          <div style={{display:'flex',gap:6,marginBottom:14,flexWrap:'wrap'}}>
             {ZONE_OPTIONS.map(z => (
               <button key={z} onClick={() => setZone(z)} style={{
                 padding:'5px 12px',borderRadius:4,fontFamily:T.mono,
@@ -1645,7 +1659,7 @@ function CustomWorkoutBuilder({ profile, onSaveCustom, savingWk, ac }) {
             ))}
           </div>
 
-          {/* Zone info — reps e descanso no mesmo padrão visual dos treinos programados */}
+          {/* Zone info — mesmo padrão visual dos stats grid dos treinos programados */}
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:14}}>
             {[['Reps', zoneInfo.reps],['Descanso', zoneInfo.rest]].map(([lbl,val]) => (
               <div key={lbl} style={{
@@ -1658,11 +1672,25 @@ function CustomWorkoutBuilder({ profile, onSaveCustom, savingWk, ac }) {
             ))}
           </div>
 
+          {/* Aviso de treino compartilhado recebido */}
+          {sharedBy && (
+            <div style={{
+              padding:'10px 12px',borderRadius:'0 10px 10px 0',marginBottom:14,
+              background:`${ac}0d`,border:`1px solid ${T.border}`,borderLeftWidth:2,borderLeftColor:ac,
+              display:'flex',alignItems:'center',gap:8
+            }}>
+              <span style={{fontSize:12}}>🔗</span>
+              <div style={{fontFamily:T.mono,fontSize:9,color:ac,letterSpacing:'1px'}}>
+                Exercícios de {sharedBy.toUpperCase()} · Preencha sua própria carga
+              </div>
+            </div>
+          )}
+
           {/* Toggle compartilhado */}
           <button onClick={toggleShared} style={{
             display:'flex',alignItems:'center',gap:10,
             background:'transparent',border:`1px solid ${shared?ac+'40':T.border}`,
-            borderRadius:8,padding:'10px 14px',cursor:'pointer',width:'100%',marginTop:8
+            borderRadius:10,padding:'10px 14px',cursor:'pointer',width:'100%'
           }}>
             <div style={{
               width:32,height:18,borderRadius:9,transition:'all .2s',position:'relative',
@@ -1698,6 +1726,7 @@ function CustomWorkoutBuilder({ profile, onSaveCustom, savingWk, ac }) {
                 sets={ex.sets}
                 obs={ex.obs}
                 ac={ac}
+                lastRef={getLastRef(ex.name)}
                 isOpen={openExIdx===i}
                 onToggle={() => setOpenExIdx(openExIdx===i ? null : i)}
                 onUpdate={(sets,obs) => updateExercise(i,sets,obs)}
@@ -2004,6 +2033,7 @@ function TreinoPage({ profile, state, onSave, onSaveCustom, savingWk, activeWk, 
       {isCustom && (
         <CustomWorkoutBuilder
           profile={profile}
+          state={state}
           onSaveCustom={onSaveCustom}
           savingWk={savingWk}
           ac={ac}
