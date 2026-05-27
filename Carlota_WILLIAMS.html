@@ -70,8 +70,9 @@ const { useState, useEffect, useRef, useCallback, useMemo } = React;
 // CONSTANTS
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const API_URL = 'https://script.google.com/macros/s/AKfycbxcvOvWl5xyW5MKihdPYBz7qgAC2kWOrbGMLRfQ5s0udwSL92ErhsEY6oOsAD1ceae4/exec';
-const PROFILE_COLORS = { fk: '#F59300', jrv: '#00C8FF' };
-const ZONE_COLORS = { 'FORÇA': '#F59300', 'HIPERTROFIA': '#818cf8', 'METABÓLICO': '#10b981' };
+const PROFILE_COLORS  = { fk: '#F59300', jrv: '#00C8FF' };
+const ZONE_COLORS     = { 'FORÇA': '#F59300', 'HIPERTROFIA': '#818cf8', 'METABÓLICO': '#10b981' };
+const CUSTOM_WK_IDX   = 999; // índice sentinel fixo para o tab CUSTOM — igual para ambos os perfis
 
 // ── CONFIG ────────────────────────────────────────────────────────────────────
 const APP_PIN          = '1215';  // ← PIN de F.K.
@@ -1983,11 +1984,10 @@ function InsightsCarousel({ insights, ac }) {
 function TreinoPage({ profile, state, onSave, onSaveCustom, savingWk, activeWk, setActiveWk }) {
   const ac  = PROFILE_COLORS[profile];
   const wks = profile==='fk' ? FK_WK : JRV_WK;
-  const CUSTOM_IDX = wks.length;
-  const isCustom   = activeWk === CUSTOM_IDX;
+  const isCustom = activeWk === CUSTOM_WK_IDX;
 
   // activeWk é controlado pelo App — mantém o mesmo card ao trocar de perfil
-  const safeWk = isCustom ? CUSTOM_IDX : Math.min(activeWk, wks.length - 1);
+  const safeWk = isCustom ? CUSTOM_WK_IDX : Math.min(activeWk, wks.length - 1);
   const wk     = isCustom ? null : wks[safeWk];
   const last   = wk ? state.hist.find(h => h.wkId===wk.id) : null;
   const zc     = wk ? (ZONE_COLORS[wk.zone] || ac) : ac;
@@ -2019,7 +2019,7 @@ function TreinoPage({ profile, state, onSave, onSaveCustom, savingWk, activeWk, 
           </button>
         ))}
         {/* Tab CUSTOM */}
-        <button onClick={() => setActiveWk(CUSTOM_IDX)} style={{
+        <button onClick={() => setActiveWk(CUSTOM_WK_IDX)} style={{
           flexShrink:0, padding:'10px 12px',
           border:'none', cursor:'pointer', background:'transparent',
           fontFamily:T.mono, fontSize:9, letterSpacing:'1.5px', textTransform:'uppercase',
