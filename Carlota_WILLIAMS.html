@@ -1265,6 +1265,204 @@ function ProgPage({ profile, state, onSaveMetas }) {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PAGE: TREINO
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// INSIGHT CARD — card individual (usado no carrossel em modo compacto/expandido)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function InsightCard({ insightData, expanded, onToggle }) {
+  if (!insightData || !insightData.insights) return null;
+  const { wkId, date, insights } = insightData;
+  const { metrics, comparisons, messages } = insights;
+
+  // Cor da zona ou fallback laranja
+  const zoneColor = (() => {
+    const z = insights.metrics && comparisons ? null : null; // não temos zone aqui diretamente
+    return ZONE_COLORS['FORÇA'] || '#F59300'; // usa a cor do perfil fk como fallback
+  })();
+  const ac = '#F59300'; // insights são sempre do perfil fk por ora
+
+  const DiffBadge = ({ diff }) => {
+    if (!diff) return null;
+    const sign  = diff > 0 ? '+' : '';
+    const color = diff > 0 ? '#10b981' : '#f87171';
+    return <span style={{fontFamily:T.mono,fontSize:7,color,marginLeft:3}}>{sign}{diff}%</span>;
+  };
+
+  const vol    = metrics.volume || 0;
+  const volStr = vol >= 1000 ? (vol/1000).toFixed(1)+'k' : String(vol);
+
+  return (
+    <div
+      onClick={onToggle}
+      style={{
+        borderRadius:12, border:`1px solid ${ac}30`, background:`${ac}07`,
+        overflow:'hidden', cursor:'pointer', transition:'all .2s',
+        flexShrink:0, width:'100%'
+      }}
+    >
+      {/* Header sempre visível */}
+      <div style={{
+        padding:'10px 14px', borderBottom:`1px solid ${ac}18`,
+        display:'flex', justifyContent:'space-between', alignItems:'center'
+      }}>
+        <div style={{display:'flex',alignItems:'center',gap:8}}>
+          <span style={{fontFamily:T.mono,fontSize:8,letterSpacing:'2.5px',textTransform:'uppercase',color:ac}}>
+            ⚡ {wkId}
+          </span>
+        </div>
+        <div style={{display:'flex',alignItems:'center',gap:10}}>
+          <span style={{fontFamily:T.mono,fontSize:8,color:T.muted}}>{date}</span>
+          <span style={{fontFamily:T.mono,fontSize:9,color:T.muted}}>{expanded ? '▲' : '▼'}</span>
+        </div>
+      </div>
+
+      {/* Métricas resumo — sempre visíveis */}
+      <div style={{padding:'10px 10px 8px',display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:5}}>
+        {[
+          {label:'Kcal',    val:metrics.calories, diff:comparisons.calories?.diff},
+          {label:'FC méd',  val:metrics.avgHR,    diff:comparisons.avgHR?.diff},
+          {label:'FC máx',  val:metrics.maxHR,    diff:null},
+          {label:'Dur min', val:metrics.duration, diff:comparisons.duration?.diff},
+          {label:'Vol kg',  val:volStr,            diff:comparisons.volume?.diff},
+        ].map(({label,val,diff}) => (
+          <div key={label} style={{
+            background:T.surface, border:`1px solid ${T.border}`,
+            borderRadius:8, padding:'7px 3px', textAlign:'center'
+          }}>
+            <div style={{fontFamily:T.mono,fontSize:11,fontWeight:700,color:ac,lineHeight:1.1}}>
+              {val > 0 || typeof val === 'string' ? val : '—'}
+              {diff ? <DiffBadge diff={diff}/> : null}
+            </div>
+            <div style={{fontFamily:T.mono,fontSize:6,letterSpacing:'1px',textTransform:'uppercase',color:T.muted,marginTop:2}}>
+              {label}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Densidade — sempre visível */}
+      {comparisons.density?.current > 0 && (
+        <div style={{padding:'0 12px 8px',display:'flex',gap:8,alignItems:'center'}}>
+          <div style={{fontFamily:T.mono,fontSize:7,color:T.muted,letterSpacing:'1px',textTransform:'uppercase'}}>Densidade</div>
+          <div style={{fontFamily:T.mono,fontSize:10,color:ac}}>{comparisons.density.current} kg·rep/min</div>
+          <DiffBadge diff={comparisons.density.diff}/>
+        </div>
+      )}
+
+      {/* Mensagens — só aparecem expandido */}
+      {expanded && messages && messages.length > 0 && (
+        <div style={{borderTop:`1px solid ${ac}15`,padding:'10px 14px 12px'}}>
+          {metrics.postHRV > 0 && (
+            <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:8}}>
+              <div style={{fontFamily:T.mono,fontSize:7,color:T.muted,letterSpacing:'1px',textTransform:'uppercase'}}>HRV pós</div>
+              <div style={{fontFamily:T.mono,fontSize:10,color:ac}}>{metrics.postHRV} ms</div>
+            </div>
+          )}
+          {messages.map((msg,i) => (
+            <div key={i} style={{
+              fontSize:11, color:T.subtle, lineHeight:1.7,
+              paddingLeft:10, borderLeft:`2px solid ${ac}35`,
+              marginBottom: i < messages.length-1 ? 8 : 0
+            }}>
+              {msg}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Preview da primeira mensagem quando fechado */}
+      {!expanded && messages && messages.length > 0 && (
+        <div style={{padding:'0 14px 10px'}}>
+          <div style={{
+            fontSize:10, color:T.dim, lineHeight:1.5,
+            overflow:'hidden', display:'-webkit-box',
+            WebkitLineClamp:1, WebkitBoxOrient:'vertical'
+          }}>
+            {messages[0]}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// INSIGHTS CAROUSEL — histórico dos últimos 6 treinos com dados do Watch
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function InsightsCarousel({ insights, ac }) {
+  const [expandedIdx, setExpandedIdx] = useState(0); // primeiro expandido por default
+  const [page, setPage]               = useState(0);
+
+  if (!insights || insights.length === 0) return null;
+
+  const total = insights.length;
+
+  return (
+    <div style={{marginBottom:24}}>
+      {/* Título da seção */}
+      <div style={{
+        display:'flex', justifyContent:'space-between', alignItems:'center',
+        marginBottom:10
+      }}>
+        <div style={{fontFamily:T.mono,fontSize:8,letterSpacing:'3px',textTransform:'uppercase',color:T.muted}}>
+          ⚡ INSIGHTS RECENTES
+        </div>
+        <div style={{fontFamily:T.mono,fontSize:8,color:T.muted}}>
+          {page+1} / {total}
+        </div>
+      </div>
+
+      {/* Card atual */}
+      <InsightCard
+        insightData={insights[page]}
+        expanded={expandedIdx === page}
+        onToggle={() => setExpandedIdx(expandedIdx === page ? -1 : page)}
+      />
+
+      {/* Navegação por pontos */}
+      {total > 1 && (
+        <div style={{display:'flex',justifyContent:'center',gap:6,marginTop:10}}>
+          {insights.map((_,i) => (
+            <button
+              key={i}
+              onClick={() => { setPage(i); setExpandedIdx(i); }}
+              style={{
+                width: i===page ? 18 : 6,
+                height:6, borderRadius:3, border:'none', cursor:'pointer',
+                background: i===page ? ac : T.border,
+                padding:0, transition:'all .2s'
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Setas de navegação */}
+      {total > 1 && (
+        <div style={{display:'flex',justifyContent:'space-between',marginTop:8}}>
+          <button
+            onClick={() => { const p = Math.max(0,page-1); setPage(p); setExpandedIdx(p); }}
+            disabled={page===0}
+            style={{
+              fontFamily:T.mono,fontSize:9,letterSpacing:'1px',
+              background:'transparent',border:'none',cursor:page===0?'default':'pointer',
+              color:page===0 ? T.border : T.muted, padding:'4px 0'
+            }}
+          >← anterior</button>
+          <button
+            onClick={() => { const p = Math.min(total-1,page+1); setPage(p); setExpandedIdx(p); }}
+            disabled={page===total-1}
+            style={{
+              fontFamily:T.mono,fontSize:9,letterSpacing:'1px',
+              background:'transparent',border:'none',cursor:page===total-1?'default':'pointer',
+              color:page===total-1 ? T.border : T.muted, padding:'4px 0'
+            }}
+          >próximo →</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function TreinoPage({ profile, state, onSave, savingWk, activeWk, setActiveWk }) {
   const ac = PROFILE_COLORS[profile];
   const wks = profile==='fk' ? FK_WK : JRV_WK;
@@ -1403,9 +1601,14 @@ function TreinoPage({ profile, state, onSave, savingWk, activeWk, setActiveWk })
             {isSaving ? '✓ TREINO SALVO' : '↑ SALVAR TREINO'}
           </button>
           <div style={{textAlign:'center', marginTop:8, fontFamily:T.mono, fontSize:9, color:T.muted}}>
-            Sincroniza automaticamente com a nuvem
+            {isSaving ? 'Encerre o treino no Watch — insights chegam automaticamente' : 'Sincroniza automaticamente com a nuvem'}
           </div>
         </div>
+
+        {/* Carrossel de insights — histórico dos últimos 6 treinos com dados do Watch */}
+        {state.insights && state.insights.length > 0 && (
+          <InsightsCarousel insights={state.insights} ac={ac} />
+        )}
 
         {/* Scientific refs */}
         <div style={{padding:'12px 14px', borderRadius:10, marginBottom:10, background:T.surface, border:`1px solid ${T.border}`}}>
@@ -2018,8 +2221,8 @@ function App() {
   const [loadedProfiles, setLoadedProfiles] = useState(new Set());
   const [activeWk, setActiveWk] = useState(0); // compartilhado entre perfis
   const [state, setState] = useState({
-    fk:  {hist:[],healthkit:[],bodyComp:[],bioHistory:[],metas:null},
-    jrv: {hist:[],healthkit:[],bodyComp:[],bioHistory:[],metas:null},
+    fk:  {hist:[],healthkit:[],bodyComp:[],bioHistory:[],metas:null,insights:[]},
+    jrv: {hist:[],healthkit:[],bodyComp:[],bioHistory:[],metas:null,insights:[]},
   });
 
   // Sync CSS accent color on profile change
@@ -2030,10 +2233,10 @@ function App() {
   async function syncDown(p) {
     setSyncStatus('syncing');
     try {
-      const [wR,hkR,bcR,mR,bhR] = await Promise.all([
+      const [wR,hkR,bcR,mR,bhR,inR] = await Promise.all([
         apiGet('list',p), apiGet('listHealthKit',p),
         apiGet('listBodyComp',p), apiGet('getMetas',p),
-        apiGet('getBioHistory',p),
+        apiGet('getBioHistory',p), apiGet('listInsights',p),
       ]);
       setState(prev => ({...prev, [p]: {
         hist:       wR.ok  ? (wR.data||[]).sort((a,b)=>new Date(b.date)-new Date(a.date)) : prev[p].hist,
@@ -2041,6 +2244,7 @@ function App() {
         bodyComp:   bcR.ok ? bcR.data||[]  : prev[p].bodyComp,
         bioHistory: bhR.ok ? bhR.data||[]  : prev[p].bioHistory,
         metas:      mR.ok  ? mR.data||null : prev[p].metas,
+        insights:   inR.ok ? inR.data||[]  : prev[p].insights,
       }}));
       setSyncStatus('ok');
       setLoadedProfiles(prev => new Set([...prev, p]));
