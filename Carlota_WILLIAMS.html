@@ -1535,20 +1535,54 @@ function CustomExCard({ exIdx, name, sets, obs, onUpdate, onRemove, isOpen, onTo
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function CustomWorkoutBuilder({ profile, onSaveCustom, savingWk, ac }) {
   const STORAGE_KEY  = `cw_${profile}_CUSTOM`;
+  const OTHER        = profile === 'fk' ? 'jrv' : 'fk';
+  const OTHER_KEY    = `cw_${OTHER}_CUSTOM`;
   const ZONE_OPTIONS = ['FORÇA','HIPERTROFIA','METABÓLICO'];
+  const ZONE_INFO    = {
+    'FORÇA':       { reps:'4–6 reps', rest:'2–3 min descanso' },
+    'HIPERTROFIA': { reps:'8–12 reps', rest:'60–90 seg descanso' },
+    'METABÓLICO':  { reps:'15–20 reps', rest:'30–45 seg descanso' },
+  };
 
-  const [exercises, setExercises] = React.useState(() => {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { return []; }
-  });
+  // Carrega do localStorage — suporta formato array (legado) e objeto {exercises, sharedBy}
+  const loadStored = () => {
+    try {
+      const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      return Array.isArray(raw) ? { exercises: raw, sharedBy: null } : raw;
+    } catch(e) { return { exercises: [], sharedBy: null }; }
+  };
+
+  const stored = loadStored();
+  const [exercises,  setExercises]  = React.useState(stored.exercises || []);
+  const [sharedBy,   setSharedBy]   = React.useState(stored.sharedBy  || null);
   const [zone,       setZone]       = React.useState('HIPERTROFIA');
+  const [shared,     setShared]     = React.useState(false);
   const [showSearch, setShowSearch] = React.useState(false);
   const [openExIdx,  setOpenExIdx]  = React.useState(null);
 
   const isSaving = savingWk === `${profile}-CUSTOM`;
+  const zoneInfo = ZONE_INFO[zone];
 
-  const persist = (exs) => {
+  // Persiste no perfil atual; se shared=true, espelha os exercícios no outro perfil
+  const persist = (exs, isShared) => {
     setExercises(exs);
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(exs)); } catch(e) {}
+    if (isShared !== undefined ? isShared : shared) {
+      try {
+        localStorage.setItem(OTHER_KEY, JSON.stringify({
+          exercises: exs,
+          sharedBy:  profile,
+          sharedAt:  new Date().toLocaleString('pt-BR', {timeZone:'America/Sao_Paulo'})
+        }));
+      } catch(e) {}
+    }
+  };
+
+  // Ao ligar compartilhado, espelha imediatamente os exercícios existentes
+  const toggleShared = () => {
+    const next = !shared;
+    setShared(next);
+    if (next && exercises.length > 0) persist(exercises, true);
   };
 
   const addExercise = (name) => {
@@ -1573,11 +1607,8 @@ function CustomWorkoutBuilder({ profile, onSaveCustom, savingWk, ac }) {
 
   const handleSave = () => onSaveCustom(profile, exercises, zone);
 
-  const zc = ZONE_COLORS[zone] || ac;
-
   return (
     <div className="pb-safe">
-      {/* Tab strip placeholder — mantém alinhamento com os outros treinos */}
       <div style={{padding:'16px 16px 0'}}>
         {/* Header */}
         <div style={{marginBottom:20}}>
@@ -1586,8 +1617,22 @@ function CustomWorkoutBuilder({ profile, onSaveCustom, savingWk, ac }) {
           </div>
           <div style={{fontSize:12,color:T.dim,marginBottom:14}}>Treino personalizado do dia</div>
 
+          {/* Aviso de treino compartilhado recebido */}
+          {sharedBy && (
+            <div style={{
+              padding:'8px 12px',borderRadius:8,marginBottom:12,
+              background:'#a3e63510',border:'1px solid #a3e63530',
+              display:'flex',alignItems:'center',gap:8
+            }}>
+              <span style={{fontSize:12}}>🔗</span>
+              <div style={{fontFamily:T.mono,fontSize:9,color:'#a3e635',letterSpacing:'1px'}}>
+                Exercícios compartilhados por {sharedBy.toUpperCase()} · Preencha sua própria carga
+              </div>
+            </div>
+          )}
+
           {/* Zone selector */}
-          <div style={{display:'flex',gap:6,marginBottom:14,flexWrap:'wrap'}}>
+          <div style={{display:'flex',gap:6,marginBottom:8,flexWrap:'wrap'}}>
             {ZONE_OPTIONS.map(z => (
               <button key={z} onClick={() => setZone(z)} style={{
                 padding:'5px 12px',borderRadius:4,fontFamily:T.mono,
@@ -1599,6 +1644,48 @@ function CustomWorkoutBuilder({ profile, onSaveCustom, savingWk, ac }) {
               }}>{z}</button>
             ))}
           </div>
+
+          {/* Zone info — reps e descanso sugeridos */}
+          <div style={{
+            display:'flex',gap:8,marginBottom:14,alignItems:'center'
+          }}>
+            <span style={{
+              fontFamily:T.mono,fontSize:9,padding:'3px 10px',borderRadius:4,
+              background:`${ZONE_COLORS[zone]}12`,color:ZONE_COLORS[zone],
+              border:`1px solid ${ZONE_COLORS[zone]}25`
+            }}>{zoneInfo.reps}</span>
+            <span style={{
+              fontFamily:T.mono,fontSize:9,padding:'3px 10px',borderRadius:4,
+              background:T.surface,color:T.dim,border:`1px solid ${T.border}`
+            }}>⏱ {zoneInfo.rest}</span>
+          </div>
+
+          {/* Toggle compartilhado */}
+          <button onClick={toggleShared} style={{
+            display:'flex',alignItems:'center',gap:8,
+            background:'transparent',border:`1px solid ${shared?'#a3e63540':T.border}`,
+            borderRadius:8,padding:'8px 12px',cursor:'pointer',width:'100%',marginBottom:4
+          }}>
+            <div style={{
+              width:32,height:18,borderRadius:9,transition:'all .2s',position:'relative',
+              background:shared?'#a3e635':'#333',flexShrink:0
+            }}>
+              <div style={{
+                position:'absolute',top:2,left:shared?14:2,
+                width:14,height:14,borderRadius:7,background:'#fff',transition:'all .2s'
+              }}/>
+            </div>
+            <div style={{textAlign:'left'}}>
+              <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:'1px',textTransform:'uppercase',color:shared?'#a3e635':T.muted}}>
+                {shared ? 'Compartilhado com '+OTHER.toUpperCase() : 'Só para mim'}
+              </div>
+              {shared && (
+                <div style={{fontFamily:T.mono,fontSize:8,color:T.muted,marginTop:1}}>
+                  {OTHER.toUpperCase()} verá os exercícios e preencherá a própria carga
+                </div>
+              )}
+            </div>
+          </button>
         </div>
 
         {/* Exercise list */}
@@ -1624,7 +1711,7 @@ function CustomWorkoutBuilder({ profile, onSaveCustom, savingWk, ac }) {
 
         {exercises.length === 0 && (
           <div style={{
-            textAlign:'center',padding:'48px 0 32px',
+            textAlign:'center',padding:'40px 0 28px',
             color:T.muted,fontFamily:T.mono,fontSize:11,lineHeight:1.8
           }}>
             Nenhum exercício adicionado<br/>
@@ -1657,6 +1744,7 @@ function CustomWorkoutBuilder({ profile, onSaveCustom, savingWk, ac }) {
             </button>
             <div style={{textAlign:'center',marginTop:8,fontFamily:T.mono,fontSize:9,color:T.muted}}>
               {exercises.length} exercício{exercises.length!==1?'s':''} · zona {zone}
+              {shared && <span style={{color:'#a3e635',marginLeft:6}}>· compartilhado</span>}
             </div>
           </div>
         )}
