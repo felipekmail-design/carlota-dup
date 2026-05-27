@@ -482,7 +482,16 @@ function ExCard({ ex, profile, wkIdx, exIdx, ac, lastRef, isOpen, onToggle }) {
     setSets(next); save(next, obs);
   };
   const toggleDone = (i) => {
-    const next = sets.map((s,si) => si===i ? {...s, done:!s.done} : s);
+    const next = sets.map((s, si) => {
+      if (si !== i) return s;
+      if (!s.done) {
+        // marcando como feito — preenche campos vazios com o valor do placeholder
+        const phKg   = String(lastRef?.sets?.find(ls => ls.s === i+1)?.kg   || '');
+        const phReps = String(lastRef?.sets?.find(ls => ls.s === i+1)?.reps || ex.rT || '');
+        return { ...s, done: true, kg: s.kg || phKg, reps: s.reps || phReps };
+      }
+      return { ...s, done: false };
+    });
     setSets(next); save(next, obs);
   };
   const clear = () => {
