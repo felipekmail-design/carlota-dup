@@ -2050,6 +2050,7 @@ function TreinoPage({ profile, state, onSave, onSaveCustom, savingWk, activeWk, 
       {/* Tela de montagem do treino personalizado */}
       {isCustom && (
         <CustomWorkoutBuilder
+          key={profile}
           profile={profile}
           state={state}
           onSaveCustom={onSaveCustom}
