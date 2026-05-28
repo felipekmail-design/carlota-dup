@@ -1588,8 +1588,14 @@ function CustomWorkoutBuilder({ profile, state, onSaveCustom, savingWk, ac }) {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(exs)); } catch(e) {}
     if (isShared !== undefined ? isShared : shared) {
       try {
+        // Compartilha só a lista de exercícios — sem cargas/reps/obs do perfil atual
+        const sharedExs = exs.map(ex => ({
+          ...ex,
+          sets: ex.sets.map(() => ({kg:'', reps:'', done:false})),
+          obs: ''
+        }));
         localStorage.setItem(OTHER_KEY, JSON.stringify({
-          exercises: exs,
+          exercises: sharedExs,
           sharedBy:  profile,
           sharedAt:  new Date().toLocaleString('pt-BR', {timeZone:'America/Sao_Paulo'})
         }));
