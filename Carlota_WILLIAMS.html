@@ -1567,7 +1567,19 @@ function CustomWorkoutBuilder({ profile, state, onSaveCustom, savingWk, ac }) {
   const loadStored = () => {
     try {
       const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      return Array.isArray(raw) ? { exercises: raw, sharedBy: null } : raw;
+      if (Array.isArray(raw)) return { exercises: raw, sharedBy: null };
+      // Se veio de outro perfil, limpa cargas/reps/obs ao carregar (cada um preenche o seu)
+      if (raw.sharedBy && raw.sharedBy !== profile) {
+        return {
+          ...raw,
+          exercises: (raw.exercises || []).map(ex => ({
+            ...ex,
+            sets: (ex.sets || []).map(() => ({kg:'', reps:'', done:false})),
+            obs: ''
+          }))
+        };
+      }
+      return raw;
     } catch(e) { return { exercises: [], sharedBy: null }; }
   };
 
