@@ -871,7 +871,7 @@ function ProgPage({ profile, state, onSaveMetas }) {
           const t = latest.syncedAt || '—:—';
           if      (diff === 0) hkLabel = `Hoje · ${t}`;
           else if (diff === 1) hkLabel = `Ontem · ${t}`;
-          else                 hkLabel = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+          else                 hkLabel = `${d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})} · ${t}`;
         }
         return <SLabel>Apple Health · {hkLabel}</SLabel>;
       })()}
