@@ -1587,7 +1587,10 @@ function CustomWorkoutBuilder({ profile, state, onSaveCustom, savingWk, ac }) {
   const [exercises,  setExercises]  = React.useState(stored.exercises || []);
   const [sharedBy,   setSharedBy]   = React.useState(stored.sharedBy  || null);
   const [zone,       setZone]       = React.useState('HIPERTROFIA');
-  const [shared,     setShared]     = React.useState(false);
+  const SHARED_KEY = 'carlota_custom_shared';
+  const [shared, setShared] = React.useState(() => {
+    try { return JSON.parse(localStorage.getItem(SHARED_KEY) ?? 'false'); } catch(e) { return false; }
+  });
   const [showSearch, setShowSearch] = React.useState(false);
   const OPEN_IDX_KEY = 'carlota_custom_openIdx';
   const [openExIdx, setOpenExIdx] = React.useState(() => {
@@ -1627,6 +1630,7 @@ function CustomWorkoutBuilder({ profile, state, onSaveCustom, savingWk, ac }) {
   const toggleShared = () => {
     const next = !shared;
     setShared(next);
+    try { localStorage.setItem(SHARED_KEY, JSON.stringify(next)); } catch(e) {}
     if (next && exercises.length > 0) persist(exercises, true);
   };
 
@@ -1656,7 +1660,14 @@ function CustomWorkoutBuilder({ profile, state, onSaveCustom, savingWk, ac }) {
     });
   };
 
-  const handleSave = () => onSaveCustom(profile, exercises, zone);
+  const handleSave = () => {
+    onSaveCustom(profile, exercises, zone);
+    // Reseta toggle e card aberto ao salvar — próxima sessão começa limpa
+    try {
+      localStorage.removeItem(SHARED_KEY);
+      localStorage.removeItem(OPEN_IDX_KEY);
+    } catch(e) {}
+  };
 
   // Busca última referência de um exercício pelo nome no histórico
   const getLastRef = (name) => {
