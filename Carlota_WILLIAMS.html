@@ -1605,13 +1605,14 @@ function CustomWorkoutBuilder({ profile, state, onSaveCustom, savingWk, ac }) {
   const isSaving = savingWk === `${profile}-CUSTOM`;
   const zoneInfo = ZONE_INFO[zone];
 
-  // Persiste no perfil atual; se shared=true, espelha os exercícios no outro perfil
-  const persist = (exs, isShared) => {
+  // Persiste no perfil atual; syncOther=true apenas quando a lista muda (add/remove/toggle)
+  // Nunca sincronizar ao atualizar kg/reps — cada perfil preenche o seu
+  const persist = (exs, isShared, syncOther = false) => {
     setExercises(exs);
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(exs)); } catch(e) {}
-    if (isShared !== undefined ? isShared : shared) {
+    if (syncOther && (isShared !== undefined ? isShared : shared)) {
       try {
-        // Compartilha só a lista de exercícios — sem cargas/reps/obs do perfil atual
+        // Compartilha só a estrutura — sem cargas/reps/obs do perfil atual
         const sharedExs = exs.map(ex => ({
           ...ex,
           sets: ex.sets.map(() => ({kg:'', reps:'', done:false})),
@@ -1631,7 +1632,7 @@ function CustomWorkoutBuilder({ profile, state, onSaveCustom, savingWk, ac }) {
     const next = !shared;
     setShared(next);
     try { localStorage.setItem(SHARED_KEY, JSON.stringify(next)); } catch(e) {}
-    if (next && exercises.length > 0) persist(exercises, true);
+    if (next && exercises.length > 0) persist(exercises, true, true);
   };
 
   const addExercise = (name) => {
@@ -1641,7 +1642,7 @@ function CustomWorkoutBuilder({ profile, state, onSaveCustom, savingWk, ac }) {
       obs: ''
     };
     const next = [...exercises, newEx];
-    persist(next);
+    persist(next, undefined, true);
     const newIdx = next.length - 1;
     setOpenExIdx(newIdx);
     try { localStorage.setItem(OPEN_IDX_KEY, JSON.stringify(newIdx)); } catch(e) {}
@@ -1652,7 +1653,7 @@ function CustomWorkoutBuilder({ profile, state, onSaveCustom, savingWk, ac }) {
     persist(exercises.map((ex,ei) => ei===i ? {...ex,sets,obs} : ex));
 
   const removeExercise = (i) => {
-    persist(exercises.filter((_,ei) => ei!==i));
+    persist(exercises.filter((_,ei) => ei!==i), undefined, true);
     setOpenExIdx(idx => {
       const next = idx===i ? null : idx>i ? idx-1 : idx;
       try { localStorage.setItem(OPEN_IDX_KEY, JSON.stringify(next)); } catch(e) {}
