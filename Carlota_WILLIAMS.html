@@ -1600,12 +1600,12 @@ function CustomWorkoutBuilder({ profile, state, onSaveCustom, savingWk, ac }) {
   const [zone,       setZone]       = React.useState('HIPERTROFIA');
   const SHARED_KEY = 'carlota_custom_shared';
   const [shared, setShared] = React.useState(() => {
-    try { return JSON.parse(localStorage.getItem(SHARED_KEY) ?? 'false'); } catch(e) { return false; }
+    try { return JSON.parse(localStorage.getItem(SHARED_KEY) || 'false'); } catch(e) { return false; }
   });
   const [showSearch, setShowSearch] = React.useState(false);
   const OPEN_IDX_KEY = 'carlota_custom_openIdx';
   const [openExIdx, setOpenExIdx] = React.useState(() => {
-    try { return JSON.parse(localStorage.getItem(OPEN_IDX_KEY) ?? 'null'); } catch(e) { return null; }
+    try { return JSON.parse(localStorage.getItem(OPEN_IDX_KEY) || 'null'); } catch(e) { return null; }
   });
   const toggleOpen = (i) => {
     const next = openExIdx === i ? null : i;
