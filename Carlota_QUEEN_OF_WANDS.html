@@ -193,8 +193,10 @@ async function apiPost(body) {
   try {
     const params = new URLSearchParams({ payload: JSON.stringify(body) });
     const r = await fetch(`${API_URL}?${params}`);
-    return await r.json();
-  } catch(e) { return {ok:false}; }
+    if (!r.ok) return { ok:false, error:`HTTP ${r.status}` };
+    const json = await r.json();
+    return (json && typeof json.ok !== 'undefined') ? json : { ok:true, ...json };
+  } catch(e) { return { ok:false, error: (e && e.message) || String(e) }; }
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -3098,7 +3100,16 @@ function App() {
       id: Date.now(), wkId:wk.id, title:wk.title,
       zone:wk.zone, zc:ac, date:new Date().toISOString(), exercises:exData
     };
-    await apiPost({action:'saveWorkout', profile:p, workout:entry});
+    const res = await apiPost({action:'saveWorkout', profile:p, workout:entry});
+
+    if (!res || res.ok === false) {
+      // Falha real no salvamento — não atualiza o histórico local nem apaga os rascunhos,
+      // pra não perder o treino que a pessoa acabou de registrar.
+      setSavingWk(null);
+      alert('Não foi possível salvar o treino na planilha. Seus dados continuam salvos neste aparelho — tente salvar de novo em instantes.' + (res && res.error ? `\n\nErro: ${res.error}` : ''));
+      return;
+    }
+
     setState(prev => ({...prev, [p]: {...prev[p], hist:[entry,...prev[p].hist]}}));
 
     setTimeout(() => {
